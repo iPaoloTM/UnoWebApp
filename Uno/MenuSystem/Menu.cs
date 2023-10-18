@@ -81,6 +81,7 @@ public class Menu
                     // TODO:  handle result - b,x,r
                     
                 }
+                
                 else if (MenuItems[userChoice!.ToLower()].MethodToRun != null)
                 {
                     var result = MenuItems[userChoice!.ToLower()].MethodToRun!();
