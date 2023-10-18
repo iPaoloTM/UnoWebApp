@@ -4,9 +4,9 @@ using Domain;
 
 namespace DurakEngine;
 
-public class GameEngine<TKey>
+public class GameEngine<TKey, TKey>
 {
-    public IGameRepository<TKey> GameRepository { get; set; }
+    public IGameRepository<TKey, TKey> GameRepository { get; set; }
 
     public GameState State { get; set; } = new GameState();
     
@@ -14,7 +14,7 @@ public class GameEngine<TKey>
     private const int InitialHandSize = 6;
     private Random rnd { get; set; } = new Random();
 
-    public GameEngine(IGameRepository<TKey> repository)
+    public GameEngine(IGameRepository<TKey, TKey> repository)
     {
         InitializeFullDeck();
         GameRepository = repository;

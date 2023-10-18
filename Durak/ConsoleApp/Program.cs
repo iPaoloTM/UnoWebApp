@@ -1,19 +1,16 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using DAL;
-using Domain;
-using DurakEngine;
 using MenuSystem;
 
-var gameRepository = new GameRepositoryFileSystem();
-var game = new GameEngine<string, string>(gameRepository);
+//var game = new GameEngine<string, string>();
 
 string? SetPlayerCount()
 {
     Console.Write("Player count?");
     var countStr = Console.ReadLine()?.Trim();
     var count = int.Parse(countStr);
-
+    
+    /**
     game.Players = new List<Player>();
     for (int i = 0; i < count; i++)
     {
@@ -22,7 +19,7 @@ string? SetPlayerCount()
             NickName   = "Human " + i,
             PlayerType = EPlayerType.Human,
         });
-    }
+    }*/
     return null;
 }
 
@@ -35,7 +32,7 @@ string? runNewGameMenu()
             new MenuItem()
             {
                 Shortcut = "c",
-                MenuLabel = "Player count: " + game.Players.Count,
+                MenuLabel = "Player count: ",
                 MethodToRun = SetPlayerCount
             },
             new MenuItem()
@@ -46,7 +43,7 @@ string? runNewGameMenu()
             new MenuItem()
             {
                 Shortcut = "s",
-                MenuLabel = "Start the game of DURAK",
+                MenuLabel = "Start the game of UNO",
             },
         }
     );
@@ -55,7 +52,7 @@ string? runNewGameMenu()
     return startNewGameMenu.Run(EMenuLevel.Second);
 }
 
-var mainMenu = new Menu(">> D U R A K <<", new List<MenuItem>()
+var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
 {
     new MenuItem()
     {
