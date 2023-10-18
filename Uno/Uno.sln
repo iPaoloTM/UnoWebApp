@@ -11,6 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "!Solution Items", "!Solutio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MenuSystem", "MenuSystem\MenuSystem.csproj", "{08D6B3D4-F214-4E93-A048-99F4DCBD7EA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoEngine", "UnoEngine\UnoEngine.csproj", "{D8902B48-68BC-4E62-B0C4-A664219ED125}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{D37559B0-421F-4636-93BE-EADFEA3F269D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +29,13 @@ Global
 		{08D6B3D4-F214-4E93-A048-99F4DCBD7EA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08D6B3D4-F214-4E93-A048-99F4DCBD7EA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08D6B3D4-F214-4E93-A048-99F4DCBD7EA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8902B48-68BC-4E62-B0C4-A664219ED125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8902B48-68BC-4E62-B0C4-A664219ED125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8902B48-68BC-4E62-B0C4-A664219ED125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8902B48-68BC-4E62-B0C4-A664219ED125}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
