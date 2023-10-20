@@ -9,4 +9,5 @@ public class Player
     public EPlayerType PlayerTipe { get; set; }
 
     public List<Card> Deck { get; set; } = new List<Card>();
+    
 }
