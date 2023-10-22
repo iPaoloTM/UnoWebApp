@@ -107,7 +107,7 @@ public class CardDeck
         //TODO
     }
 
-    public void Draw()
+    public List<Card> Draw(int numberOfCards)
     {
         //TODO
     }
