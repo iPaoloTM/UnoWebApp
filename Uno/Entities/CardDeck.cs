@@ -104,11 +104,11 @@ public class CardDeck
 
     public void Shuffle()
     {
-        //TODO
+        //TODO Paolo
     }
 
     public void Draw()
     {
-        //TODO
+        //TODO Michal 
     }
 }

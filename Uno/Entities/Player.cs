@@ -22,7 +22,7 @@ public class Player
 
     public PlayerTurn DrawCard()
     {
-        //TODO - Michal
+
     }
     
     public void DisplayTurn()
