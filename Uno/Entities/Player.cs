@@ -20,9 +20,24 @@ public class Player
         //TODO - Kata
     }
 
-    public PlayerTurn DrawCard()
-    {
-        //TODO - Michal
+    public PlayerTurn DrawCard(PlayerTurn previousTurn, CardDeck cardDeck)
+    { 
+        PlayerTurn turn = new PlayerTurn();
+        var drawnCard = cardDeck.Draw(1);
+        Deck.AddRange(drawnCard); //what if CardDeck will be empty? call function that will create new shuffled deck.
+        
+        if (HasMatch(previousTurn.Card))
+        {
+        turn = PlayMatchingCard(previousTurn.Card);
+        turn.Result = TurnResult.ForceDrawPlay; //enum TurnResult was created by Kata in katbranch
+        }
+        else
+        {
+        turn.Result = TurnResult.ForceDraw; //enum TurnResult was created by Kata in katbranch
+        turn.Card = previousTurn.Card;
+        }
+        
+        return turn;
     }
     
     public void DisplayTurn()
@@ -41,7 +56,7 @@ public class Player
 
     }
 
-    private PlayerTurn PlayMatchingCard()
+    private PlayerTurn PlayMatchingCard(Card currentDiscard)
     {
         //TODO - Michal
     }

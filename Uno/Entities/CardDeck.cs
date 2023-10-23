@@ -107,7 +107,7 @@ public class CardDeck
         //TODO Poalo
     }
 
-    public List<Card> Draw(int count)
+    public List<Card>? Draw(int count) //thing about this nullable reference
     {
         var drawnCards = Cards.Take(count).ToList();
         Cards.RemoveAll(x => drawnCards.Contains(x));
