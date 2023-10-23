@@ -104,11 +104,13 @@ public class CardDeck
 
     public void Shuffle()
     {
-        //TODO
+        //TODO Poalo
     }
 
-    public void Draw()
+    public List<Card> Draw(int count)
     {
-        //TODO
+        var drawnCards = Cards.Take(count).ToList();
+        Cards.RemoveAll(x => drawnCards.Contains(x));
+        return drawnCards;
     }
 }
