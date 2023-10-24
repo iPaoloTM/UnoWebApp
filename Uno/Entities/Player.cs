@@ -258,48 +258,48 @@ public class Player
             return turn;
     }
             
-      private PlayerTurn PlayMatchingCard(CardColor color)
+      private PlayerTurn PlayMatchingCard(EColors color)
         {
             var turn = new PlayerTurn();
-            turn.Result = TurnResult.PlayedCard;
-            var matching = Deck.Where(x => x.Color == color || x.Color == CardColor.Wild).ToList();
+            turn.Result = ETurnResult.PlayedCard;
+            var matching = Deck.Where(x => x.Color == color || x.Color == EColors.Black).ToList();
 
             //We cannot play wild draw four unless there are no other matches.
-            if (matching.All(x => x.Value == CardValue.DrawFour))
+            if (matching.All(x => x.Value == EEffect.DrawFour))
             {
                 turn.Card = matching.First();
                 turn.DeclaredColor = SelectDominantColor();
-                turn.Result = TurnResult.WildCard;
+                turn.Result = ETurnResult.WildCard;
                 Deck.Remove(matching.First());
 
                 return turn;
             }
 
             //Otherwise, we play the card that would cause the most damage to the next player.
-            if (matching.Any(x => x.Value == CardValue.DrawTwo))
+            if (matching.Any(x => x.Value == EEffect.DrawTwo))
             {
-                turn.Card = matching.First(x => x.Value == CardValue.DrawTwo);
-                turn.Result = TurnResult.DrawTwo;
+                turn.Card = matching.First(x => x.Value == EEffect.DrawTwo);
+                turn.Result = ETurnResult.DrawTwo;
                 turn.DeclaredColor = turn.Card.Color;
                 Deck.Remove(turn.Card);
 
                 return turn;
             }
 
-            if (matching.Any(x => x.Value == CardValue.Skip))
+            if (matching.Any(x => x.Value == EEffect.Skip))
             {
-                turn.Card = matching.First(x => x.Value == CardValue.Skip);
-                turn.Result = TurnResult.Skip;
+                turn.Card = matching.First(x => x.Value == EEffect.Skip);
+                turn.Result = ETurnResult.Skip;
                 turn.DeclaredColor = turn.Card.Color;
                 Deck.Remove(turn.Card);
 
                 return turn;
             }
 
-            if (matching.Any(x => x.Value == CardValue.Reverse))
+            if (matching.Any(x => x.Value == EEffect.Reverse))
             {
-                turn.Card = matching.First(x => x.Value == CardValue.Reverse);
-                turn.Result = TurnResult.Reversed;
+                turn.Card = matching.First(x => x.Value == EEffect.Reverse);
+                turn.Result = ETurnResult.Reversed;
                 turn.DeclaredColor = turn.Card.Color;
                 Deck.Remove(turn.Card);
 
@@ -316,18 +316,18 @@ public class Player
                 return turn;
             }
 
-            if (matching.Any(x => x.Value == CardValue.Wild))
+            if (matching.Any(x => x.Value == EEffect.Wild))
             {
-                turn.Card = matching.First(x => x.Value == CardValue.Wild);
+                turn.Card = matching.First(x => x.Value == EEffect.Wild);
                 turn.DeclaredColor = SelectDominantColor();
-                turn.Result = TurnResult.WildCard;
+                turn.Result = ETurnResult.WildCard;
                 Deck.Remove(turn.Card);
 
                 return turn;
             }
 
             //This should never happen
-            turn.Result = TurnResult.ForceDraw;
+            turn.Result = ETurnResult.ForcedDraw;
             return turn;
         }
 
