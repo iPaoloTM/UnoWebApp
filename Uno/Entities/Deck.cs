@@ -68,11 +68,5 @@ public abstract class Deck
 
 
     }
-
-
-    public void Draw()
-    {
-        //TODO Michal 
-    }
     
 }

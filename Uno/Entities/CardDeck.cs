@@ -1,6 +1,6 @@
 namespace Entities;
 
-public class CardDeck
+public class CardDeck : Deck
 {
     public List<Card> Cards { get; set; }
 
@@ -100,11 +100,6 @@ public class CardDeck
     public CardDeck(List<Card> cards)
     {
         Cards = cards;
-    }
-
-    public void Shuffle()
-    {
-        //TODO Poalo
     }
 
     public List<Card>? Draw(int count) //thing about this nullable reference
