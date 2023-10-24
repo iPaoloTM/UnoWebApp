@@ -242,11 +242,11 @@ public class Player
             return turn;
         }
 
-        private CardColor SelectDominantColor()
+        private EColors SelectDominantColor()
         {
             if (!Deck.Any())
             {
-                return CardColor.Wild;
+                return EColors.Black;
             }
             var colors = Deck.GroupBy(x => x.Color).OrderByDescending(x => x.Count());
             return colors.First().First().Color;
