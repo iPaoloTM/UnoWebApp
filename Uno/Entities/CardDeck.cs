@@ -2,7 +2,7 @@ namespace Entities;
 
 public class CardDeck
 {
-    private List<Card> Cards { get; set; }
+    public List<Card> Cards { get; set; }
 
     public CardDeck()
     {
