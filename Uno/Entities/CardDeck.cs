@@ -1,8 +1,8 @@
 namespace Entities;
 
-public class CardDeck : Deck
+public class CardDeck
 {
-    
+    public List<Card> Cards { get; set; }
 
     public CardDeck()
     {
@@ -96,9 +96,19 @@ public class CardDeck : Deck
         }
         Cards = gameDeck;
     }
-    
+
     public CardDeck(List<Card> cards)
     {
         Cards = cards;
+    }
+
+    public void Shuffle()
+    {
+        //TODO
+    }
+
+    public List<Card> Draw(int numberOfCards)
+    {
+        //TODO
     }
 }
