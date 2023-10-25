@@ -5,7 +5,7 @@ using Entities;
 
 namespace UnoEngine;
 
-public class UnoEngine //i removed <TKEY> 
+public  sealed class UnoEngine //i removed <TKEY> 
 {
     
     public GameState State { get; set; } = new GameState();
