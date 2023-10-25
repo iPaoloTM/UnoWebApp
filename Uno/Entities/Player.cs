@@ -11,11 +11,11 @@ public class Player
 
     public List<Card> Hand { get; set; } = new List<Card>();
 
-    public String? reaction { get; set; } = null;
+    public String? Reaction { get; set; } = null;
 
     public Player()
     {
-        Deck = new List<Card>();
+        this.Hand = new List<Card>();
     }
 
     public PlayerTurn PlayTurn(PlayerTurn previousTurn, CardDeck pileOfCards)
@@ -341,5 +341,25 @@ public class Player
             }
             var colors = Deck.GroupBy(x => x.Color).OrderByDescending(x => x.Count());
             return colors.First().First().Color;
+            
+        }
+
+        public string getPlayerHand()
+        {
+            string res = "";
+
+            foreach (Card c in this.Hand)
+            {
+                res += c.ToString() + ",";
+
+            }
+
+            return res;
+        }
+        
+        public override string ToString()
+        {
+            return "{\"Nickname\":\"" + this.Nickname + "\", \"Position\": " + this.Position + ", \"Hand\":[" +
+                   this.getPlayerHand() + "], \"Reaction\": \"" + this.Reaction + "\"}";
         }
 }

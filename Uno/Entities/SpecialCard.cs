@@ -6,6 +6,6 @@ public class SpecialCard : Card
     
     public override string ToString()
     {
-        return "\"CardType\":\"Special\", \"Color\": \""+this.Color+"\", \"Effect\": \""+this.Effect+"\"";
+        return "{\"CardType\":\"Special\", \"Color\": \""+this.Color+"\", \"Effect\": \""+this.Effect+"\"}";
     }
 }

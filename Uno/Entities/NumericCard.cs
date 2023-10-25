@@ -6,7 +6,7 @@ public class NumericCard : Card
     
     public override string ToString()
     {
-        return "\"CardType\":\"Numeric\", \"Color\": \""+this.Color+"\", \"Number\": \""+this.Number+"\"";
+        return "{\"CardType\":\"Numeric\", \"Color\": \""+this.Color+"\", \"Number\": \""+this.Number+"\"}";
     }
     
 }

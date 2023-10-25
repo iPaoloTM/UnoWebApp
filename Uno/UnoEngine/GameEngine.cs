@@ -88,9 +88,43 @@ public class UnoEngine //i removed <TKEY>
 
         try
         {
-           
+            string GameState = "{\"CardDeck\":[";
 
-            string jsonGameState = JsonSerializer.Serialize(this.GameState);
+            //include GameDeck's cards
+
+            foreach (Card c in this.GameState.GameDeck.Cards)
+            {
+                GameState += c.ToString() + ",";
+            }
+
+            GameState += "], \"UsedDeck\":[";
+            
+            //include UsedDeck's cards
+
+            foreach (Card c in this.GameState.UsedDeck.Cards)
+            {
+                GameState += c.ToString() + ",";
+            }
+            
+            GameState += "], \"Players\":[";
+            
+            //include Player hand's cards
+            
+            foreach (Player p in this.GameState.Players)
+            {
+                GameState += p.ToString() + ",";
+            }
+
+            GameState += "],";
+            
+            //include utilities info
+
+            GameState += "\"ActivePlayerNo\":"+this.GameState.ActivePlayerNo+"\"CurrentRoundNo\":" + this.GameState.CurrentRoundNo + "";
+            
+            GameState += "}";
+            
+
+            string jsonGameState = JsonSerializer.Serialize(GameState);
 
 
             File.WriteAllText(filePath, jsonGameState);
