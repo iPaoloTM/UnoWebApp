@@ -1,7 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Net.NetworkInformation;
+
+namespace Entities;
 using Entities;
+
+
 
 public class Player
 {
@@ -9,15 +13,18 @@ public class Player
     public int Position { get; set; } = default!;
     public EPlayerType PlayerTipe { get; set; }
 
-    public List<Card> Hand { get; set; } = new List<Card>();
+    public List<Card> Hand { get; set; } =  new List<Card>();
 
     public String? Reaction { get; set; } = null;
 
-    public Player()
-    {
-        this.Hand = new List<Card>();
-    }
+    public UnoEngine GameManager = new UnoEngine().GetInstance();
 
+    public Player(string nickname = "player")
+    {
+        Nickname = nickname;
+        Hand = new List<Card>();
+    }
+/*
     public PlayerTurn PlayTurn(PlayerTurn previousTurn, CardHand pileOfCards)
     {
         //TODO - Kata
@@ -106,7 +113,8 @@ public class Player
             Console.WriteLine("Player shouts UNO but WE NEED TO THINK ABOUT IT!!!!!!!!!!!");
         }
     }
-    
+    */
+    /*
     public PlayerTurn ProcessAttack( Card currentCard, CardHand pileOfCards)
     {
         //TODO - Kata
@@ -141,7 +149,8 @@ public class Player
 
         return turn;
     }
-
+    */
+/*
     private bool HasMatch(Card card)
     {
         //refactor of Cards.cs and SpecialCards.cs and NumericCard.cs or create function for both of them.
@@ -149,7 +158,8 @@ public class Player
         //possibility control the match just by color input and check matching colorsHas
         return Hand.Any(x => x.Color == card.Color || x.Number == card.Number|| x.Color == EColors.Black);
     }
-
+    */
+/*
     private PlayerTurn PlayMatchingCard(Card currentDiscard)
     {
         var turn = new PlayerTurn();
@@ -259,7 +269,8 @@ public class Player
 
             return turn;
     }
-            
+    */
+     /*       
       private PlayerTurn PlayMatchingCard(EColors color)
         {
             var turn = new PlayerTurn();
@@ -329,22 +340,24 @@ public class Player
             }
 
             //This should never happen
-            turn.Result = ETurnResult.ForceDraw;
+            turn.Result = ETurnResult.ForcedDraw;
             return turn;
         }
+      */
 
-        private EColors SelectDominantColor()
+        public EColors SelectDominantColor()
         {
             if (!Hand.Any())
             {
                 return EColors.Black;
             }
+            //this function needs to be modified
             var colors = Hand.GroupBy(x => x.Color).OrderByDescending(x => x.Count());
             return colors.First().First().Color;
             
         }
 
-        public string getPlayerHand()
+        public string GetPlayerHand()
         {
             string res = "";
 
@@ -360,6 +373,65 @@ public class Player
         public override string ToString()
         {
             return "{\"Nickname\":\"" + this.Nickname + "\", \"Position\": " + this.Position + ", \"Hand\":[" +
-                   this.getPlayerHand() + "], \"Reaction\": \"" + this.Reaction + "\"}";
+                   this.GetPlayerHand() + "], \"Reaction\": \"" + this.Reaction + "\"}";
         }
+
+        public void MakeChoice()
+        {
+            var decision = MakeDecision();
+            switch (decision)
+            {
+                case EPlayerAction.PlayCard:
+                    var chosenCard = ChooseCard();
+                    PlayCard(chosenCard);
+                    break;
+                case EPlayerAction.Draw:
+                    Draw();
+                    break;
+                case EPlayerAction.NextPlayer:
+                    NextPlayer();
+                    break;
+                case EPlayerAction.Shout:
+                    Shout();
+                    break;
+                default:
+                    throw new Exception("handling exception");
+            }
+                
+        }
+
+        public EPlayerAction MakeDecision()
+        {
+            //it is a function to make decision on the menu and send it to makechoice function, maybe it's more logical to put everything into makechoice function but idk ://
+            //need to think about it
+            return EPlayerAction.Shout;
+        }
+
+        public Card ChooseCard()
+        {
+            //it is a function that chooses the card to put for a player
+            //need to think about it
+            return new NumericCard();
+        }
+        
+        public void PlayCard(Card card)
+        {
+            gameEngine.HandlePlayerAction(this, EPlayerAction.PlayCard, card);
+        }
+
+        public void Draw()
+        {
+            gameEngine.HandlePlayerAction(this, EPlayerAction.Draw, Hand);
+        }
+    
+        public void NextPlayer()
+        {
+            gameEngine.HandlePlayerAction(this, EPlayerAction.NextPlayer);
+        }
+
+        public void Shout()
+        {
+            gameEngine.HandlePlayerAction(this, EPlayerAction.Shout, null);
+        }
+
 }
