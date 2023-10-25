@@ -49,7 +49,7 @@ public class Player
     { 
         PlayerTurn turn = new PlayerTurn();
         var drawnCard = cardHand.Draw(1);
-        Entities.Hand.AddRange(drawnCard); //what if CardDeck will be empty? call function that will create new shuffled deck
+        Hand.AddRange(drawnCard); //what if CardDeck will be empty? call function that will create new shuffled deck
                                   //or shouldnt allow to return null CardDeck? 
         
         if (HasMatch(previousTurn.Card))
@@ -100,7 +100,7 @@ public class Player
             }
         }
 
-        if (Entities.Hand.Count == 1)
+        if (Hand.Count == 1)
         {
             //TODO - think about shouting UNO logic
             Console.WriteLine("Player shouts UNO but WE NEED TO THINK ABOUT IT!!!!!!!!!!!");
@@ -125,12 +125,12 @@ public class Player
             else if(specialCard.Effect == EEffect.DrawTwo)
             {
                 Console.WriteLine("Player  must draw two cards!");
-                Entities.Hand.AddRange(pileOfCards.Draw(2));
+                Hand.AddRange(pileOfCards.Draw(2));
             }
             else if(specialCard.Effect == EEffect.DrawFour)
             {
                 Console.WriteLine("Player  must draw four cards!");
-                Entities.Hand.AddRange(pileOfCards.Draw(4));
+                Hand.AddRange(pileOfCards.Draw(4));
             }
         }
         else
@@ -147,7 +147,7 @@ public class Player
         //refactor of Cards.cs and SpecialCards.cs and NumericCard.cs or create function for both of them.
         // here is also matching by color or number(value).
         //possibility control the match just by color input and check matching colorsHas
-        return Entities.Hand.Any(x => x.Color == card.Color || x.Number == card.Number|| x.Color == EColors.Black);
+        return Hand.Any(x => x.Color == card.Color || x.Number == card.Number|| x.Color == EColors.Black);
     }
 
     private PlayerTurn PlayMatchingCard(Card currentDiscard)
