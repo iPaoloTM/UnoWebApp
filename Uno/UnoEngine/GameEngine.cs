@@ -15,8 +15,8 @@ public class UnoEngine //i removed <TKEY>
     
     public GameState State { get; set; } = new GameState();
     public List<Player> Players { get; set; } = new List<Player>();
-    public CardDeck CardDeck { get; set; } = new CardDeck();
-    public CardDeck UsedDeck { get; set; } = new CardDeck();
+    public CardHand CardHand { get; set; } = new CardHand();
+    public CardHand UsedHand { get; set; } = new CardHand();
 
     public int ActivePlayerNo, CurrentRoundNo;
     
@@ -28,7 +28,7 @@ public class UnoEngine //i removed <TKEY>
     {
         this.GameState = new GameState();
         
-        CardDeck.Shuffle();
+        CardHand.Shuffle();
         for (int i = 0; i < numberOfPlayers; i++)
         {
             Players.Add(new Player()
@@ -43,18 +43,18 @@ public class UnoEngine //i removed <TKEY>
         {
             for(int i = 0; i < numberOfPlayers; i ++)
             {
-                Players[i].Hand.Add(CardDeck.Cards.First());
-                CardDeck.Cards.RemoveAt(0);
+                Players[i].Hand.Add(CardHand.Cards.First());
+                CardHand.Cards.RemoveAt(0);
                 dealtCards++;
             }
         }
-        UsedDeck.Add(CardDeck.Cards.First());
-        UsedDeck.Cards.RemoveAt(0);
+        UsedHand.Add(CardHand.Cards.First());
+        UsedHand.Cards.RemoveAt(0);
   
-        while(UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+        while(UsedHand.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
         {
-            UsedDeck.Insert(0, CardDeck.Cards.First());
-            UsedDeck.Cards.RemoveAt(0);
+            UsedHand.Insert(0, CardHand.Cards.First());
+            UsedHand.Cards.RemoveAt(0);
         }
         
     }
@@ -68,9 +68,9 @@ public class UnoEngine //i removed <TKEY>
     {
         Console.Write("Saving Game State...");
 
-        this.GameState.GameDeck = this.CardDeck;
+        this.GameState.GameHand = this.CardHand;
 
-        this.GameState.UsedDeck = this.UsedDeck;
+        this.GameState.UsedHand = this.UsedHand;
 
         this.GameState.Players = this.Players;
 
@@ -92,7 +92,7 @@ public class UnoEngine //i removed <TKEY>
 
             //include GameDeck's cards
 
-            foreach (Card c in this.GameState.GameDeck.Cards)
+            foreach (Card c in this.GameState.GameHand.Cards)
             {
                 GameState += c.ToString() + ",";
             }
@@ -101,7 +101,7 @@ public class UnoEngine //i removed <TKEY>
             
             //include UsedDeck's cards
 
-            foreach (Card c in this.GameState.UsedDeck.Cards)
+            foreach (Card c in this.GameState.UsedHand.Cards)
             {
                 GameState += c.ToString() + ",";
             }

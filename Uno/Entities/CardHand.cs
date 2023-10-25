@@ -1,10 +1,10 @@
 namespace Entities;
 
-public class CardDeck : Deck
+public class CardHand : Hand
 {
     public List<Card> Cards { get; set; }
 
-    public CardDeck()
+    public CardHand()
     {
         //Initialize Numeric Cards 
         EColors color;
@@ -97,7 +97,7 @@ public class CardDeck : Deck
         Cards = gameDeck;
     }
 
-    public CardDeck(List<Card> cards)
+    public CardHand(List<Card> cards)
     {
         Cards = cards;
     }

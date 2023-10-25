@@ -1,6 +1,6 @@
 namespace Entities;
 
-public class UsedDeck : Deck
+public class UsedHand : Hand
 {
     
 }

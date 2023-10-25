@@ -1,13 +1,13 @@
 namespace Entities;
 
-public abstract class Deck
+public abstract class Hand
 {
     
 
     protected List<Card> Cards { get; set; }
     private Random rnd { get; set; } = new Random();
     
-    public Deck()
+    public Hand()
     {
         this.Cards = new List<Card>();
     }
