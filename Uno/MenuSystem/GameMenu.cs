@@ -8,37 +8,48 @@ public class GameMenu
 {
     public GameMenu(UnoEngine game)
     {
-        this.game = game;
+        this.Game = game;
         
     }
 
-    public UnoEngine game { get; set; }
+    public UnoEngine Game { get; set; }
 
     public void Draw()
     {
         //Display whose turn it is
-        Console.WriteLine("Player nr. " + game.State.ActivePlayerNo + "'s turn");
+        Console.WriteLine("Player nr. " + Game.State.ActivePlayerNo + "'s turn");
         Console.WriteLine("================================================");
 
         //Print the number of cards each player has
-        foreach (Player plyr in game.Players)
+        foreach (Player plyr in Game.Players)
         {
             Console.Write(plyr.Nickname + " - ");
             foreach (Card c in plyr.Deck)
             {
+                //Print a # for each card
                 Console.Write("#");
             }
             Console.WriteLine();
         }
         
-        //TODO: Print info about current player cards
-        //How to access the player who is playing right now?
-        //  ActivePlayerNo --> Type INT --> Cant get cards
-        //foreach (Card c in game.State.)
+        
+        //Print card information of current player
+        foreach (Card c in Game.Players[Game.State.ActivePlayerNo].Deck)
+        {
+            if (c is NumericCard)
+            {
+                NumericCard nc = (NumericCard)c;
+                Console.Write(nc.Color+" "+nc.Number +", ");
+            } else if (c is SpecialCard)
+            {
+                SpecialCard nc = (SpecialCard)c;
+                Console.Write(nc.Color+" "+nc.Effect +", ");
+            }
+        }
         
         Console.WriteLine();
         
-        //PlayGame function goes here?
+        //PlayGame function goes here
     }
     
 }
