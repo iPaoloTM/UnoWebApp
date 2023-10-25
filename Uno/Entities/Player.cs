@@ -11,6 +11,8 @@ public class Player
 
     public List<Card> Hand { get; set; } = new List<Card>();
 
+    public String? reaction { get; set; } = null;
+
     public Player()
     {
         Deck = new List<Card>();

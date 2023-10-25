@@ -2,6 +2,11 @@
 
 using System.Drawing;
 using Entities;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace UnoEngine;
 
@@ -77,10 +82,27 @@ public class UnoEngine //i removed <TKEY>
         Console.Write("Game State saved!");
     }
 
-    public void ExportJSON()
+    public void ExportJSON(string filePath)
     {
-        
+        Console.Write("Exporting Game State to JSON...");
+
+        try
+        {
+           
+
+            string jsonGameState = JsonSerializer.Serialize(this.GameState);
+
+
+            File.WriteAllText(filePath, jsonGameState);
+
+            Console.WriteLine("Game State exported to JSON successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error exporting game state to JSON: " + ex.Message);
+        }
     }
+
 
 
     
