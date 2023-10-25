@@ -55,11 +55,11 @@ public class Player
         if (HasMatch(previousTurn.Card))
         {
         turn = PlayMatchingCard(previousTurn.Card);
-        turn.Result = TurnResult.ForceDrawPlay; //enum TurnResult was created by Kata in katbranch
+        turn.Result = ETurnResult.ForcedDrawPlay; //enum TurnResult was created by Kata in katbranch
         }
         else
         {
-        turn.Result = TurnResult.ForceDraw; //enum TurnResult was created by Kata in katbranch
+        turn.Result = ETurnResult.ForcedDraw; //enum TurnResult was created by Kata in katbranch
         turn.Card = previousTurn.Card;
         }
         
@@ -153,7 +153,7 @@ public class Player
     private PlayerTurn PlayMatchingCard(Card currentDiscard)
     {
         var turn = new PlayerTurn();
-            turn.Result = TurnResult.PlayedCard; //enum by kata
+            turn.Result = ETurnResult.PlayedCard; //enum by kata
             //refactor of Cards.cs and SpecialCards.cs and NumericCard.cs or create function for both of them.
             var matching = Hand.Where(x =>
                     x.Color == currentDiscard.Color || x.Value == currentDiscard.Value || x.Color == EColors.Black)
@@ -164,7 +164,7 @@ public class Player
             {
                 turn.Card = matching.First();
                 turn.DeclaredColor = SelectDominantColor();
-                turn.Result = TurnResult.WildCard;
+                turn.Result = ETurnResult.WildCard;
                 Hand.Remove(matching.First());
 
                 return turn;
@@ -174,7 +174,7 @@ public class Player
             if(matching.Any(x=> x.Value == CardValue.DrawTwo))
             {
                 turn.Card = matching.First(x => x.Value == CardValue.DrawTwo);
-                turn.Result = TurnResult.DrawTwo;
+                turn.Result = ETurnResult.DrawTwo;
                 turn.DeclaredColor = turn.Card.Color;
                 Hand.Remove(turn.Card);
 
@@ -184,7 +184,7 @@ public class Player
             if(matching.Any(x => x.Value == CardValue.Skip))
             {
                 turn.Card = matching.First(x => x.Value == CardValue.Skip);
-                turn.Result = TurnResult.Skip;
+                turn.Result = ETurnResult.Skip;
                 turn.DeclaredColor = turn.Card.Color;
                 Hand.Remove(turn.Card);
 
@@ -194,7 +194,7 @@ public class Player
             if (matching.Any(x => x.Value == CardValue.Reverse))
             {
                 turn.Card = matching.First(x => x.Value == CardValue.Reverse);
-                turn.Result = TurnResult.Reversed;
+                turn.Result = ETurnResult.Reversed;
                 turn.DeclaredColor = turn.Card.Color;
                 Hand.Remove(turn.Card);
 
@@ -251,7 +251,7 @@ public class Player
             {
                 turn.Card = matching.First(x => x.Value == CardValue.Wild);
                 turn.DeclaredColor = SelectDominantColor();
-                turn.Result = TurnResult.WildCard;
+                turn.Result = ETurnResult.WildCard;
                 Hand.Remove(turn.Card);
 
                 return turn;
@@ -260,18 +260,18 @@ public class Player
             return turn;
     }
             
-      private PlayerTurn PlayMatchingCard(CardColor color)
+      private PlayerTurn PlayMatchingCard(EColors color)
         {
             var turn = new PlayerTurn();
-            turn.Result = TurnResult.PlayedCard;
-            var matching = Hand.Where(x => x.Color == color || x.Color == CardColor.Wild).ToList();
+            turn.Result = ETurnResult.PlayedCard;
+            var matching = Hand.Where(x => x.Color == color || x.Color == EColors.Black).ToList();
 
             //We cannot play wild draw four unless there are no other matches.
             if (matching.All(x => x.Value == CardValue.DrawFour))
             {
                 turn.Card = matching.First();
                 turn.DeclaredColor = SelectDominantColor();
-                turn.Result = TurnResult.WildCard;
+                turn.Result = ETurnResult.WildCard;
                 Hand.Remove(matching.First());
 
                 return turn;
@@ -281,7 +281,7 @@ public class Player
             if (matching.Any(x => x.Value == CardValue.DrawTwo))
             {
                 turn.Card = matching.First(x => x.Value == CardValue.DrawTwo);
-                turn.Result = TurnResult.DrawTwo;
+                turn.Result = ETurnResult.DrawTwo;
                 turn.DeclaredColor = turn.Card.Color;
                 Hand.Remove(turn.Card);
 
@@ -291,7 +291,7 @@ public class Player
             if (matching.Any(x => x.Value == CardValue.Skip))
             {
                 turn.Card = matching.First(x => x.Value == CardValue.Skip);
-                turn.Result = TurnResult.Skip;
+                turn.Result = ETurnResult.Skip;
                 turn.DeclaredColor = turn.Card.Color;
                 Hand.Remove(turn.Card);
 
@@ -301,7 +301,7 @@ public class Player
             if (matching.Any(x => x.Value == CardValue.Reverse))
             {
                 turn.Card = matching.First(x => x.Value == CardValue.Reverse);
-                turn.Result = TurnResult.Reversed;
+                turn.Result = ETurnResult.Reversed;
                 turn.DeclaredColor = turn.Card.Color;
                 Hand.Remove(turn.Card);
 
@@ -322,14 +322,14 @@ public class Player
             {
                 turn.Card = matching.First(x => x.Value == CardValue.Wild);
                 turn.DeclaredColor = SelectDominantColor();
-                turn.Result = TurnResult.WildCard;
+                turn.Result = ETurnResult.WildCard;
                 Hand.Remove(turn.Card);
 
                 return turn;
             }
 
             //This should never happen
-            turn.Result = TurnResult.ForceDraw;
+            turn.Result = ETurnResult.ForceDraw;
             return turn;
         }
 
