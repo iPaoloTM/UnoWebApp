@@ -14,6 +14,8 @@ public class UnoEngine //i removed <TKEY>
 {
     
     public GameState State { get; set; } = new GameState();
+    
+    public PlayerMove? LastTurn { get; set; } 
 
     public List<Player> Players { get; set; } = new List<Player>();
     public CardDeck CardDeck { get; set; } = new CardDeck();
@@ -44,7 +46,7 @@ public class UnoEngine //i removed <TKEY>
         {
             for(int i = 0; i < numberOfPlayers; i ++)
             {
-                Players[i].Hand.Add(CardDeck.Cards.First());
+                Players[i].HandCards.Add(CardDeck.Cards.First());
                 CardDeck.Cards.RemoveAt(0);
                 dealtCards++;
             }
@@ -59,81 +61,64 @@ public class UnoEngine //i removed <TKEY>
         }
         
     }
-
-
-    public void PlayGame()
-    {
-        
-    }
     
-    public void HandlePlayerAction(Player player, EPlayerAction playerAction, Card card)
+    public void HandlePlayerAction(Player player, Decision decision)
     {
         //Handling "Playing Card"
-        if (playerAction != EPlayerAction.PlayCard)
+        switch (decision.typeOfDecision)
         {
-            throw new Exception("something went wrong we need to come up with handling it");
-        }
-        var response = Validator.ValidateAction(card, UsedDeck.First());
-        if (response)
-        {
-            UsedDeck.Insert(0, card);
-            if (card is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
-            {
-                var newColor = player.SelectDominantColor();
+            case EPlayerAction.PlayCard:
+                var response = Validator.ValidateAction(card, UsedDeck.First());
+                if (response)
+                {
+                    UsedDeck.Insert(0, card);
+                    if (card is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+                    {
+                        var newColor = player.SelectDominantColor();
                 
-            }
-            player.MakeChoice();
-        }
-        else
-        {
-            //we need to show somehow that it's not allowed
-            player.MakeChoice();
-        }
-    }
-    
-    public void HandlePlayerAction(Player player, EPlayerAction playerAction, List<Card> hand)
-    {
-        //Handling "Draw"
-        if (playerAction != EPlayerAction.Draw)
-        {
-            throw new Exception("something went wrong we need to come up with handling it");
-        }
-        var response = Validator.ValidateAction(hand, UsedDeck.First());
-        if (response)
-        {
-            player.Hand.AddRange(DrawDeckOfCards.Draw(1));
-            player.MakeChoice();
-        }
-        else
-        {
-            player.MakeChoice();
-        }
-    }
-    public void HandlePlayerAction(Player player, EPlayerAction playerAction)
-    {
-        //Handling "skip"
-        if (playerAction == EPlayerAction.NextPlayer)
-        {
-            var response = Validator.ValidateAction();
-            if (response)
-            {
-                //we need to think what to write here guyss :( 
-            }
-            else
-            {
-                player.MakeChoice();
-            }
-        }
-        else if (playerAction == EPlayerAction.Shout)
-        {
-            //we need to think about what will be here
-        }
-        else
-        {
-            throw new Exception("something went wrong we need to come up with handling it");
+                    }
+                    player.MakeChoice();
+                }
+                else
+                {
+                    //we need to show somehow that it's not allowed
+                    player.MakeChoice();
+                }
+                break;
+            case EPlayerAction.Draw:
+                var response = Validator.ValidateAction(card, UsedDeck.First());
+                if (response)
+                {
+                    player.Hand.AddRange(DrawDeckOfCards.Draw(1));
+                    player.MakeChoice();
+                }
+                else
+                {
+                    player.MakeChoice();
+                }
+
+                break;
+            case EPlayerAction.NextPlayer:
+                var response = Validator.ValidateAction();
+                if (response)
+                {
+                    //we need to think what to write here guyss :( 
+                }
+                else
+                {
+                    player.MakeChoice();
+                }
+
+                break;
+            case EPlayerAction.SaySomething:
+                ////
+                break;
+            default:
+                throw new Exception("something went wrong when making a decision :(");
         }
         
     }
+    
     
     public void SaveGameState()
     {
