@@ -1,16 +1,19 @@
-using System.Diagnostics;
+using UnoEngine;
 
 namespace Entities;
 
-public class PlayerEdited
+
+public class Player
 {
     public string Nickname { get; }
     public int Position { get; set; } = default!;
     public EPlayerType PlayerType { get; set; }
-
     public List<Card> HandCards { get; set; } = new List<Card>();
-
-    public PlayerEdited(string nickname)
+    public EPlayerAction? PreviousAction { get; set; }
+    
+    UnoEngine unoEngine = UnoEngine.GetInstance();
+    
+    public Player(string nickname)
     {
         Nickname = nickname ?? throw new ArgumentNullException(nameof(nickname), "Nickname cannot be null.");
         HandCards = new List<Card>();
@@ -38,21 +41,21 @@ public class PlayerEdited
     
     public void PlayCard(Card card)
     {
-        gameEngine.HandlePlayerAction(this, PlayerAction.PlayCard, card);
+        unoEngine.HandlePlayerAction(this, EPlayerAction.PlayCard, card);
     }
 
     public void Draw()
     {
-        gameEngine.HandlePlayerAction(this, PlayerAction.Draw, null);
+        unoEngine.HandlePlayerAction(this, EPlayerAction.Draw, null);
     }
     
     public void NextPlayer()
     {
-        gameEngine.HandlePlayerAction(this, PlayerAction.NextPlayer, null);
+        unoEngine.HandlePlayerAction(this, EPlayerAction.NextPlayer, null);
     }
 
-    public void Shout()
+    public void SaySomething()
     {
-        gameEngine.HandlePlayerAction(this, PlayerAction.Shout, null);
+        unoEngine.HandlePlayerAction(this, EPlayerAction.SaySomething, null);
     }
 }

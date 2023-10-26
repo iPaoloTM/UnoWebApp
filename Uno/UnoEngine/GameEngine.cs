@@ -5,17 +5,19 @@ using Entities;
 
 namespace UnoEngine;
 
-public class UnoEngine //i removed <TKEY> 
+public  sealed class UnoEngine //i removed <TKEY> 
 {
     
     public GameState State { get; set; } = new GameState();
+    
+    
     public List<Player> Players { get; set; } = new List<Player>();
     public CardDeck DrawDeckOfCards { get; set; } = new CardDeck();
     public List<Card> DiscardDeck { get; set; } = new List<Card>();
     
     private const int InitialHandSize = 7;
 
-    public UnoEngine (int numberOfPlayers)
+    private UnoEngine (int numberOfPlayers)
     {
         DrawDeckOfCards.Shuffle();
         for (int i = 0; i < numberOfPlayers; i++)
@@ -47,12 +49,21 @@ public class UnoEngine //i removed <TKEY>
         }
         
     }
-
+    
+    private static UnoEngine? _instance;
+    
+    
+    public static UnoEngine GetInstance(int numberOfPlayers = 2)
+    {
+        if (_instance == null)
+        {
+            _instance = new UnoEngine(numberOfPlayers);
+        }
+        return _instance;
+    }
+    
     public void PlayGame()
     {
         
     }
-
-
-    
 }
