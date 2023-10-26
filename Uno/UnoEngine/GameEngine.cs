@@ -62,13 +62,14 @@ public class UnoEngine //i removed <TKEY>
         
     }
     
-    public void HandlePlayerAction(Player player, Decision decision)
+    public void HandlePlayerAction(Player player, PlayerMove decision)
     {
+        var response = false;
         //Handling "Playing Card"
-        switch (decision.typeOfDecision)
+        switch (decision.PlayerAction)
         {
             case EPlayerAction.PlayCard:
-                var response = Validator.ValidateAction(card, UsedDeck.First());
+                response = Validator.ValidateAction(card, decision);
                 if (response)
                 {
                     UsedDeck.Insert(0, card);
@@ -86,7 +87,7 @@ public class UnoEngine //i removed <TKEY>
                 }
                 break;
             case EPlayerAction.Draw:
-                var response = Validator.ValidateAction(card, UsedDeck.First());
+                response = Validator.ValidateAction(card, decision);
                 if (response)
                 {
                     player.Hand.AddRange(DrawDeckOfCards.Draw(1));
@@ -99,7 +100,7 @@ public class UnoEngine //i removed <TKEY>
 
                 break;
             case EPlayerAction.NextPlayer:
-                var response = Validator.ValidateAction();
+                response = Validator.ValidateAction();
                 if (response)
                 {
                     //we need to think what to write here guyss :( 
