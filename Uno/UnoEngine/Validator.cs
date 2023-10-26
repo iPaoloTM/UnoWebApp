@@ -4,7 +4,7 @@ namespace UnoEngine;
 
 public class Validator
     {
-        public bool ValidateAction(EPlayerAction previousAction, EPlayerAction currentAction)
+        public bool ValidateAction(PlayerMove previousAction, PlayerMove currentAction)
         {
             if (previousAction is null)
             {
