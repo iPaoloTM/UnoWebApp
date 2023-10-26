@@ -1,14 +1,26 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using MenuSystem;
+using UnoEngine;
 
-//var game = new GameEngine<string, string>();
+//This isn't a good way to create the engine instance
+UnoEngine.UnoEngine game = new UnoEngine.UnoEngine(0);
+
+string? startGame()
+{
+    GameMenu gameMenu = new GameMenu(game);
+    gameMenu.Draw();
+    return null;
+}
 
 string? SetPlayerCount()
 {
     Console.Write("Player count?");
     var countStr = Console.ReadLine()?.Trim();
     var count = int.Parse(countStr);
+    
+    //This is also horrible code
+    game = new UnoEngine.UnoEngine(count);
     
     /**
     game.Players = new List<Player>();
@@ -43,7 +55,8 @@ string? runNewGameMenu()
             new MenuItem()
             {
                 Shortcut = "s",
-                MenuLabel = "Start the game of UNO",
+                MenuLabel = "Start the game of UNO", 
+                MethodToRun = startGame
             },
         }
     );

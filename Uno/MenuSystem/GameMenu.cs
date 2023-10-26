@@ -16,6 +16,8 @@ public class GameMenu
 
     public void Draw()
     {
+        Console.Clear();
+        
         Player currPlayer = Game.Players[Game.GameState.ActivePlayerNo];
         //Display whose turn it is
         Console.WriteLine("Player " + currPlayer.Nickname + "'s turn");
