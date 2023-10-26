@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 
 namespace UnoEngine;
 
-public class UnoEngine //i removed <TKEY> 
+public class GameEngine //i removed <TKEY> 
 {
     
     public GameState State { get; set; } = new GameState();
@@ -21,13 +21,17 @@ public class UnoEngine //i removed <TKEY>
     public CardDeck CardDeck { get; set; } = new CardDeck();
     public CardDeck UsedDeck { get; set; } = new CardDeck();
 
+    public Validator val { get; set; } = new Validator();
+    
+    public PlayerMove? LastMove { get; set; }
+
     public int ActivePlayerNo, CurrentRoundNo;
     
     private const int InitialHandSize = 7;
 
     private GameState GameState;
 
-    public UnoEngine (int numberOfPlayers)
+    public GameEngine (int numberOfPlayers)
     {
         this.GameState = new GameState();
         
@@ -62,6 +66,7 @@ public class UnoEngine //i removed <TKEY>
         
     }
     
+    //this function will be called by MenuSystem
     public void HandlePlayerAction(Player player, PlayerMove decision)
     {
         var response = false;
@@ -69,55 +74,64 @@ public class UnoEngine //i removed <TKEY>
         switch (decision.PlayerAction)
         {
             case EPlayerAction.PlayCard:
-                response = Validator.ValidateAction(card, decision);
+                response = val.ValidateAction(LastMove,decision);
                 if (response)
                 {
-                    UsedDeck.Insert(0, card);
-                    if (card is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+                    UsedDeck.Insert(0, decision.PlayedCard);
+                    if (decision.PlayedCard is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
                     {
-                        var newColor = player.SelectDominantColor();
-                
+                        
+                        Console.WriteLine("Choose a new color");
+                        
+                        var newColor = Console.ReadLine();
+                        
+                        //some parsing and sanity check is needed
+
+
                     }
-                    player.MakeChoice();
+                    player.PlayCard(decision.PlayedCard);
                 }
                 else
                 {
                     //we need to show somehow that it's not allowed
-                    player.MakeChoice();
+                    Console.WriteLine("Move not allowed! Retry");
                 }
                 break;
             case EPlayerAction.Draw:
-                response = Validator.ValidateAction(card, decision);
+                response = val.ValidateAction(LastMove, decision);
                 if (response)
                 {
-                    player.Hand.AddRange(DrawDeckOfCards.Draw(1));
-                    player.MakeChoice();
+                    player.HandCards.Add(GameState.GameDeck.Cards.First());
+                    
                 }
                 else
                 {
-                    player.MakeChoice();
+                    Console.WriteLine("Move not allowed! Retry");
                 }
 
                 break;
             case EPlayerAction.NextPlayer:
-                response = Validator.ValidateAction();
+                response = val.ValidateAction(LastMove, decision);;
                 if (response)
                 {
                     //we need to think what to write here guyss :( 
                 }
                 else
                 {
-                    player.MakeChoice();
+                    Console.WriteLine("Move not allowed! Retry");
                 }
 
                 break;
             case EPlayerAction.SaySomething:
-                ////
+                var reaction = Console.ReadLine();
+                this.Players[ActivePlayerNo].Reaction = reaction;
                 break;
             default:
                 throw new Exception("something went wrong when making a decision :(");
         }
-        
+
+        LastMove = decision;
+
     }
     
     
@@ -135,6 +149,7 @@ public class UnoEngine //i removed <TKEY>
         
         this.GameState.CurrentRoundNo = this.CurrentRoundNo;
         
+        this.GameState.LastMove = this.LastMove;
         
         Console.Write("Game State saved!");
     }

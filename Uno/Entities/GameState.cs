@@ -7,6 +7,7 @@ public class GameState
     public int ActivePlayerNo { get; set; } = 0; 
     public List<Player> Players { get; set; } = new List<Player>();
     
+    public PlayerMove? LastMove { get; set; }
     public int CurrentRoundNo { get; set; } = 0;
     
     public static int NumberOfCards = 112;

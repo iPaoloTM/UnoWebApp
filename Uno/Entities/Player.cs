@@ -13,7 +13,7 @@ public class Player
     public EPlayerType PlayerType { get; set; }
     public List<Card> HandCards { get; set; } = new List<Card>();
 
-    private String? Reaction { get; set; }
+    public String? Reaction { get; set; }
     
     
     public Player( string nickname = "player")

@@ -1,12 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-
-using UnoEngine;
-
 namespace MenuSystem;
-using MenuSystem;
-
-
 
 string? SetPlayerCount()
 {
@@ -26,8 +20,6 @@ string? SetPlayerCount()
     }*/
     return null;
 }
-
-
 
 string? runNewGameMenu()
 {
@@ -78,5 +70,3 @@ var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
 
 
 var userChoice = mainMenu.Run();
-
-var game = new UnoEngine(7);
