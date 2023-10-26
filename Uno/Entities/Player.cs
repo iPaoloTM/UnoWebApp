@@ -18,7 +18,7 @@ public class Player
         this.Hand = new List<Card>();
     }
 
-    public PlayerTurn PlayTurn(PlayerTurn previousTurn, CardHand pileOfCards)
+    public PlayerTurn PlayTurn(PlayerTurn previousTurn, CardDeck pileOfCards)
     {
         //TODO - Kata
         PlayerTurn turn = new PlayerTurn();
@@ -45,10 +45,10 @@ public class Player
         return turn;
     }
 
-    public PlayerTurn DrawCard(PlayerTurn previousTurn, CardHand cardHand)
+    public PlayerTurn DrawCard(PlayerTurn previousTurn, CardDeck cardDeck)
     { 
         PlayerTurn turn = new PlayerTurn();
-        var drawnCard = cardHand.Draw(1);
+        var drawnCard = cardDeck.Draw(1);
         Hand.AddRange(drawnCard); //what if CardDeck will be empty? call function that will create new shuffled deck
                                   //or shouldnt allow to return null CardDeck? 
         
@@ -107,7 +107,7 @@ public class Player
         }
     }
     
-    public PlayerTurn ProcessAttack( Card currentCard, CardHand pileOfCards)
+    public PlayerTurn ProcessAttack( Card currentCard, CardDeck pileOfCards)
     {
         //TODO - Kata
         PlayerTurn turn = new PlayerTurn();
