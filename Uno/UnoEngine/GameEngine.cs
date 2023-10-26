@@ -11,8 +11,10 @@ public  sealed class UnoEngine //i removed <TKEY>
     public GameState State { get; set; } = new GameState();
     
     public List<Player> Players { get; set; } = new List<Player>();
-    public CardHand DrawDeckOfCards { get; set; } = new CardHand();
+    public CardHand DrawDeckOfCards { get; set; } = new CardDeck();
     public List<Card> DiscardDeck { get; set; } = new List<Card>();
+
+    public PlayerMove LastTurn { get; set; } = new PlayerMove();
     
     public EColors DominantColor { get; set; } 
 

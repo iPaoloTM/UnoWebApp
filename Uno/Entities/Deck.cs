@@ -1,6 +1,6 @@
 namespace Entities;
 
-public abstract class Hand
+public abstract class Deck
 {
     
 

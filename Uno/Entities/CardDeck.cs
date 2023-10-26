@@ -1,6 +1,6 @@
 namespace Entities;
 
-public class CardHand : Hand
+public class CardDeck : Deck
 {
     public List<Card> Cards { get; set; }
 
