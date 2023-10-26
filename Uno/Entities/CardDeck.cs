@@ -4,7 +4,7 @@ public class CardDeck : Deck
 {
     public List<Card> Cards { get; set; }
 
-    public CardHand()
+    public CardDeck()
     {
         //Initialize Numeric Cards 
         EColors color;
@@ -97,7 +97,7 @@ public class CardDeck : Deck
         Cards = gameDeck;
     }
 
-    public CardHand(List<Card> cards)
+    public CardDeck(List<Card> cards)
     {
         Cards = cards;
     }

@@ -1,9 +1,11 @@
-﻿namespace Entities;
+
+namespace Entities;
 
 public enum EPlayerAction
 {
+    PlayCard,
     Draw,
     NextPlayer,
-    PlayCard,
-    Shout
+    SaySomething
+
 }

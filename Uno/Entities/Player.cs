@@ -1,15 +1,18 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 
+using System.Buffers;
 using System.Net.NetworkInformation;
-using Entities;
+
+namespace Entities;
+
 
 public class Player
 {
-    public string? Nickname { get; set; }
+    public string Nickname { get; }
     public int Position { get; set; } = default!;
     public EPlayerType PlayerTipe { get; set; }
 
-    public List<Card> Deck { get; set; } = new List<Card>();
+    public List<Card> Hand { get; set; } = new List<Card>();
 
     public Player()
     {
@@ -62,93 +65,56 @@ public class Player
         }
         
         return turn;
-    }
-    
-    public void DisplayTurn(PlayerTurn turn)
-    {
-        //TODO - Kata ---- WHAT IS IN CONSOLE NEEDS TO BE MODIFIED
-        if (turn.Result == ETurnResult.ForcedDrawPlay)
-        {
-            Console.WriteLine("Player is forced to draw a card since he can't put anything");
-        }
-        if(turn.Result == ETurnResult.ForcedDrawPlay)
-        {
-            Console.WriteLine("Player is forced to draw,  but can play the drawn card!");
-        }
-        if (turn.Result == ETurnResult.PlayedCard || turn.Result == ETurnResult.Skip || turn.Result == ETurnResult.DrawTwoCards 
-                                                  || turn.Result == ETurnResult.WildCard || turn.Result == ETurnResult.WildDrawFourCards 
-                                                  || turn.Result == ETurnResult.Reversed || turn.Result == ETurnResult.ForcedDrawPlay)
-        {
-            Console.WriteLine("Player plays a card.");
-            //!!!!!!!!!!!!!!!!
-            if (turn.Card is SpecialCard specialCard)
-            {
-                if (specialCard.Effect == EEffect.Wild) // here i'd change the logic of declaring a card but i didn't do it because i don't want to spoil anything :(
-                {
-                    Console.WriteLine("Player declares new color.");
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException("Card is of an unexpected type"); //we can also handle it somehow else that is just an idea
-            }
-            if(turn.Result == ETurnResult.Reversed)
-            {
-                Console.WriteLine("Turn order reversed!");
-            }
-        }
 
-        if (Deck.Count == 1)
-        {
-            //TODO - think about shouting UNO logic
-            Console.WriteLine("Player shouts UNO but WE NEED TO THINK ABOUT IT!!!!!!!!!!!");
-        }
+    public EPlayerType PlayerType { get; set; }
+    public List<Card> HandCards { get; set; } = new List<Card>();
+    public PlayerMove PreviousPlayerMove;
+    private String? Reaction { get; set; }
+    
+    
+    public Player(string nickname, PlayerMove previousTurn)
+    {
+        Nickname = nickname ?? throw new ArgumentNullException(nameof(nickname), "Nickname cannot be null.");
+        PreviousPlayerMove = previousTurn;
+        HandCards = new List<Card>();
     }
     
-    public PlayerTurn ProcessAttack( Card currentCard, CardDeck pileOfCards)
+    public void AddCard(Card card)
     {
-        //TODO - Kata
-        PlayerTurn turn = new PlayerTurn();
-        turn.Result = ETurnResult.IsAttacked;
-        turn.Card = currentCard;
-        turn.DeclaredColor = currentCard.Color;
-        //!!!!!!!!!!!!!!!
-        if (currentCard is  SpecialCard specialCard)
+        HandCards.Add(card);
+
+    }
+    
+    public void TakeCard(Card card)
+    {
+        if (card == null)
         {
-            if(specialCard.Effect == EEffect.Skip)
-            {
-                Console.WriteLine("Player  was skipped!");
-                return turn;
-            }
-            else if(specialCard.Effect == EEffect.DrawTwo)
-            {
-                Console.WriteLine("Player  must draw two cards!");
-                Deck.AddRange(pileOfCards.Draw(2));
-            }
-            else if(specialCard.Effect == EEffect.DrawFour)
-            {
-                Console.WriteLine("Player  must draw four cards!");
-                Deck.AddRange(pileOfCards.Draw(4));
-            }
-        }
-        else
-        {
-            throw new InvalidOperationException("Card is of an unexpected type"); //we can also handle it somehow else that is just an idea
+            throw new ArgumentNullException(nameof(card), "Card cannot be null");
         }
         
+        if (!HandCards.Contains(card))
+        {
+            throw new ArgumentException("The specified card is not in the player's hand", nameof(card));
+        }
 
-        return turn;
+        HandCards.Remove(card);
     }
+    
 
-    private bool HasMatch(Card card)
+    public PlayerMove PlayCard(Card card)
     {
-        //refactor of Cards.cs and SpecialCards.cs and NumericCard.cs or create function for both of them.
-        // here is also matching by color or number(value).
-        //possibility control the match just by color input and check matching colorsHas
-        return Deck.Any(x => x.Color == card.Color || x.Number == card.Number|| x.Color == EColors.Black);
+        var playerMove = new PlayerMove(this, EPlayerAction.PlayCard, card);
+        return playerMove; 
+
     }
 
-    private PlayerTurn PlayMatchingCard(Card currentDiscard)
+    public PlayerMove Draw( )
+    {
+        var playerMove = new PlayerMove(this, EPlayerAction.Draw, null);
+        return playerMove;
+    }
+
+    public PlayerMove NextPlayer()
     {
         var turn = new PlayerTurn();
             turn.Result = TurnResult.PlayedCard; //enum by kata
@@ -341,3 +307,4 @@ public class Player
             return colors.First().First().Color;
         }
 }
+

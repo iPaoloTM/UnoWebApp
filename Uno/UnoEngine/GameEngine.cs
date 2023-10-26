@@ -2,29 +2,34 @@
 
 using System.Drawing;
 using Entities;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace UnoEngine;
 
-public  sealed class UnoEngine //i removed <TKEY> 
+public class UnoEngine //i removed <TKEY> 
 {
     
     public GameState State { get; set; } = new GameState();
-    
+
     public List<Player> Players { get; set; } = new List<Player>();
-    public CardHand DrawDeckOfCards { get; set; } = new CardDeck();
-    public List<Card> DiscardDeck { get; set; } = new List<Card>();
+    public CardDeck CardDeck { get; set; } = new CardDeck();
+    public CardDeck UsedDeck { get; set; } = new CardDeck();
 
-    public PlayerMove LastTurn { get; set; } = new PlayerMove();
-    
-    public EColors DominantColor { get; set; } 
-
-    public Validator Validator = new Validator();
+    public int ActivePlayerNo, CurrentRoundNo;
     
     private const int InitialHandSize = 7;
 
-    private UnoEngine (int numberOfPlayers)
+    private GameState GameState;
+
+    public UnoEngine (int numberOfPlayers)
     {
-        DrawDeckOfCards.Shuffle();
+        this.GameState = new GameState();
+        
+        CardDeck.Shuffle();
         for (int i = 0; i < numberOfPlayers; i++)
         {
             Players.Add(new Player()
@@ -39,36 +44,28 @@ public  sealed class UnoEngine //i removed <TKEY>
         {
             for(int i = 0; i < numberOfPlayers; i ++)
             {
-                Players[i].Hand.Add(DrawDeckOfCards.Cards.First());
-                DrawDeckOfCards.Cards.RemoveAt(0);
+                Players[i].Hand.Add(CardDeck.Cards.First());
+                CardDeck.Cards.RemoveAt(0);
                 dealtCards++;
             }
         }
-        DiscardDeck.Add(DrawDeckOfCards.Cards.First());
-        DominantColor = DiscardDeck.First().Color;
-        DrawDeckOfCards.Cards.RemoveAt(0);
+        UsedDeck.Add(CardDeck.Cards.First());
+        UsedDeck.Cards.RemoveAt(0);
   
-        while(DiscardDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+        while(UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
         {
-            DiscardDeck.Insert(0, DrawDeckOfCards.Cards.First());
-            DominantColor = DiscardDeck.First().Color;
-            DrawDeckOfCards.Cards.RemoveAt(0);
+            UsedDeck.Insert(0, CardDeck.Cards.First());
+            UsedDeck.Cards.RemoveAt(0);
         }
         
     }
-    
-    private static UnoEngine? _instance;
-    
-    
-    public static UnoEngine GetInstance(int numberOfPlayers = 2)
-    {
-        if (_instance == null)
-        {
-            _instance = new UnoEngine(numberOfPlayers);
-        }
-        return _instance;
-    }
 
+
+    public void PlayGame()
+    {
+        
+    }
+    
     public void HandlePlayerAction(Player player, EPlayerAction playerAction, Card card)
     {
         //Handling "Playing Card"
@@ -76,10 +73,10 @@ public  sealed class UnoEngine //i removed <TKEY>
         {
             throw new Exception("something went wrong we need to come up with handling it");
         }
-        var response = Validator.validate(card, DiscardDeck.First());
+        var response = Validator.ValidateAction(card, UsedDeck.First());
         if (response)
         {
-            DiscardDeck.Insert(0, card);
+            UsedDeck.Insert(0, card);
             if (card is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
             {
                 var newColor = player.SelectDominantColor();
@@ -101,7 +98,7 @@ public  sealed class UnoEngine //i removed <TKEY>
         {
             throw new Exception("something went wrong we need to come up with handling it");
         }
-        var response = Validator.validate(hand, DiscardDeck.First());
+        var response = Validator.ValidateAction(hand, UsedDeck.First());
         if (response)
         {
             player.Hand.AddRange(DrawDeckOfCards.Draw(1));
@@ -117,7 +114,7 @@ public  sealed class UnoEngine //i removed <TKEY>
         //Handling "skip"
         if (playerAction == EPlayerAction.NextPlayer)
         {
-            var response = Validator.validate();
+            var response = Validator.ValidateAction();
             if (response)
             {
                 //we need to think what to write here guyss :( 
@@ -137,8 +134,81 @@ public  sealed class UnoEngine //i removed <TKEY>
         }
         
     }
-    public void PlayGame()
+    
+    public void SaveGameState()
     {
+        Console.Write("Saving Game State...");
+
+        GameState.GameDeck = this.CardDeck;
+
+        this.GameState.UsedDeck = this.UsedDeck;
+
+        this.GameState.Players = this.Players;
+
+        this.GameState.ActivePlayerNo = this.ActivePlayerNo;
         
+        this.GameState.CurrentRoundNo = this.CurrentRoundNo;
+        
+        
+        Console.Write("Game State saved!");
     }
+
+    public void ExportJSON(string filePath)
+    {
+        Console.Write("Exporting Game State to JSON...");
+
+        try
+        {
+            string GameState = "{\"CardDeck\":[";
+
+            //include GameDeck's cards
+
+            foreach (Card c in this.GameState.GameDeck.Cards)
+            {
+                GameState += c.ToString() + ",";
+            }
+
+            GameState += "], \"UsedDeck\":[";
+            
+            //include UsedDeck's cards
+
+            foreach (Card c in this.GameState.UsedDeck.Cards)
+            {
+                GameState += c.ToString() + ",";
+            }
+            
+            GameState += "], \"Players\":[";
+            
+            //include Player hand's cards
+            
+            foreach (Player p in this.GameState.Players)
+            {
+                GameState += p.ToString() + ",";
+            }
+
+            GameState += "],";
+            
+            //include utilities info
+
+            GameState += "\"ActivePlayerNo\":"+this.GameState.ActivePlayerNo+"\"CurrentRoundNo\":" + this.GameState.CurrentRoundNo + "";
+            
+            GameState += "}";
+            
+
+            string jsonGameState = JsonSerializer.Serialize(GameState);
+
+
+            File.WriteAllText(filePath, jsonGameState);
+
+            Console.WriteLine("Game State exported to JSON successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error exporting game state to JSON: " + ex.Message);
+        }
+    }
+
+
+
+    
 }
