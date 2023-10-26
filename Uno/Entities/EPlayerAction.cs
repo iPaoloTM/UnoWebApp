@@ -1,3 +1,4 @@
+
 namespace Entities;
 
 public enum EPlayerAction
@@ -6,4 +7,5 @@ public enum EPlayerAction
     Draw,
     NextPlayer,
     SaySomething
+
 }

@@ -5,68 +5,25 @@ public abstract class Deck
     
 
     protected List<Card> Cards { get; set; }
-    private Random rnd { get; set; } = new Random();
+    private Random Rnd { get; set; } = new Random();
     
     public Deck()
     {
         this.Cards = new List<Card>();
     }
 
+    //Changed Shuffle to be shorter and more readable
     public void Shuffle()
     {
-        List<Card?> randomDeck = new List<Card?>(); 
-
-        // Initialize randomDeck with nulls.
-        for (int k = 0; k < GameState.NumberOfCards; k++)
+        int n = Cards.Count;
+        //i will count down from the biggest index to 0
+        for (int i = n - 1; i > 0; i--)
         {
-            randomDeck.Add(null);
+            //Get a random number between 0 and the value of i
+            int j = Rnd.Next(i + 1);
+            //Swap the rightmost element with the random element
+            (Cards[i], Cards[j]) = (Cards[j], Cards[i]);
         }
-        //for the first half of the deck, we randomly map cards from the deck to the new randomDeck,
-        //in order to be sure that the conflicts are still not so probable.
-        int i = 0;
-        while (i < GameState.NumberOfCards / 2)
-        {
-            var randomPositionInDeck = rnd.Next(GameState.NumberOfCards);
-            //we make sure to put the card in an empty spot
-            while (randomDeck[randomPositionInDeck] != null)
-            {
-                randomPositionInDeck = rnd.Next(GameState.NumberOfCards);
-            }
-
-            randomDeck[randomPositionInDeck] = Cards?[randomPositionInDeck];
-            if (Cards != null) Cards.RemoveAt(randomPositionInDeck);
-            i++;
-        }
-        
-        //Now we map the remaining cards from the deck into the empty spots of the random deck
-        //to avoid a lot of new random assignment, since checking for conflictsd becomes harder
-        //and harder the more card we put (the less empty spots there are)
-
-        if (Cards != null)
-        {
-            int j = 0;
-            while (j < this.Cards.Count)
-            {
-                
-                int k = 0;
-                while (randomDeck[k] != null)
-                {
-                    k++;
-                }
-
-                randomDeck[k] = Cards[j];
-                
-                j++;
-            }
-        }
-
-        if (randomDeck.Count == GameState.NumberOfCards)
-        {
-            this.Cards = randomDeck;
-        }
-        else throw new Exception("Something went wrong when shuffling the deck");
-
-
     }
     
     public Card First()

@@ -4,11 +4,11 @@ using MenuSystem;
 using UnoEngine;
 
 //This isn't a good way to create the engine instance
-UnoEngine.UnoEngine game = new UnoEngine.UnoEngine(0);
+GameEngine Game = new GameEngine(0);
 
 string? startGame()
 {
-    GameMenu gameMenu = new GameMenu(game);
+    GameMenu gameMenu = new GameMenu(Game);
     gameMenu.Draw();
     return null;
 }
@@ -19,8 +19,8 @@ string? SetPlayerCount()
     var countStr = Console.ReadLine()?.Trim();
     var count = int.Parse(countStr);
     
-    //This is also horrible code
-    game = new UnoEngine.UnoEngine(count);
+    //This is also kind of horrible code
+    Game = new GameEngine(count);
     
     /**
     game.Players = new List<Player>();

@@ -6,19 +6,19 @@ using UnoEngine;
 
 public class GameMenu
 {
-    public GameMenu(UnoEngine game)
+    public GameMenu(GameEngine game)
     {
         this.Game = game;
         
     }
 
-    public UnoEngine Game { get; set; }
+    public GameEngine Game { get; set; }
 
     public void Draw()
     {
         Console.Clear();
         
-        Player currPlayer = Game.Players[Game.GameState.ActivePlayerNo];
+        Player currPlayer = Game.Players[Game.ActivePlayerNo];
         //Display whose turn it is
         Console.WriteLine("Player " + currPlayer.Nickname + "'s turn");
         Console.WriteLine("================================================");
