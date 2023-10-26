@@ -42,7 +42,7 @@ public class Player
     
     public PlayerMove PlayCard(Card card)
     {
-        var playerMove = new PlayerMove(this, EPlayerAction.PlayCard, null);
+        var playerMove = new PlayerMove(this, EPlayerAction.PlayCard, card);
         return playerMove; 
     }
 
