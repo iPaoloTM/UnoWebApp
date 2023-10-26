@@ -1,5 +1,6 @@
 // See https://aka.ms/new-console-template for more information
 
+using System.Buffers;
 using System.Net.NetworkInformation;
 
 namespace Entities;
@@ -12,6 +13,7 @@ public class Player
     public EPlayerType PlayerType { get; set; }
     public List<Card> HandCards { get; set; } = new List<Card>();
     public PlayerMove PreviousPlayerMove;
+    private String? Reaction { get; set; }
     
     
     public Player(string nickname, PlayerMove previousTurn)
@@ -59,22 +61,11 @@ public class Player
         return playerMove;
     }
 
-        private EColors SelectDominantColor()
-        {
-            if (!Hand.Any())
-            {
-                return EColors.Black;
-            }
-            var colors = Hand.GroupBy(x => x.Color).OrderByDescending(x => x.Count());
-            return colors.First().First().Color;
-            
-        }
-
         public string getPlayerHand()
         {
             string res = "";
 
-            foreach (Card c in this.Hand)
+            foreach (Card c in this.HandCards)
             {
                 res += c.ToString() + ",";
 
