@@ -13,7 +13,7 @@ namespace UnoEngine;
 public class UnoEngine //i removed <TKEY> 
 {
     
-    public GameState State { get; set; } = new GameState();
+    public GameState GameState { get; set; } 
     public List<Player> Players { get; set; } = new List<Player>();
     public CardDeck CardDeck { get; set; } = new CardDeck();
     public CardDeck UsedDeck { get; set; } = new CardDeck();
@@ -21,8 +21,6 @@ public class UnoEngine //i removed <TKEY>
     public int ActivePlayerNo, CurrentRoundNo;
     
     private const int InitialHandSize = 7;
-
-    private GameState GameState;
 
     public UnoEngine (int numberOfPlayers)
     {
@@ -43,7 +41,7 @@ public class UnoEngine //i removed <TKEY>
         {
             for(int i = 0; i < numberOfPlayers; i ++)
             {
-                Players[i].Hand.Add(CardDeck.Cards.First());
+                Players[i].HandCards.Add(CardDeck.Cards.First());
                 CardDeck.Cards.RemoveAt(0);
                 dealtCards++;
             }
