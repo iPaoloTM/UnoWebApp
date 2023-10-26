@@ -1,4 +1,5 @@
-using UnoEngine;
+
+using System.Net.NetworkInformation;
 
 namespace Entities;
 
@@ -9,13 +10,13 @@ public class Player
     public int Position { get; set; } = default!;
     public EPlayerType PlayerType { get; set; }
     public List<Card> HandCards { get; set; } = new List<Card>();
-    public EPlayerAction? PreviousAction { get; set; }
+    public PlayerMove PreviousPlayerMove;
     
-    UnoEngine unoEngine = UnoEngine.GetInstance();
     
-    public Player(string nickname)
+    public Player(string nickname, PlayerMove previousTurn)
     {
         Nickname = nickname ?? throw new ArgumentNullException(nameof(nickname), "Nickname cannot be null.");
+        PreviousPlayerMove = previousTurn;
         HandCards = new List<Card>();
     }
     
@@ -39,23 +40,27 @@ public class Player
         HandCards.Remove(card);
     }
     
-    public void PlayCard(Card card)
+    public PlayerMove PlayCard(Card card)
     {
-        unoEngine.HandlePlayerAction(this, EPlayerAction.PlayCard, card);
+        var playerMove = new PlayerMove(this, EPlayerAction.PlayCard, null);
+        return playerMove; 
     }
 
-    public void Draw()
+    public PlayerMove Draw( )
     {
-        unoEngine.HandlePlayerAction(this, EPlayerAction.Draw, null);
-    }
-    
-    public void NextPlayer()
-    {
-        unoEngine.HandlePlayerAction(this, EPlayerAction.NextPlayer, null);
+        var playerMove = new PlayerMove(this, EPlayerAction.Draw, null);
+        return playerMove;
     }
 
-    public void SaySomething()
+    public PlayerMove NextPlayer()
     {
-        unoEngine.HandlePlayerAction(this, EPlayerAction.SaySomething, null);
+        var playerMove = new PlayerMove(this, EPlayerAction.NextPlayer, null);
+        return playerMove;
+    }
+
+    public PlayerMove SaySomething()
+    {
+        var playerMove = new PlayerMove(this, EPlayerAction.SaySomething, null);
+        return playerMove;
     }
 }

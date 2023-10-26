@@ -6,23 +6,47 @@ public class Validator
     {
         public bool ValidateAction(EPlayerAction previousAction, EPlayerAction currentAction)
         {
-            switch (previousAction)
+            if (previousAction is null)
             {
-                case EPlayerAction.PlayCard:
-                    return ValidatePlayCard(currentAction);
+                switch (previousAction)
+                {
+                    case EPlayerAction.PlayCard:
+                        return ValidatePlayCard(currentAction);
 
-                case EPlayerAction.Draw:
-                    return ValidateDraw(currentAction);
+                    case EPlayerAction.Draw:
+                        return ValidateDraw(currentAction);
 
-                case EPlayerAction.NextPlayer:
-                    return ValidateNextPlayer(currentAction);
+                    case EPlayerAction.NextPlayer:
+                        return ValidateNextPlayer(currentAction);
 
-                case EPlayerAction.SaySomething:
-                    return ValidateSaySomething(currentAction);
+                    case EPlayerAction.SaySomething:
+                        return ValidateSaySomething(currentAction);
 
-                default:
-                    return false;
+                    default:
+                        return false;
+                } 
             }
+            else
+            {
+                switch (previousAction)
+                {
+                    case EPlayerAction.PlayCard:
+                        return ValidatePlayCard(currentAction);
+
+                    case EPlayerAction.Draw:
+                        return ValidateDraw(currentAction);
+
+                    case EPlayerAction.NextPlayer:
+                        return ValidateNextPlayer(currentAction);
+
+                    case EPlayerAction.SaySomething:
+                        return ValidateSaySomething(currentAction);
+
+                    default:
+                        return false;
+                } 
+            }
+
         }
 
         private bool ValidatePlayCard(EPlayerAction currentAction)
