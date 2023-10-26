@@ -7,7 +7,7 @@ public abstract class Deck
     protected List<Card> Cards { get; set; }
     private Random rnd { get; set; } = new Random();
     
-    protected Deck()
+    public Deck()
     {
         this.Cards = new List<Card>();
     }
@@ -67,6 +67,21 @@ public abstract class Deck
         else throw new Exception("Something went wrong when shuffling the deck");
 
 
+    }
+    
+    public Card First()
+    {
+        return this.Cards.First();
+    }
+
+    public void Insert(int index, Card card)
+    {
+        this.Cards.Insert(index, card);
+    }
+
+    public void Add(Card card)
+    {
+        this.Cards.Add(card);
     }
     
 }
