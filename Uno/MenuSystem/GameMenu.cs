@@ -58,13 +58,14 @@ public class GameMenu
     public void PlayerPrompt()
     {
         string? choice;
-        //bool turnOver = false; Maybe?
+        var turnOver = false; 
         do //While the player hasn't skipped...
         {
             Console.WriteLine("Choose an action: ");
             Console.WriteLine("1. Play a card ");
             Console.WriteLine("2. Draw from deck ");
-            Console.WriteLine("3. Skip ");
+            Console.WriteLine("3. Say something");
+            Console.WriteLine("4. Skip ");
             choice = Console.ReadLine();
             switch (choice)
             {
@@ -83,6 +84,7 @@ public class GameMenu
                         //Check if the move is valid? Will edit when method is clearly defined
                         //if ... { Handle accepted move...}
                         Game.HandlePlayerAction(currPlayer, movePlay);
+                        turnOver = true;
                     }
                     break;
                 case "2":
@@ -91,8 +93,30 @@ public class GameMenu
                     var moveDraw = new PlayerMove(currPlayer, EPlayerAction.Draw, null);
                     //Check if the player can NOT play a card to validate the draw action?
                     Game.HandlePlayerAction(currPlayer, moveDraw);
+                    turnOver = true;
                     break;
                 case "3":
+                    var screamingPlayer = Console.ReadLine();
+        
+                    //Check if player has said uno when his turn ends and has 1 card left
+                    if (screamingPlayer != null && screamingPlayer.ToLower().Trim() != "uno" && 
+                        currPlayer.HandCards.Count == 1)
+                    {
+                        // Need to add some sort of UNO FLAG to GameEngine.cs, enable it here
+                        //Game.ForgotUno(PlayerNumber?) should remember who forgot it
+                    }
+        
+                    //Someone else says uno after the player forgot to say it
+                    else if (screamingPlayer!= null  && screamingPlayer.ToLower().Trim() == "uno")
+                        //&& Game.UnoFlag == 1
+                    {
+                        // Punish player that has 1 card who didnt say Uno, remove uno flag
+                        //Game.Players[PlayerNumber] take two cards, cant find a function to do it
+                        //Game.UnoFlag = 0;
+                    }
+                    
+                    break;
+                case "4":
                     //Player wants to skip to the next player?
                     var moveSkip = new PlayerMove(currPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(currPlayer, moveSkip);
@@ -101,34 +125,11 @@ public class GameMenu
                     Console.WriteLine("Invalid option");
                     break;
             }
-        } while (choice != "3");
-        
-        
-        //Assume the turn is over, prompt the user if they want to say something
-        //Should say UNO if they have 1 card left
-        Console.WriteLine("Do you want to say something?");
-        var screamingPlayer = Console.ReadLine();
-        
-        //Check if player has said uno when his turn ends and has 1 card left
-        if (screamingPlayer != null && screamingPlayer.ToLower().Trim() != "uno" && 
-            currPlayer.HandCards.Count == 1)
-        {
-            // Need to add some sort of UNO FLAG to GameEngine.cs, enable it here
-            //Game.ForgotUno(PlayerNumber?) should remember who forgot it
-        }
-        
-        //Someone else says uno after the player forgot to say it
-        else if (screamingPlayer!= null  && screamingPlayer.ToLower().Trim() == "uno")
-            //&& Game.UnoFlag == 1
-        {
-            // Punish player that has 1 card who didnt say Uno, remove uno flag
-            //Game.Players[PlayerNumber] take two cards, cant find a function to do it
-            //Game.UnoFlag = 0;
-        }
-        
+        } while (!turnOver);
+
         //De-activate the uno flag when the player who forgot gets his turn again
         //Think how to do it?
-
+        
         // Pass turn to next player 
         Game.ActivePlayerNo++;
         if (Game.ActivePlayerNo >= Game.Players.Count) Game.ActivePlayerNo = 0;
