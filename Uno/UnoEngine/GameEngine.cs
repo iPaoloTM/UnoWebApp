@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Drawing;
+using System.Text.RegularExpressions;
 using Entities;
 using System;
 using System.Collections.Generic;
@@ -15,13 +16,15 @@ public class GameEngine //i removed <TKEY>
     
     public GameState State { get; set; } = new GameState();
     
-    public PlayerMove? LastTurn { get; set; } 
+    public PlayerMove? LastTurn { get; set; }
+
+    public bool IsAscendingOrder = true;
 
     public List<Player> Players { get; set; } = new List<Player>();
     public CardDeck CardDeck { get; set; } = new CardDeck();
     public CardDeck UsedDeck { get; set; } = new CardDeck();
 
-    public Validator val { get; set; } = new Validator();
+    public Validator Val { get; set; } = new Validator();
     
     public PlayerMove? LastMove { get; set; }
 
@@ -31,7 +34,12 @@ public class GameEngine //i removed <TKEY>
 
     private GameState GameState;
 
-    public GameEngine (int numberOfPlayers)
+    public GameEngine()
+    {
+        
+    }
+
+    public GameEngine (int numberOfPlayers) // public void setupcards 
     {
         this.GameState = new GameState();
         
@@ -43,6 +51,8 @@ public class GameEngine //i removed <TKEY>
                 Position = i
             });
         }
+
+        ActivePlayerNo = 0;
 
         int maxNumOfCards = InitialHandSize * numberOfPlayers;
         int dealtCards = 0;
@@ -65,7 +75,15 @@ public class GameEngine //i removed <TKEY>
         }
         
     }
-    
+
+    public void AddPlayer(string playerName)
+    {
+        Players.Add(new Player(nickname:playerName)
+        {
+            PlayerType = EPlayerType.Human
+        });
+
+    }
     //this function will be called by MenuSystem
     public void HandlePlayerAction(Player player, PlayerMove decision)
     {
@@ -74,13 +92,13 @@ public class GameEngine //i removed <TKEY>
         switch (decision.PlayerAction)
         {
             case EPlayerAction.PlayCard:
-                response = val.ValidateAction(LastMove,decision);
+                response = Val.ValidateAction(LastMove,decision);
                 if (response)
                 {
                     UsedDeck.Insert(0, decision.PlayedCard);
                     if (decision.PlayedCard is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
                     {
-                        
+                        ////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         Console.WriteLine("Choose a new color");
                         
                         var newColor = Console.ReadLine();
@@ -89,32 +107,57 @@ public class GameEngine //i removed <TKEY>
 
 
                     }
-                    player.PlayCard(decision.PlayedCard);
+                    player.HandCards.Remove(decision.PlayedCard);
+                    LastMove = player.PlayCard(decision.PlayedCard);
                 }
                 else
                 {
                     //we need to show somehow that it's not allowed
                     Console.WriteLine("Move not allowed! Retry");
+                    //TODO: we need to add interaction with menusystem, maybe we need to return something, so that the menu system knows that we need to show choice one more time !!!
                 }
                 break;
             case EPlayerAction.Draw:
-                response = val.ValidateAction(LastMove, decision);
+                response = Val.ValidateAction(LastMove, decision);
                 if (response)
                 {
                     player.HandCards.Add(GameState.GameDeck.Cards.First());
-                    
+                    LastMove = player.Draw();
+                    LastMove.PlayedCard = UsedDeck.First();
+                    HandleUnoShouting(player);
+
                 }
                 else
                 {
                     Console.WriteLine("Move not allowed! Retry");
+                    //TODO: we need to add interaction with menusystem, maybe we need to return something, so that the menu system knows that we need to show choice one more time !!!
+
                 }
 
                 break;
             case EPlayerAction.NextPlayer:
-                response = val.ValidateAction(LastMove, decision);;
+                response = Val.ValidateAction(LastMove, decision);;
                 if (response)
                 {
-                    //we need to think what to write here guyss :( 
+                    //we need to think what to write here guyss :(
+                    if (IsAscendingOrder)
+                    {
+                        ActivePlayerNo ++;
+                        if (ActivePlayerNo >= Players.Count) //Reset player counter
+                        {
+                            ActivePlayerNo = 0;
+                        }
+                    }
+                    else
+                    {
+                        ActivePlayerNo--;
+                        if (ActivePlayerNo < 0)
+                        {
+                            ActivePlayerNo = Players.Count - 1;
+                        }
+                    }       
+                LastMove = player.NextPlayer();
+                LastMove.PlayedCard = UsedDeck.First();
                 }
                 else
                 {
@@ -125,13 +168,60 @@ public class GameEngine //i removed <TKEY>
             case EPlayerAction.SaySomething:
                 var reaction = Console.ReadLine();
                 this.Players[ActivePlayerNo].Reaction = reaction;
+                HandleUnoShouting(player, reaction);
+                if (Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Success)
+                {
+                    int playerNumber = int.Parse(Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Value);
+                    HandleUnoReporting(Players[playerNumber]);
+                }
                 break;
             default:
                 throw new Exception("something went wrong when making a decision :(");
         }
 
-        LastMove = decision;
 
+    }
+
+    public void HandleUnoShouting(Player player, string message = "")
+    {
+        if (message == "uno" && player.HandCards.Count() == 1)
+        {
+            player.SaidUno = true;
+        }
+        else if (player.SaidUno && player.HandCards.Count() > 1)
+        {
+            player.SaidUno = false;
+        }
+    }
+
+    public void HandleUnoReporting(Player player)
+    {
+        if (!player.SaidUno)
+        {
+            player.HandCards.AddRange(GameState.GameDeck.Cards.GetRange(0, 2));
+            GameState.GameDeck.Cards.RemoveRange(0, 2);
+        }
+    }
+
+    public void HandleSpecialCard(EEffect effect)
+    {
+        //TODO: is it handled in validator????
+        switch (effect)
+        {
+            case EEffect.Reverse:
+                IsAscendingOrder = !IsAscendingOrder;
+                break;
+            case EEffect.Skip:
+                break;
+            case EEffect.Wild:
+                break;
+            case EEffect.DrawFour:
+                break;
+            case EEffect.DrawTwo:
+                break;
+            default:
+                throw new Exception("something went wrong");
+        }
     }
     
     
@@ -195,7 +285,8 @@ public class GameEngine //i removed <TKEY>
             
             GameState += "}";
             
-
+            
+            //TODO: serialize this.GameState? Teacher does it in his example and is simpler
             string jsonGameState = JsonSerializer.Serialize(GameState);
 
 

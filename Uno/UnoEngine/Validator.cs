@@ -1,136 +1,270 @@
+using System.Diagnostics;
 using Entities;
 
 namespace UnoEngine;
 
 public class Validator
+{
+    public Boolean ValidatePlayerMove(PlayerMove previousPlayer, PlayerMove currentPlayer)
     {
-        public bool ValidateAction(PlayerMove previousAction, PlayerMove currentAction)
+        if (previousPlayer.PlayedCard is NumericCard)
         {
-            if (previousAction is null)
+            return ValidateByCard(previousPlayer, currentPlayer, previousPlayer.PlayedCard);
+        }
+        else if (previousPlayer.PlayedCard is SpecialCard { Effect: EEffect.Wild })
+        {
+            return ValidateByCard(previousPlayer, currentPlayer, previousPlayer.PlayedCard);
+        }
+        else if (previousPlayer.PlayedCard is SpecialCard { Effect: EEffect.Reverse })
+        {
+            return ValidateByCard(previousPlayer, currentPlayer, previousPlayer.PlayedCard);
+        }
+        else if (previousPlayer.PlayedCard is SpecialCard { Effect: EEffect.Skip })
+        {
+            return currentPlayer.PlayerAction switch
             {
-                switch (previousAction)
+                EPlayerAction.Draw => false,
+                EPlayerAction.PlayCard => false,
+                EPlayerAction.NextPlayer => true,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        else if (previousPlayer.PlayedCard is SpecialCard { Effect: EEffect.DrawTwo } )
+        {
+            if (currentPlayer.PlayerPreviousMove == null)
+            {
+                return currentPlayer.PlayerAction switch
                 {
-                    case EPlayerAction.PlayCard:
-                        return ValidatePlayCard(currentAction);
-
-                    case EPlayerAction.Draw:
-                        return ValidateDraw(currentAction);
-
-                    case EPlayerAction.NextPlayer:
-                        return ValidateNextPlayer(currentAction);
-
-                    case EPlayerAction.SaySomething:
-                        return ValidateSaySomething(currentAction);
-
-                    default:
-                        return false;
-                } 
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };  
             }
-            else
+            if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.Draw && currentPlayer.PlayerPreviousMove.PlayerPreviousMove == null )
             {
-                switch (previousAction)
+                return currentPlayer.PlayerAction switch
                 {
-                    case EPlayerAction.PlayCard:
-                        return ValidatePlayCard(currentAction);
-
-                    case EPlayerAction.Draw:
-                        return ValidateDraw(currentAction);
-
-                    case EPlayerAction.NextPlayer:
-                        return ValidateNextPlayer(currentAction);
-
-                    case EPlayerAction.SaySomething:
-                        return ValidateSaySomething(currentAction);
-
-                    default:
-                        return false;
-                } 
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };  
             }
-
-        }
-
-        private bool ValidatePlayCard(EPlayerAction currentAction)
-        {
-            switch (currentAction)
+            if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.Draw &&
+                (currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                 currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.SaySomething))
             {
-                case EPlayerAction.PlayCard:
-                    return false; 
-
-                case EPlayerAction.Draw:
-                    return false; 
-
-                case EPlayerAction.NextPlayer:
-                    return true; 
-
-                case EPlayerAction.SaySomething:
-                    return true;
-
-                default:
-                    return false;
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => false,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => true,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
             }
-        }
-
-        private bool ValidateDraw(EPlayerAction currentAction)
-        {
-            switch (currentAction)
+            if (currentPlayer.PlayerPreviousMove?.PlayerAction == EPlayerAction.SaySomething &&
+                (currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                 currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw))
             {
-                case EPlayerAction.PlayCard:
-                    return false; // PlayCard cannot follow Draw
-
-                case EPlayerAction.Draw:
-                    return true; // Draw can follow Draw
-
-                case EPlayerAction.NextPlayer:
-                    return true; // NextPlayer can follow Draw
-
-                case EPlayerAction.SaySomething:
-                    return true; // SaySomething can follow Draw
-
-                default:
-                    throw new ArgumentException("Invalid current player action.");
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => false,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => true,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
             }
         }
-
-        private bool ValidateNextPlayer(EPlayerAction currentAction)
+        else if (previousPlayer.PlayedCard is SpecialCard { Effect: EEffect.DrawFour } )
         {
-            switch (currentAction)
+            if (currentPlayer.PlayerPreviousMove == null)
             {
-                case EPlayerAction.PlayCard:
-                    return true; // PlayCard can follow NextPlayer
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };  
+            }
+            if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.Draw && currentPlayer.PlayerPreviousMove.PlayerPreviousMove == null )
+            {
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };  
+            }
+            if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw)
+            {
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
+            }
 
-                case EPlayerAction.Draw:
-                    return false; // Draw cannot follow NextPlayer
+            if (currentPlayer.PlayerPreviousMove?.PlayerAction == EPlayerAction.SaySomething &&
+                (currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                 currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction ==
+                 EPlayerAction.Draw))
+            {
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
+            }
 
-                case EPlayerAction.NextPlayer:
-                    return false; // NextPlayer cannot follow NextPlayer
-
-                case EPlayerAction.SaySomething:
-                    return true; // SaySomething can follow NextPlayer
-
-                default:
-                    throw new ArgumentException("Invalid current player action.");
+            if (currentPlayer.PlayerPreviousMove?.PlayerAction == EPlayerAction.SaySomething &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                 currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw)
+            {
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => false,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
+            }
+            if (currentPlayer.PlayerPreviousMove?.PlayerAction == EPlayerAction.SaySomething &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw)
+            {
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => true,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
+            }
+            if (currentPlayer.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw &&
+                currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.SaySomething)
+            {
+                return currentPlayer.PlayerAction switch
+                {
+                    EPlayerAction.Draw => true,
+                    EPlayerAction.PlayCard => false,
+                    EPlayerAction.NextPlayer => true,
+                    EPlayerAction.SaySomething => true,
+                    _ => false
+                };
             }
         }
-
-        private bool ValidateSaySomething(EPlayerAction currentAction)
+        return false;
+    }
+    
+    public bool ValidateByCard(PlayerMove previousPlayer, PlayerMove currentPlayer, Card card)
+    {
+        if (currentPlayer.PlayerPreviousMove is null)
         {
-            switch (currentAction)
+            return currentPlayer.PlayerAction switch
             {
-                case EPlayerAction.PlayCard:
-                    return true; // PlayCard can follow SaySomething
-
-                case EPlayerAction.Draw:
-                    return true; // Draw can follow SaySomething
-
-                case EPlayerAction.NextPlayer:
-                    return true; // NextPlayer can follow SaySomething
-
-                case EPlayerAction.SaySomething:
-                    return true; // SaySomething can follow SaySomething
-
-                default:
-                    throw new ArgumentException("Invalid current player action.");
-            }
+                EPlayerAction.Draw => true,
+                EPlayerAction.PlayCard => true,
+                EPlayerAction.NextPlayer => false,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
         }
+        else if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.Draw)
+        {
+            return currentPlayer.PlayerAction switch
+            {
+                EPlayerAction.Draw => false,
+                EPlayerAction.PlayCard => true,
+                EPlayerAction.NextPlayer => true,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        else if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.PlayCard)
+        {
+            return currentPlayer.PlayerAction switch
+            {
+                EPlayerAction.Draw => false,
+                EPlayerAction.PlayCard => false,
+                EPlayerAction.NextPlayer => true,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        else if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.SaySomething &&
+            (currentPlayer.PlayerPreviousMove.PlayerPreviousMove is null ||
+            currentPlayer.PlayerPreviousMove.PlayerPreviousMove.PlayerAction == EPlayerAction.NextPlayer))
+        {
+            return currentPlayer.PlayerAction switch
+            {
+                EPlayerAction.Draw => true,
+                EPlayerAction.PlayCard => true,
+                EPlayerAction.NextPlayer => false,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        else if (currentPlayer.PlayerPreviousMove.PlayerAction == EPlayerAction.SaySomething &&
+            currentPlayer.PlayerPreviousMove?.PlayerPreviousMove?.PlayerAction == EPlayerAction.Draw)
+        {
+            return currentPlayer.PlayerAction switch
+            {
+                EPlayerAction.Draw => false,
+                EPlayerAction.PlayCard => true,
+                EPlayerAction.NextPlayer => true,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        else if (currentPlayer.PlayerPreviousMove is { PlayerAction: EPlayerAction.SaySomething, PlayerPreviousMove.PlayerAction: EPlayerAction.PlayCard })
+        {
+            return currentPlayer.PlayerAction switch
+            {
+                EPlayerAction.Draw => false,
+                EPlayerAction.PlayCard => false,
+                EPlayerAction.NextPlayer => true,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        else if (currentPlayer.PlayerPreviousMove?.PlayerAction == EPlayerAction.NextPlayer &&
+            (currentPlayer.PlayerPreviousMove.PlayerPreviousMove is null ||
+            currentPlayer.PlayerPreviousMove.PlayerPreviousMove.PlayerAction == EPlayerAction.NextPlayer))
+        {
+            return currentPlayer.PlayerAction switch
+            {
+                EPlayerAction.Draw => true,
+                EPlayerAction.PlayCard => true,
+                EPlayerAction.NextPlayer => false,
+                EPlayerAction.SaySomething => true,
+                _ => false
+            };
+        }
+        return false;
     }
 }

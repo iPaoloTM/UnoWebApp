@@ -14,6 +14,8 @@ public class Player
     public List<Card> HandCards { get; set; } = new List<Card>();
 
     public String? Reaction { get; set; }
+
+    public bool SaidUno { get; set; } = false;
     
     
     public Player( string nickname = "player")
