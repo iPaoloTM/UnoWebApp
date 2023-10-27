@@ -1,4 +1,5 @@
-﻿using Entities;
+﻿using System.Text.Json;
+using Entities;
 
 namespace MenuSystem;
 
@@ -9,12 +10,11 @@ public class GameMenu
     public GameMenu(GameEngine game)
     {
         this.Game = game;
-        
     }
 
     public GameEngine Game { get; set; }
 
-    public void Draw()
+    public void Run()
     {
         Console.Clear();
         
@@ -35,7 +35,22 @@ public class GameMenu
             Console.WriteLine();
         }
         
+        //Show the last card of the used deck
+        Console.WriteLine(Game.UsedDeck.Cards.Count);
+        Console.ReadLine();
+        var lastCard = Game.UsedDeck.First();
+        switch (lastCard)
+        {
+            case NumericCard numCard:
+                Console.WriteLine("Last played card: " + numCard.Color + " " + numCard.Number);
+                break;
+            case SpecialCard speCard:
+                Console.WriteLine("Last played card: " + speCard.Color + " " + speCard.Effect);
+                break;
+        }
         
+        
+        Console.WriteLine("\nYour Hand:");
         //Print card information of current player
         foreach (Card c in currPlayer.HandCards)
         {
@@ -58,10 +73,24 @@ public class GameMenu
         Console.WriteLine("2. Draw from deck ");
         Console.WriteLine("3. Skip ");
         string? choice = Console.ReadLine();
+
         
+        //Test json
+        var jsonOptions = new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            AllowTrailingCommas = true
+
+        };
+        
+        Game.SaveGameState();
+        Console.WriteLine(JsonSerializer.Serialize(this.Game.GameState,jsonOptions));
+        Console.ReadLine();
+
+
         //Game.HandlePlayerAction(currPlayer, decision?)
-        
-        
+
+
     }
     
 }

@@ -2,8 +2,7 @@ namespace Entities;
 
 public class CardDeck : Deck
 {
-    public List<Card> Cards { get; set; }
-
+    
     public CardDeck()
     {
         //Initialize Numeric Cards 

@@ -29,8 +29,9 @@ public class Menu
         }
     }
 
-    private void Draw()
+    private void Draw(EMenuLevel menuLevel)
     {
+        Console.Clear();
         if (!string.IsNullOrWhiteSpace(Title))
         {
             Console.WriteLine(Title);
@@ -44,10 +45,15 @@ public class Menu
             Console.WriteLine(menuItem.Value.MenuLabel);
         }
 
-        // TODO: should not be there in the main level
-        Console.WriteLine("b) Back");
-        // TODO: should not be there in the main and second level
-        Console.WriteLine("r) Return to main");
+        if (menuLevel != EMenuLevel.First)
+        {
+            Console.WriteLine("b) Back");
+        }
+
+        if (menuLevel == EMenuLevel.Other)
+        {
+            Console.WriteLine("r) Return to main");
+        }
 
         Console.WriteLine("x) eXit");
 
@@ -62,7 +68,7 @@ public class Menu
         var userChoice = "";
         do
         {
-            Draw();
+            Draw(menuLevel);
             userChoice = Console.ReadLine()?.Trim();
 
             if (MenuItems.ContainsKey(userChoice?.ToLower()))

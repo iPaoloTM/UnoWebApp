@@ -4,7 +4,7 @@ public abstract class Deck
 {
     
 
-    protected List<Card> Cards { get; set; }
+    public List<Card> Cards { get; set; }
     private Random Rnd { get; set; } = new Random();
     
     public Deck()

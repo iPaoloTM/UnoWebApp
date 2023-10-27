@@ -13,7 +13,7 @@ namespace UnoEngine;
 public class GameEngine //i removed <TKEY> 
 {
     
-    public GameState GameState { get; set; }
+    public GameState GameState { get; set; } =  new GameState();
     
     public PlayerMove? LastTurn { get; set; } 
 
@@ -30,25 +30,19 @@ public class GameEngine //i removed <TKEY>
     private const int InitialHandSize = 7;
     
 
-    public GameEngine (int numberOfPlayers)
+    public void SetupCards()
     {
-        this.GameState = new GameState();
-        
+        //Constructor on CardDeck automatically creates another deck
+        //So I do this to avoid having 200+ cards on the table
+        //TODO: Fix 2 decks intialized
+        UsedDeck.Cards = new List<Card>();
         CardDeck.Shuffle();
-        for (int i = 0; i < numberOfPlayers; i++)
-        {
-            Players.Add(new Player()
-            {
-                Nickname = "Player" + i.ToString(),
-                Position = i
-            });
-        }
 
-        int maxNumOfCards = InitialHandSize * numberOfPlayers;
+        int maxNumOfCards = InitialHandSize * Players.Count;
         int dealtCards = 0;
         while(dealtCards < maxNumOfCards)
         {
-            for(int i = 0; i < numberOfPlayers; i ++)
+            for(int i = 0; i < Players.Count; i ++)
             {
                 Players[i].HandCards.Add(CardDeck.Cards.First());
                 CardDeck.Cards.RemoveAt(0);
@@ -56,12 +50,12 @@ public class GameEngine //i removed <TKEY>
             }
         }
         UsedDeck.Add(CardDeck.Cards.First());
-        UsedDeck.Cards.RemoveAt(0);
+        CardDeck.Cards.RemoveAt(0);
   
         while(UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
         {
             UsedDeck.Insert(0, CardDeck.Cards.First());
-            UsedDeck.Cards.RemoveAt(0);
+            CardDeck.Cards.RemoveAt(0);
         }
         
     }
@@ -110,6 +104,7 @@ public class GameEngine //i removed <TKEY>
                 }
 
                 break;
+            // Skip
             case EPlayerAction.NextPlayer:
                 response = Val.ValidateAction(LastMove, decision);;
                 if (response)
@@ -196,7 +191,8 @@ public class GameEngine //i removed <TKEY>
             
             GameState += "}";
             
-
+            
+            //TODO: serialize this.GameState? Teacher does it in his example and is simpler
             string jsonGameState = JsonSerializer.Serialize(GameState);
 
 

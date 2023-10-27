@@ -1,68 +1,63 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using Entities;
 using MenuSystem;
 using UnoEngine;
 
-//This isn't a good way to create the engine instance
-GameEngine Game = new GameEngine(0);
 
-string? startGame()
+string? startGame(GameEngine gameEngine)
 {
-    GameMenu gameMenu = new GameMenu(Game);
-    gameMenu.Draw();
+    gameEngine.SetupCards();
+    GameMenu gameMenu = new GameMenu(gameEngine);
+    gameMenu.Run();
     return null;
 }
-
-string? SetPlayerCount()
-{
-    Console.Write("Player count?");
-    var countStr = Console.ReadLine()?.Trim();
-    var count = int.Parse(countStr);
-    
-    //This is also kind of horrible code
-    Game = new GameEngine(count);
-    
-    /**
-    game.Players = new List<Player>();
-    for (int i = 0; i < count; i++)
-    {
-        game.Players.Add(new Player()
-        {
-            NickName   = "Human " + i,
-            PlayerType = EPlayerType.Human,
-        });
-    }*/
-    return null;
-}
-
 
 
 string? runNewGameMenu()
 {
-    var startNewGameMenu = new Menu("New Game", new List<MenuItem>()
+    Console.Clear();
+    var playerCount = 0;
+    var gameEngine = new GameEngine();
+
+    while (true)
+    {
+        Console.Write($"How many players? [2]:");
+        var playerCountStr = Console.ReadLine()?.Trim();
+        if (string.IsNullOrWhiteSpace(playerCountStr)) playerCountStr = "2";
+        if (int.TryParse(playerCountStr, out playerCount))
         {
-            new MenuItem()
-            {
-                Shortcut = "c",
-                MenuLabel = "Player count: ",
-                MethodToRun = SetPlayerCount
-            },
-            new MenuItem()
-            {
-                Shortcut = "t",
-                MenuLabel = "Player names and types: ",
-            },
-            new MenuItem()
-            {
-                Shortcut = "s",
-                MenuLabel = "Start the game of UNO", 
-                MethodToRun = startGame
-            },
+            //&& playerCount <= gameEngine.GetMaxAmountOfPlayers()
+            if (playerCount > 1 ) break;
         }
-    );
+    }
+
+
+    for (int i = 0; i < playerCount; i++)
+    {
+
+        string? playerName = "";
+        while (true)
+        {
+            Console.Write($"Player {i + 1} name (min 1 letter):");
+            playerName = Console.ReadLine()?.Trim();
+            if (string.IsNullOrWhiteSpace(playerName))
+            {
+                playerName = "Human" + (i + 1);
+            }
+
+            if (!string.IsNullOrWhiteSpace(playerName) && playerName.Length > 0) break;
+            Console.WriteLine("Parse error...");
+        }
+
+        gameEngine.Players.Add(new Player()
+        {
+            Nickname = playerName,
+            PlayerType = EPlayerType.Human
+        });
+    }
     
-    
-    return startNewGameMenu.Run(EMenuLevel.Second);
+    return startGame(gameEngine);
 }
 
 var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
@@ -77,11 +72,13 @@ var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
     {
         Shortcut = "l",
         MenuLabel = "Load game",
+        //To be implemented
     },
     new MenuItem()
     {
         Shortcut = "o",
         MenuLabel = "Options",
+        //To be implemented
     },
 });
 
