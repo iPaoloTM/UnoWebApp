@@ -58,8 +58,8 @@ public class GameMenu
     public void PlayerPrompt()
     {
         string? choice;
-        //bool turnOver = false;
-        do
+        //bool turnOver = false; Maybe?
+        do //While the player hasn't skipped...
         {
             Console.WriteLine("Choose an action: ");
             Console.WriteLine("1. Play a card ");
@@ -102,6 +102,36 @@ public class GameMenu
                     break;
             }
         } while (choice != "3");
+        
+        
+        //Assume the turn is over, prompt the user if they want to say something
+        //Should say UNO if they have 1 card left
+        Console.WriteLine("Do you want to say something?");
+        var screamingPlayer = Console.ReadLine();
+        
+        //Check if player has said uno when his turn ends and has 1 card left
+        if (screamingPlayer != null && screamingPlayer.ToLower().Trim() != "uno" && 
+            currPlayer.HandCards.Count == 1)
+        {
+            // Need to add some sort of UNO FLAG to GameEngine.cs, enable it here
+            //Game.ForgotUno(PlayerNumber?) should remember who forgot it
+        }
+        
+        //Someone else says uno after the player forgot to say it
+        else if (screamingPlayer!= null  && screamingPlayer.ToLower().Trim() == "uno")
+            //&& Game.UnoFlag == 1
+        {
+            // Punish player that has 1 card who didnt say Uno, remove uno flag
+            //Game.Players[PlayerNumber] take two cards, cant find a function to do it
+            //Game.UnoFlag = 0;
+        }
+        
+        //De-activate the uno flag when the player who forgot gets his turn again
+        //Think how to do it?
+
+        // Pass turn to next player 
+        Game.ActivePlayerNo++;
+        if (Game.ActivePlayerNo >= Game.Players.Count) Game.ActivePlayerNo = 0;
     }
 
     public void ShowHand()
