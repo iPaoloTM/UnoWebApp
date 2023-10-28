@@ -10,10 +10,10 @@ using System.Text.Json.Serialization;
 
 namespace UnoEngine;
 
-public class GameEngine //i removed <TKEY> 
+public class UnoEngine //i removed <TKEY> 
 {
     
-    public GameState GameState { get; set; } =  new GameState();
+    public GameState State { get; set; } = new GameState();
     
     public PlayerMove? LastTurn { get; set; } 
 
@@ -21,28 +21,30 @@ public class GameEngine //i removed <TKEY>
     public CardDeck CardDeck { get; set; } = new CardDeck();
     public CardDeck UsedDeck { get; set; } = new CardDeck();
 
-    public Validator Val { get; set; } = new Validator();
-    
-    public PlayerMove? LastMove { get; set; }
-
     public int ActivePlayerNo, CurrentRoundNo;
     
     private const int InitialHandSize = 7;
-    
 
-    public void SetupCards()
+    private GameState GameState;
+
+    public UnoEngine (int numberOfPlayers)
     {
-        //Constructor on CardDeck automatically creates another deck
-        //So I do this to avoid having 200+ cards on the table
-        //TODO: Fix 2 decks intialized
-        UsedDeck.Cards = new List<Card>();
+        this.GameState = new GameState();
+        
         CardDeck.Shuffle();
+        for (int i = 0; i < numberOfPlayers; i++)
+        {
+            Players.Add(new Player()
+            {
+                Position = i
+            });
+        }
 
-        int maxNumOfCards = InitialHandSize * Players.Count;
+        int maxNumOfCards = InitialHandSize * numberOfPlayers;
         int dealtCards = 0;
         while(dealtCards < maxNumOfCards)
         {
-            for(int i = 0; i < Players.Count; i ++)
+            for(int i = 0; i < numberOfPlayers; i ++)
             {
                 Players[i].HandCards.Add(CardDeck.Cards.First());
                 CardDeck.Cards.RemoveAt(0);
@@ -50,84 +52,71 @@ public class GameEngine //i removed <TKEY>
             }
         }
         UsedDeck.Add(CardDeck.Cards.First());
-        CardDeck.Cards.RemoveAt(0);
+        UsedDeck.Cards.RemoveAt(0);
   
         while(UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
         {
             UsedDeck.Insert(0, CardDeck.Cards.First());
-            CardDeck.Cards.RemoveAt(0);
+            UsedDeck.Cards.RemoveAt(0);
         }
         
     }
     
-    //this function will be called by MenuSystem
-    public void HandlePlayerAction(Player player, PlayerMove decision)
+    public void HandlePlayerAction(Player player, Decision decision)
     {
-        var response = false;
         //Handling "Playing Card"
-        switch (decision.PlayerAction)
+        switch (decision.typeOfDecision)
         {
             case EPlayerAction.PlayCard:
-                response = Val.ValidateAction(LastMove,decision);
+                var response = Validator.ValidateAction(card, UsedDeck.First());
                 if (response)
                 {
-                    UsedDeck.Insert(0, decision.PlayedCard);
-                    if (decision.PlayedCard is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+                    UsedDeck.Insert(0, card);
+                    if (card is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
                     {
-                        
-                        Console.WriteLine("Choose a new color");
-                        
-                        var newColor = Console.ReadLine();
-                        
-                        //some parsing and sanity check is needed
-
-
+                        var newColor = player.SelectDominantColor();
+                
                     }
-                    player.PlayCard(decision.PlayedCard);
+                    player.MakeChoice();
                 }
                 else
                 {
                     //we need to show somehow that it's not allowed
-                    Console.WriteLine("Move not allowed! Retry");
+                    player.MakeChoice();
                 }
                 break;
             case EPlayerAction.Draw:
-                response = Val.ValidateAction(LastMove, decision);
+                var response = Validator.ValidateAction(card, UsedDeck.First());
                 if (response)
                 {
-                    player.HandCards.Add(GameState.GameDeck.Cards.First());
-                    
+                    player.Hand.AddRange(DrawDeckOfCards.Draw(1));
+                    player.MakeChoice();
                 }
                 else
                 {
-                    Console.WriteLine("Move not allowed! Retry");
+                    player.MakeChoice();
                 }
 
                 break;
-            // Skip
             case EPlayerAction.NextPlayer:
-                response = Val.ValidateAction(LastMove, decision);;
+                var response = Validator.ValidateAction();
                 if (response)
                 {
                     //we need to think what to write here guyss :( 
                 }
                 else
                 {
-                    Console.WriteLine("Move not allowed! Retry");
+                    player.MakeChoice();
                 }
 
                 break;
             case EPlayerAction.SaySomething:
-                var reaction = Console.ReadLine();
-                //Im missing something here
-                //this.Players[ActivePlayerNo].Reaction = reaction;
+                ////
                 break;
             default:
                 throw new Exception("something went wrong when making a decision :(");
         }
-
-        LastMove = decision;
-
+        
     }
     
     
@@ -145,7 +134,6 @@ public class GameEngine //i removed <TKEY>
         
         this.GameState.CurrentRoundNo = this.CurrentRoundNo;
         
-        this.GameState.LastMove = this.LastMove;
         
         Console.Write("Game State saved!");
     }
@@ -191,8 +179,7 @@ public class GameEngine //i removed <TKEY>
             
             GameState += "}";
             
-            
-            //TODO: serialize this.GameState? Teacher does it in his example and is simpler
+
             string jsonGameState = JsonSerializer.Serialize(GameState);
 
 

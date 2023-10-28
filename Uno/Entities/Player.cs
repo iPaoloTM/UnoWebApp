@@ -8,13 +8,19 @@ namespace Entities;
 
 public class Player
 {
-    public string Nickname { get; set; } = default!;
+    public string Nickname { get; }
     public int Position { get; set; } = default!;
     public EPlayerType PlayerType { get; set; }
     public List<Card> HandCards { get; set; } = new List<Card>();
-    public PlayerMove? PreviousPlayerMove;
+
     private String? Reaction { get; set; }
     
+    
+    public Player( string nickname = "player")
+    {
+        Nickname = nickname ?? throw new ArgumentNullException(nameof(nickname), "Nickname cannot be null.");
+        HandCards = new List<Card>();
+    }
     
     public void AddCard(Card card)
     {
