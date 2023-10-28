@@ -5,6 +5,7 @@ namespace UnoEngine;
 
 public class Validator
 {
+    /*
     public Boolean ValidatePlayerMove(PlayerMove previousPlayer, PlayerMove currentPlayer)
     {
         if (previousPlayer.PlayedCard is NumericCard)
@@ -266,5 +267,7 @@ public class Validator
             };
         }
         return false;
+        
     }
+    */
 }

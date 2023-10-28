@@ -8,7 +8,7 @@ namespace Entities;
 
 public class Player
 {
-    public string Nickname { get; }
+    public string Nickname { get; set; }
     public int Position { get; set; } = default!;
     public EPlayerType PlayerType { get; set; }
     public List<Card> HandCards { get; set; } = new List<Card>();

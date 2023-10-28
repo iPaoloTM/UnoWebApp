@@ -14,71 +14,49 @@ namespace UnoEngine;
 public class GameEngine //i removed <TKEY> 
 {
     
+    //All attributes (Decks, players, active player...) are held inside the GAME STATE
     public GameState State { get; set; } = new GameState();
     
-    public PlayerMove? LastTurn { get; set; }
-
     public bool IsAscendingOrder = true;
 
-    public List<Player> Players { get; set; } = new List<Player>();
-    public CardDeck CardDeck { get; set; } = new CardDeck();
-    public CardDeck UsedDeck { get; set; } = new CardDeck();
-
-    public Validator Val { get; set; } = new Validator();
-    
-    public PlayerMove? LastMove { get; set; }
-
-    public int ActivePlayerNo, CurrentRoundNo;
+    public NewValidator Val { get; set; } = new NewValidator();
     
     private const int InitialHandSize = 7;
-
-    private GameState GameState;
-
-    public GameEngine()
+    
+    public void SetupCards()
     {
-        
-    }
+        //Constructor on CardDeck automatically creates another deck
+        //So I do this to avoid having 200+ cards on the table
+        //TODO: Fix 2 decks initialized
+        State.UsedDeck.Cards = new List<Card>();
+        State.GameDeck.Shuffle();
 
-    public GameEngine (int numberOfPlayers) // public void setupcards 
-    {
-        this.GameState = new GameState();
-        
-        CardDeck.Shuffle();
-        for (int i = 0; i < numberOfPlayers; i++)
-        {
-            Players.Add(new Player()
-            {
-                Position = i
-            });
-        }
-
-        ActivePlayerNo = 0;
-
-        int maxNumOfCards = InitialHandSize * numberOfPlayers;
+        int maxNumOfCards = InitialHandSize * State.Players.Count;
         int dealtCards = 0;
         while(dealtCards < maxNumOfCards)
         {
-            for(int i = 0; i < numberOfPlayers; i ++)
+            for(int i = 0; i < State.Players.Count; i ++)
             {
-                Players[i].HandCards.Add(CardDeck.Cards.First());
-                CardDeck.Cards.RemoveAt(0);
+                State.Players[i].HandCards.Add(State.GameDeck.Cards.First());
+                State.GameDeck.Cards.RemoveAt(0);
                 dealtCards++;
             }
         }
-        UsedDeck.Add(CardDeck.Cards.First());
-        UsedDeck.Cards.RemoveAt(0);
+        State.UsedDeck.Add(State.GameDeck.Cards.First());
+        State.GameDeck.Cards.RemoveAt(0);
   
-        while(UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+        while(State.UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
         {
-            UsedDeck.Insert(0, CardDeck.Cards.First());
-            UsedDeck.Cards.RemoveAt(0);
+            State.UsedDeck.Insert(0, State.GameDeck.Cards.First());
+            State.GameDeck.Cards.RemoveAt(0);
         }
         
     }
 
+
     public void AddPlayer(string playerName)
     {
-        Players.Add(new Player(nickname:playerName)
+        State.Players.Add(new Player(nickname:playerName)
         {
             PlayerType = EPlayerType.Human
         });
@@ -92,10 +70,10 @@ public class GameEngine //i removed <TKEY>
         switch (decision.PlayerAction)
         {
             case EPlayerAction.PlayCard:
-                response = Val.ValidateAction(LastMove,decision);
+                response = Val.ValidateMove(decision,State);
                 if (response)
                 {
-                    UsedDeck.Insert(0, decision.PlayedCard);
+                    State.UsedDeck.Insert(0, decision.PlayedCard);
                     if (decision.PlayedCard is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
                     {
                         ////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -108,7 +86,7 @@ public class GameEngine //i removed <TKEY>
 
                     }
                     player.HandCards.Remove(decision.PlayedCard);
-                    LastMove = player.PlayCard(decision.PlayedCard);
+                    State.LastMove = player.PlayCard(decision.PlayedCard);
                 }
                 else
                 {
@@ -118,12 +96,12 @@ public class GameEngine //i removed <TKEY>
                 }
                 break;
             case EPlayerAction.Draw:
-                response = Val.ValidateAction(LastMove, decision);
+                response = Val.ValidateMove(decision,State);
                 if (response)
                 {
-                    player.HandCards.Add(GameState.GameDeck.Cards.First());
-                    LastMove = player.Draw();
-                    LastMove.PlayedCard = UsedDeck.First();
+                    player.HandCards.Add(State.GameDeck.Cards.First());
+                    State.LastMove = player.Draw();
+                    State.LastMove.PlayedCard = State.UsedDeck.First();
                     HandleUnoShouting(player);
 
                 }
@@ -136,28 +114,28 @@ public class GameEngine //i removed <TKEY>
 
                 break;
             case EPlayerAction.NextPlayer:
-                response = Val.ValidateAction(LastMove, decision);;
+                response = Val.ValidateMove(decision,State);
                 if (response)
                 {
                     //we need to think what to write here guyss :(
                     if (IsAscendingOrder)
                     {
-                        ActivePlayerNo ++;
-                        if (ActivePlayerNo >= Players.Count) //Reset player counter
+                        State.ActivePlayerNo ++;
+                        if (State.ActivePlayerNo >= State.Players.Count) //Reset player counter
                         {
-                            ActivePlayerNo = 0;
+                            State.ActivePlayerNo = 0;
                         }
                     }
                     else
                     {
-                        ActivePlayerNo--;
-                        if (ActivePlayerNo < 0)
+                        State.ActivePlayerNo--;
+                        if (State.ActivePlayerNo < 0)
                         {
-                            ActivePlayerNo = Players.Count - 1;
+                            State.ActivePlayerNo = State.Players.Count - 1;
                         }
                     }       
-                LastMove = player.NextPlayer();
-                LastMove.PlayedCard = UsedDeck.First();
+                State.LastMove = player.NextPlayer();
+                State.LastMove.PlayedCard = State.UsedDeck.First();
                 }
                 else
                 {
@@ -167,12 +145,12 @@ public class GameEngine //i removed <TKEY>
                 break;
             case EPlayerAction.SaySomething:
                 var reaction = Console.ReadLine();
-                this.Players[ActivePlayerNo].Reaction = reaction;
+                State.Players[State.ActivePlayerNo].Reaction = reaction;
                 HandleUnoShouting(player, reaction);
                 if (Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Success)
                 {
                     int playerNumber = int.Parse(Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Value);
-                    HandleUnoReporting(Players[playerNumber]);
+                    HandleUnoReporting(State.Players[playerNumber]);
                 }
                 break;
             default:
@@ -198,8 +176,8 @@ public class GameEngine //i removed <TKEY>
     {
         if (!player.SaidUno)
         {
-            player.HandCards.AddRange(GameState.GameDeck.Cards.GetRange(0, 2));
-            GameState.GameDeck.Cards.RemoveRange(0, 2);
+            player.HandCards.AddRange(State.GameDeck.Cards.GetRange(0, 2));
+            State.GameDeck.Cards.RemoveRange(0, 2);
         }
     }
 
@@ -223,26 +201,6 @@ public class GameEngine //i removed <TKEY>
                 throw new Exception("something went wrong");
         }
     }
-    
-    
-    public void SaveGameState()
-    {
-        Console.Write("Saving Game State...");
-
-        GameState.GameDeck = this.CardDeck;
-
-        this.GameState.UsedDeck = this.UsedDeck;
-
-        this.GameState.Players = this.Players;
-
-        this.GameState.ActivePlayerNo = this.ActivePlayerNo;
-        
-        this.GameState.CurrentRoundNo = this.CurrentRoundNo;
-        
-        this.GameState.LastMove = this.LastMove;
-        
-        Console.Write("Game State saved!");
-    }
 
     public void ExportJSON(string filePath)
     {
@@ -254,7 +212,7 @@ public class GameEngine //i removed <TKEY>
 
             //include GameDeck's cards
 
-            foreach (Card c in this.GameState.GameDeck.Cards)
+            foreach (Card c in this.State.GameDeck.Cards)
             {
                 GameState += c.ToString() + ",";
             }
@@ -263,7 +221,7 @@ public class GameEngine //i removed <TKEY>
             
             //include UsedDeck's cards
 
-            foreach (Card c in this.GameState.UsedDeck.Cards)
+            foreach (Card c in this.State.UsedDeck.Cards)
             {
                 GameState += c.ToString() + ",";
             }
@@ -272,7 +230,7 @@ public class GameEngine //i removed <TKEY>
             
             //include Player hand's cards
             
-            foreach (Player p in this.GameState.Players)
+            foreach (Player p in this.State.Players)
             {
                 GameState += p.ToString() + ",";
             }
@@ -281,7 +239,7 @@ public class GameEngine //i removed <TKEY>
             
             //include utilities info
 
-            GameState += "\"ActivePlayerNo\":"+this.GameState.ActivePlayerNo+"\"CurrentRoundNo\":" + this.GameState.CurrentRoundNo + "";
+            GameState += "\"ActivePlayerNo\":"+this.State.ActivePlayerNo+"\"CurrentRoundNo\":" + this.State.CurrentRoundNo + "";
             
             GameState += "}";
             
@@ -304,3 +262,4 @@ public class GameEngine //i removed <TKEY>
 
     
 }
+

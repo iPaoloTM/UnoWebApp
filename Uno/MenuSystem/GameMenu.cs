@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json;
 using Entities;
+using UnoEngine;
 
 namespace MenuSystem;
 
@@ -22,7 +23,7 @@ public class GameMenu
         {
             Console.Clear();
 
-            currPlayer = Game.Players[Game.ActivePlayerNo];
+            currPlayer = Game.State.Players[Game.State.ActivePlayerNo];
             DrawMenu();
 
             //Print card information of current player
@@ -57,11 +58,11 @@ public class GameMenu
     //ASK THE PLAYER FOR HIS ACTIONS IN THIS FUNCTION!!
     public void PlayerPrompt()
     {
+        var turnOver = false; 
         var endTurn = false;
         string? screamingPlayer = null;
         do //While the player hasn't skipped...
         {
-            var turnOver = false; 
             Console.WriteLine("Choose an action: ");
             Console.WriteLine("1. Play a card ");
             Console.WriteLine("2. Draw from deck ");
@@ -140,8 +141,8 @@ public class GameMenu
         //Think how to do it?
         
         // Pass turn to next player 
-        Game.ActivePlayerNo++;
-        if (Game.ActivePlayerNo >= Game.Players.Count) Game.ActivePlayerNo = 0;
+        Game.State.ActivePlayerNo++;
+        if (Game.State.ActivePlayerNo >= Game.State.Players.Count) Game.State.ActivePlayerNo = 0;
     }
 
     public void ShowHand()
@@ -169,7 +170,7 @@ public class GameMenu
 
     public void ShowLastCard()
     {
-        var lastCard = Game.UsedDeck.First();
+        var lastCard = Game.State.UsedDeck.First();
         switch (lastCard)
         {
             case NumericCard numCard:
@@ -188,7 +189,7 @@ public class GameMenu
         Console.WriteLine("================================================");
 
         //Print the number of cards each player has
-        foreach (Player plyr in Game.Players)
+        foreach (Player plyr in Game.State.Players)
         {
             Console.Write(plyr.Nickname + " - ");
             foreach (Card c in plyr.HandCards)

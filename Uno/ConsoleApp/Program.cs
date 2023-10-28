@@ -50,7 +50,7 @@ string? runNewGameMenu()
             Console.WriteLine("Parse error...");
         }
 
-        gameEngine.Players.Add(new Player()
+        gameEngine.State.Players.Add(new Player()
         {
             Nickname = playerName,
             PlayerType = EPlayerType.Human

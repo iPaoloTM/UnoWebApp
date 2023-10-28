@@ -4,13 +4,8 @@ public abstract class Deck
 {
     
 
-    public List<Card> Cards { get; set; }
+    public List<Card> Cards { get; set; } = new();
     private Random Rnd { get; set; } = new Random();
-    
-    public Deck()
-    {
-        this.Cards = new List<Card>();
-    }
 
     //Changed Shuffle to be shorter and more readable
     public void Shuffle()
