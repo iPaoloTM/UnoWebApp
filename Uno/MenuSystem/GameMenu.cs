@@ -29,8 +29,6 @@ public class GameMenu
             //Print card information of current player
             ShowHand();
 
-            Console.WriteLine();
-
             // Ask the player for his choice
             PlayerPrompt();
         } while (true); //Change condition later
@@ -58,7 +56,8 @@ public class GameMenu
     //ASK THE PLAYER FOR HIS ACTIONS IN THIS FUNCTION!!
     public void PlayerPrompt()
     {
-        var turnOver = false; 
+        var turnOver = false;
+        var canDraw = true;
         var endTurn = false;
         string? screamingPlayer = null;
         do //While the player hasn't skipped...
@@ -69,60 +68,117 @@ public class GameMenu
             Console.WriteLine("3. Say something");
             Console.WriteLine("4. Skip ");
             var choice = Console.ReadLine();
+            int success = 0;
             switch (choice)
             {
                 // Try to play a card
                 case "1":
-                    ShowLastCard();
-                    ShowHand();
-                    var maxCards = currPlayer.HandCards.Count;
-                    Console.WriteLine("Choose a card from 1 to " + maxCards + ": ");
-                    var chosenCard = Console.ReadLine();
-                    if (int.TryParse(chosenCard, out var chosenInt) && chosenInt > 0 && chosenInt < maxCards)
+                    if (turnOver)
                     {
-                        var playingCard = currPlayer.HandCards[chosenInt - 1];
-                        var movePlay =
-                            new PlayerMove(currPlayer, EPlayerAction.PlayCard, playingCard);
-                        //Check if the move is valid? Will edit when method is clearly defined
-                        //if ... { Handle accepted move...}
-                        Game.HandlePlayerAction(currPlayer, movePlay);
-                        turnOver = true;
+                        Console.WriteLine("You already acted this turn!");
+                        Console.ReadLine();
                     }
+                    else
+                    {
+                        ShowLastCard();
+                        ShowHand();
+                        var maxCards = currPlayer.HandCards.Count;
+                        Console.WriteLine("Choose a card from 1 to " + maxCards + ": ");
+                        var chosenCard = Console.ReadLine();
+                        if (int.TryParse(chosenCard, out var chosenInt) && chosenInt > 0 && chosenInt <= maxCards)
+                        {
+                            var playingCard = currPlayer.HandCards[chosenInt - 1];
+                            var movePlay =
+                                new PlayerMove(currPlayer, EPlayerAction.PlayCard, playingCard);
+                            //Check if the move is valid? Will edit when method is clearly defined
+                            //if ... { Handle accepted move...}
+                            success = Game.HandlePlayerAction(movePlay);
+                            if (success == 1) turnOver = true;
+                            else if (success == 2)
+                            {
+                                Console.WriteLine("Choose a new color: ");
+                                Console.WriteLine("1) Red");
+                                Console.WriteLine("2) Blue");
+                                Console.WriteLine("3) Yellow");
+                                Console.WriteLine("4) Green");
+                                string? color = Console.ReadLine();
+                                Game.SetColorInPlay(int.Parse(color));
+                                turnOver = true;
+                            }
+                            
+                            
+                            else
+                            {
+                                Console.WriteLine("Can't play the selected card!");
+                                Console.ReadLine();
+                            }
+                        }
+
+                        Console.Clear();
+                        DrawMenu();
+                        ShowHand();
+                    }
+
                     break;
                 case "2":
-                    //The player wants to draw a card
-                    //Card should be null here??
-                    var moveDraw = new PlayerMove(currPlayer, EPlayerAction.Draw, null);
-                    //Check if the player can NOT play a card to validate the draw action?
-                    Game.HandlePlayerAction(currPlayer, moveDraw);
-                    turnOver = true;
+                    if (turnOver)
+                    {
+                        Console.WriteLine("You already acted this turn!");
+                        Console.ReadLine();
+                    }
+                    else if (!canDraw)
+                    {
+                        Console.WriteLine("You can play one of your cards!");
+                    }
+                    else
+                    {
+                        //The player wants to draw a card
+                        //Card should be null here??
+                        var moveDraw = new PlayerMove(currPlayer, EPlayerAction.Draw, null);
+                        success = Game.HandlePlayerAction(moveDraw);
+                        if (success == 1)
+                        {
+                            turnOver = true;
+                            canDraw = false;
+                        }
+                        else if (success == 3)
+                        {
+                            canDraw = false;
+                        }
+                        else
+                        {
+                            Console.WriteLine("You can play one of your cards!");
+                            Console.ReadLine();
+                        }
+                    }
+
+                    Console.Clear();
+                    DrawMenu();
+                    ShowHand();
                     break;
                 case "3":
                     Console.WriteLine("What do you want to say?");
                     screamingPlayer = Console.ReadLine();
-                    
-                    //Someone else says uno after the player forgot to say it
-                    if (screamingPlayer!= null  && screamingPlayer.ToLower().Trim() == "uno")
-                        //&& Game.UnoFlag == 1
-                    {
-                        // Punish player that has 1 card who didnt say Uno, remove uno flag
-                        //Game.Players[PlayerNumber] take two cards, cant find a function to do it
-                        //Game.UnoFlag = 0;
-                    }
-                    
+                    Game.HandleUnoShouting(currPlayer, screamingPlayer);
+                    Game.HandleUnoReporting(screamingPlayer);
                     break;
                 case "4":
                     //Player wants to skip to the next player?
                     var moveSkip = new PlayerMove(currPlayer, EPlayerAction.NextPlayer, null);
-                    Game.HandlePlayerAction(currPlayer, moveSkip);
-                    
+                    Game.HandlePlayerAction(moveSkip);
+
                     //Only end turn if the player has drawn or played
                     if (turnOver)
                     {
                         endTurn = true;
-                    } else {Console.WriteLine("Can't end turn without doing an action");}
+                    }
+                    else
+                    {
+                        Console.WriteLine("Can't end turn without doing an action");
+                    }
+
                     break;
-                
+
                 default:
                     Console.WriteLine("Invalid option");
                     break;
@@ -130,7 +186,7 @@ public class GameMenu
         } while (!endTurn);
 
         //Check if player has said uno when his turn ends and has 1 card left
-        if ((screamingPlayer == null || screamingPlayer.ToLower().Trim() != "uno") && 
+        if ((screamingPlayer == null || screamingPlayer.ToLower().Trim() != "uno") &&
             currPlayer.HandCards.Count == 1)
         {
             // Need to add some sort of UNO FLAG to GameEngine.cs, enable it here
@@ -139,15 +195,11 @@ public class GameMenu
 
         //De-activate the uno flag when the player who forgot gets his turn again
         //Think how to do it?
-        
-        // Pass turn to next player 
-        Game.State.ActivePlayerNo++;
-        if (Game.State.ActivePlayerNo >= Game.State.Players.Count) Game.State.ActivePlayerNo = 0;
     }
 
     public void ShowHand()
     {
-        Console.WriteLine("\nYour Hand:");
+        Console.WriteLine("Your Hand:");
         int i = 0;
         //Add colored text in the future
         foreach (Card c in currPlayer.HandCards)
@@ -155,16 +207,17 @@ public class GameMenu
             if (c is NumericCard)
             {
                 NumericCard nc = (NumericCard)c;
-                Console.Write(i+1 + ") " + nc.Color + " " + nc.Number + ", ");
+                Console.Write(i + 1 + ") " + nc.Color + " " + nc.Number + ", ");
             }
             else if (c is SpecialCard)
             {
                 SpecialCard nc = (SpecialCard)c;
-                Console.Write(i+1 + ") " + nc.Color + " " + nc.Effect + ", ");
+                Console.Write(i + 1 + ") " + nc.Color + " " + nc.Effect + ", ");
             }
 
             i++;
         }
+
         Console.WriteLine();
     }
 
@@ -180,6 +233,8 @@ public class GameMenu
                 Console.WriteLine("Last played card: " + speCard.Color + " " + speCard.Effect);
                 break;
         }
+
+        Console.WriteLine();
     }
 
     public void DrawMenu()
@@ -203,5 +258,9 @@ public class GameMenu
 
         //Show the last card of the used deck
         ShowLastCard();
+        if (Game.State.UsedDeck.Cards.First().Color == EColors.Black)
+        {
+            Console.WriteLine("Chosen color: " + Game.State.ColorInPlay);
+        }
     }
 }

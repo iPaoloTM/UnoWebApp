@@ -13,16 +13,15 @@ namespace UnoEngine;
 
 public class GameEngine //i removed <TKEY> 
 {
-    
     //All attributes (Decks, players, active player...) are held inside the GAME STATE
     public GameState State { get; set; } = new GameState();
-    
+
     public bool IsAscendingOrder = true;
 
     public NewValidator Val { get; set; } = new NewValidator();
-    
+
     private const int InitialHandSize = 7;
-    
+
     public void SetupCards()
     {
         //Constructor on CardDeck automatically creates another deck
@@ -33,134 +32,152 @@ public class GameEngine //i removed <TKEY>
 
         int maxNumOfCards = InitialHandSize * State.Players.Count;
         int dealtCards = 0;
-        while(dealtCards < maxNumOfCards)
+        while (dealtCards < maxNumOfCards)
         {
-            for(int i = 0; i < State.Players.Count; i ++)
+            for (int i = 0; i < State.Players.Count; i++)
             {
                 State.Players[i].HandCards.Add(State.GameDeck.Cards.First());
                 State.GameDeck.Cards.RemoveAt(0);
                 dealtCards++;
             }
         }
+
         State.UsedDeck.Add(State.GameDeck.Cards.First());
         State.GameDeck.Cards.RemoveAt(0);
-  
-        while(State.UsedDeck.First() is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+
+        while (State.UsedDeck.First() is SpecialCard specialCard &&
+               (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
         {
             State.UsedDeck.Insert(0, State.GameDeck.Cards.First());
             State.GameDeck.Cards.RemoveAt(0);
         }
-        
     }
 
 
     public void AddPlayer(string playerName)
     {
-        State.Players.Add(new Player(nickname:playerName)
+        State.Players.Add(new Player(nickname: playerName)
         {
             PlayerType = EPlayerType.Human
         });
-
     }
+
     //this function will be called by MenuSystem
-    public void HandlePlayerAction(Player player, PlayerMove decision)
+    // Return int types:
+    // 0. False
+    // 1. True
+    // 2. Need to choose color
+    // 3. Can play drawn card
+    public int HandlePlayerAction(PlayerMove decision)
     {
         var response = false;
+        var playingPlayer = State.Players[State.ActivePlayerNo];
         //Handling "Playing Card"
         switch (decision.PlayerAction)
         {
             case EPlayerAction.PlayCard:
-                response = Val.ValidateMove(decision,State);
+                response = Val.ValidateMove(decision, State);
                 if (response)
                 {
                     State.UsedDeck.Insert(0, decision.PlayedCard);
-                    if (decision.PlayedCard is SpecialCard specialCard && (specialCard.Effect == EEffect.Wild || specialCard.Effect == EEffect.DrawFour))
+
+                    playingPlayer.HandCards.Remove(decision.PlayedCard);
+                    State.LastMove = playingPlayer.PlayCard(decision.PlayedCard);
+                    if (decision.PlayedCard is SpecialCard newSpecialCard)
                     {
-                        ////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        Console.WriteLine("Choose a new color");
-                        
-                        var newColor = Console.ReadLine();
-                        
-                        //some parsing and sanity check is needed
-
-
+                        switch (newSpecialCard.Effect)
+                        {
+                            case EEffect.Reverse:
+                                IsAscendingOrder = !IsAscendingOrder;
+                                break;
+                            case EEffect.Skip:
+                                State.ActivePlayerNo = NextTurn();
+                                break;
+                            case EEffect.Wild:
+                                Console.WriteLine("WILD");
+                                Console.ReadLine();
+                                return 2;
+                                break;
+                            case EEffect.DrawFour:
+                                DrawCards(4, NextTurn());
+                                State.ActivePlayerNo = NextTurn();
+                                Console.WriteLine("d4");
+                                Console.ReadLine();
+                                return 2;
+                                break;
+                            case EEffect.DrawTwo:
+                                DrawCards(2, NextTurn());
+                                State.ActivePlayerNo = NextTurn();
+                                break;
+                            default:
+                                throw new Exception("something went wrong");
+                        }
                     }
-                    player.HandCards.Remove(decision.PlayedCard);
-                    State.LastMove = player.PlayCard(decision.PlayedCard);
+
+                    State.ColorInPlay = decision.PlayedCard.Color;
+
+                    return 1;
                 }
                 else
                 {
-                    //we need to show somehow that it's not allowed
-                    Console.WriteLine("Move not allowed! Retry");
-                    //TODO: we need to add interaction with menusystem, maybe we need to return something, so that the menu system knows that we need to show choice one more time !!!
+                    return 0;
                 }
+
                 break;
             case EPlayerAction.Draw:
-                response = Val.ValidateMove(decision,State);
+                response = Val.ValidateMove(decision, State);
                 if (response)
                 {
-                    player.HandCards.Add(State.GameDeck.Cards.First());
-                    State.LastMove = player.Draw();
+                    playingPlayer.HandCards.Add(State.GameDeck.Cards.First());
+                    if (Val.CanPlayCard(State.GameDeck.Cards.First(), State))
+                    {
+                        return 3;
+                    }
+                    State.LastMove = playingPlayer.Draw();
+                    State.GameDeck.Cards.RemoveAt(0);
                     State.LastMove.PlayedCard = State.UsedDeck.First();
-                    HandleUnoShouting(player);
+                    
+                    
 
+                    HandleUnoShouting(playingPlayer);
+                    return 1;
                 }
                 else
                 {
-                    Console.WriteLine("Move not allowed! Retry");
-                    //TODO: we need to add interaction with menusystem, maybe we need to return something, so that the menu system knows that we need to show choice one more time !!!
-
+                    return 0;
                 }
 
                 break;
             case EPlayerAction.NextPlayer:
-                response = Val.ValidateMove(decision,State);
+                response = Val.ValidateMove(decision, State);
                 if (response)
                 {
                     //we need to think what to write here guyss :(
-                    if (IsAscendingOrder)
-                    {
-                        State.ActivePlayerNo ++;
-                        if (State.ActivePlayerNo >= State.Players.Count) //Reset player counter
-                        {
-                            State.ActivePlayerNo = 0;
-                        }
-                    }
-                    else
-                    {
-                        State.ActivePlayerNo--;
-                        if (State.ActivePlayerNo < 0)
-                        {
-                            State.ActivePlayerNo = State.Players.Count - 1;
-                        }
-                    }       
-                State.LastMove = player.NextPlayer();
-                State.LastMove.PlayedCard = State.UsedDeck.First();
+                    State.ActivePlayerNo = NextTurn();
+                    State.LastMove = playingPlayer.NextPlayer();
+                    State.LastMove.PlayedCard = State.UsedDeck.First();
+                    return 1;
                 }
                 else
                 {
-                    Console.WriteLine("Move not allowed! Retry");
+                    return 0;
                 }
 
                 break;
             case EPlayerAction.SaySomething:
                 var reaction = Console.ReadLine();
                 State.Players[State.ActivePlayerNo].Reaction = reaction;
-                HandleUnoShouting(player, reaction);
-                if (Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Success)
-                {
-                    int playerNumber = int.Parse(Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Value);
-                    HandleUnoReporting(State.Players[playerNumber]);
-                }
+                HandleUnoShouting(playingPlayer, reaction);
+
                 break;
             default:
                 throw new Exception("something went wrong when making a decision :(");
         }
 
-
+        return 0;
     }
 
-    public void HandleUnoShouting(Player player, string message = "")
+    public void HandleUnoShouting(Player player, string? message = "")
     {
         if (message == "uno" && player.HandCards.Count() == 1)
         {
@@ -172,35 +189,63 @@ public class GameEngine //i removed <TKEY>
         }
     }
 
-    public void HandleUnoReporting(Player player)
+    public void HandleUnoReporting(string reaction)
     {
-        if (!player.SaidUno)
+        if (Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Success)
         {
-            player.HandCards.AddRange(State.GameDeck.Cards.GetRange(0, 2));
-            State.GameDeck.Cards.RemoveRange(0, 2);
+            int playerNumber = int.Parse(Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Value);
+            if (playerNumber > State.Players.Count && !State.Players[playerNumber].SaidUno)
+            {
+                DrawCards(2, playerNumber);
+            }
         }
     }
 
-    public void HandleSpecialCard(EEffect effect)
+    public void DrawCards(int n, int playerNumber)
     {
-        //TODO: is it handled in validator????
-        switch (effect)
+        State.Players[playerNumber].HandCards.AddRange(State.GameDeck.Cards.GetRange(0, n));
+        State.GameDeck.Cards.RemoveRange(0, n);
+    }
+
+    public void SetColorInPlay(int color)
+    {
+        switch (color)
         {
-            case EEffect.Reverse:
-                IsAscendingOrder = !IsAscendingOrder;
+            case 1:
+                State.ColorInPlay = EColors.Red;
                 break;
-            case EEffect.Skip:
+            case 2:
+                State.ColorInPlay = EColors.Blue;
                 break;
-            case EEffect.Wild:
+            case 3:
+                State.ColorInPlay = EColors.Yellow;
                 break;
-            case EEffect.DrawFour:
+            case 4:
+                State.ColorInPlay = EColors.Green;
                 break;
-            case EEffect.DrawTwo:
-                break;
-            default:
-                throw new Exception("something went wrong");
         }
     }
+
+    public int NextTurn()
+    {
+        if (IsAscendingOrder)
+        {
+            if (State.ActivePlayerNo + 1 >= State.Players.Count) //Reset player counter
+            {
+                return 0;
+            }
+            else return State.ActivePlayerNo + 1;
+        }
+        else
+        {
+            if (State.ActivePlayerNo - 1 < 0)
+            {
+                return State.Players.Count - 1;
+            }
+            else return State.ActivePlayerNo - 1;
+        }
+    }
+
 
     public void ExportJSON(string filePath)
     {
@@ -218,32 +263,33 @@ public class GameEngine //i removed <TKEY>
             }
 
             GameState += "], \"UsedDeck\":[";
-            
+
             //include UsedDeck's cards
 
             foreach (Card c in this.State.UsedDeck.Cards)
             {
                 GameState += c.ToString() + ",";
             }
-            
+
             GameState += "], \"Players\":[";
-            
+
             //include Player hand's cards
-            
+
             foreach (Player p in this.State.Players)
             {
                 GameState += p.ToString() + ",";
             }
 
             GameState += "],";
-            
+
             //include utilities info
 
-            GameState += "\"ActivePlayerNo\":"+this.State.ActivePlayerNo+"\"CurrentRoundNo\":" + this.State.CurrentRoundNo + "";
-            
+            GameState += "\"ActivePlayerNo\":" + this.State.ActivePlayerNo + "\"CurrentRoundNo\":" +
+                         this.State.CurrentRoundNo + "";
+
             GameState += "}";
-            
-            
+
+
             //TODO: serialize this.GameState? Teacher does it in his example and is simpler
             string jsonGameState = JsonSerializer.Serialize(GameState);
 
@@ -257,9 +303,4 @@ public class GameEngine //i removed <TKEY>
             Console.WriteLine("Error exporting game state to JSON: " + ex.Message);
         }
     }
-
-
-
-    
 }
-

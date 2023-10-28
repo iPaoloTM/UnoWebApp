@@ -5,7 +5,6 @@ using System.Net.NetworkInformation;
 
 namespace Entities;
 
-
 public class Player
 {
     public string Nickname { get; set; }
@@ -16,19 +15,19 @@ public class Player
     public String? Reaction { get; set; }
 
     public bool SaidUno { get; set; } = false;
-    
-    
-    public Player( string nickname = "player")
+
+
+    public Player(string nickname = "player")
     {
         Nickname = nickname ?? throw new ArgumentNullException(nameof(nickname), "Nickname cannot be null.");
         HandCards = new List<Card>();
     }
-    
+
     public void AddCard(Card card)
     {
         HandCards.Add(card);
     }
-    
+
     public void TakeCard(Card card)
     {
         if (card == null)
@@ -43,14 +42,14 @@ public class Player
 
         HandCards.Remove(card);
     }
-    
+
     public PlayerMove PlayCard(Card card)
     {
         var playerMove = new PlayerMove(this, EPlayerAction.PlayCard, card);
-        return playerMove; 
+        return playerMove;
     }
 
-    public PlayerMove Draw( )
+    public PlayerMove Draw()
     {
         var playerMove = new PlayerMove(this, EPlayerAction.Draw, null);
         return playerMove;
@@ -62,25 +61,24 @@ public class Player
         return playerMove;
     }
 
-        public string getPlayerHand()
+    public string GetPlayerHand()
+    {
+        string res = "";
+
+        foreach (Card c in this.HandCards)
         {
-            string res = "";
-
-            foreach (Card c in this.HandCards)
-            {
-                res += c.ToString() + ",";
-
-            }
-
-            return res;
+            res += c.ToString() + ",";
         }
-        
-        public override string ToString()
-        {
-            return "{\"Nickname\":\"" + this.Nickname + "\", \"Position\": " + this.Position + ", \"Hand\":[" +
-                   this.getPlayerHand() + "], \"Reaction\": \"" + this.Reaction + "\"}";
-        }
-        
+
+        return res;
+    }
+
+    public override string ToString()
+    {
+        return "{\"Nickname\":\"" + this.Nickname + "\", \"Position\": " + this.Position + ", \"Hand\":[" +
+               this.GetPlayerHand() + "], \"Reaction\": \"" + this.Reaction + "\"}";
+    }
+
     public PlayerMove SaySomething()
     {
         var playerMove = new PlayerMove(this, EPlayerAction.SaySomething, null);

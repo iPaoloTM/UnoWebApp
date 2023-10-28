@@ -9,6 +9,8 @@ public class GameState
     
     public PlayerMove? LastMove { get; set; }
     public int CurrentRoundNo { get; set; } = 0;
+
+    public EColors ColorInPlay;
     
     public static int NumberOfCards = 112;
 

@@ -9,65 +9,59 @@ public class NewValidator
         Card? lastCard;
         switch (newAction.PlayerAction)
         {
-            
             //Check number and color of the card try1ing to be played
             case EPlayerAction.PlayCard:
-            {
-                lastCard = tableState.UsedDeck.First();
-
-                if (newAction.PlayedCard is NumericCard numCard)
-                {
-                    if (lastCard is NumericCard lastCardNum)
-                    {
-                        return (numCard.Color == lastCardNum.Color || numCard.Number == lastCardNum.Number);
-                    }
-                    else if (lastCard is SpecialCard lastCardSpe)
-                    {
-                        return numCard.Color == lastCardSpe.Color;
-                    }
-                }
-
-                else if (newAction.PlayedCard is SpecialCard speCard)
-                {
-                    return speCard.Color == lastCard.Color;
-                }
-
+                return CanPlayCard(newAction.PlayedCard, tableState);
                 break;
-            }
-            
             //Check if the player has a playable card, if not, validate the move
             case EPlayerAction.Draw:
-                lastCard = tableState.UsedDeck.First();
-                return CanPlay(newAction, lastCard);
+                return !CanPlay(newAction, tableState);
                 break;
+            case EPlayerAction.NextPlayer:
+                return true;
         }
 
         return false;
     }
 
     //Check if the player can play any of his cards on top of the one on the table
-    public bool CanPlay(PlayerMove newAction, Card lastCardTable)
+    public bool CanPlay(PlayerMove newAction, GameState state)
     {
         var playerHand = newAction.Player.HandCards;
         foreach (var card in playerHand)
         {
-            if (lastCardTable is NumericCard numericLastCard)
+            return CanPlayCard(card, state);
+        }
+
+        return false;
+    }
+
+    public bool CanPlayCard(Card card, GameState state)
+    {
+        if (card.Color == EColors.Black) return true;
+
+        if (state.UsedDeck.First() is NumericCard numericLastCard)
+        {
+            if (card is NumericCard numericCard)
             {
-                if (card is NumericCard numericCard)
-                {
-                    if (numericCard.Color == numericLastCard.Color || numericCard.Number == numericLastCard.Number)
-                    {
-                        return true;
-                    }
-                }
-                else if (card is SpecialCard specialCard)
-                {
-                    if (specialCard.Color == numericLastCard.Color) return true;
-                }
+                return (numericCard.Color == numericLastCard.Color || numericCard.Number == numericLastCard.Number);
             }
-            else if (lastCardTable is SpecialCard specialLastCard)
+            else if (card is SpecialCard specialCard)
             {
-                if (card.Color == specialLastCard.Color) return true;
+                return (specialCard.Color == numericLastCard.Color);
+            }
+        }
+        else if (state.UsedDeck.First() is SpecialCard specialLastCard)
+        {
+            if (card is SpecialCard cardSpe)
+            {
+                return (cardSpe.Color == specialLastCard.Color || cardSpe.Effect == specialLastCard.Effect ||
+                        (specialLastCard.Color == EColors.Black && state.ColorInPlay == cardSpe.Color));
+            }
+            else if (card is NumericCard cardNum)
+            {
+                return (cardNum.Color == specialLastCard.Color ||
+                        (specialLastCard.Color == EColors.Black && state.ColorInPlay == cardNum.Color));
             }
         }
 
