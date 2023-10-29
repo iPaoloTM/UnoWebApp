@@ -68,7 +68,7 @@ public class GameEngine //i removed <TKEY>
     // 1. True
     // 2. Need to choose color
     // 3. Can play drawn card
-    // 4. Game over, someone has 0 cards
+    // 4. Game over, someone played their last card
     public int HandlePlayerAction(PlayerMove decision)
     {
         var response = false;
@@ -263,6 +263,25 @@ public class GameEngine //i removed <TKEY>
     }
 
 
+    public void NewJSONExport(string filePath)
+    {
+        //TODO: Create function to deserialize and load the state, and save the games somewhere in file system
+        //For deserializing into a object:
+        //var deserializedList = JsonSerializer.Deserialize<State>(json, options);
+        
+        var options = new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        };
+        options.Converters.Add(new JsonConverterUno());
+        
+
+        string json = JsonSerializer.Serialize(this.State, options);
+        Console.WriteLine(json);
+        Console.ReadLine();
+        
+    }
+    
     public void ExportJSON(string filePath)
     {
         Console.Write("Exporting Game State to JSON...");

@@ -5,7 +5,7 @@ using MenuSystem;
 using UnoEngine;
 
 
-string? startGame(GameEngine gameEngine)
+string? StartGame(GameEngine gameEngine)
 {
     gameEngine.SetupCards();
     GameMenu gameMenu = new GameMenu(gameEngine);
@@ -14,7 +14,7 @@ string? startGame(GameEngine gameEngine)
 }
 
 
-string? runNewGameMenu()
+string? RunNewGameMenu()
 {
     Console.Clear();
     var playerCount = 0;
@@ -57,7 +57,7 @@ string? runNewGameMenu()
         });
     }
     
-    return startGame(gameEngine);
+    return StartGame(gameEngine);
 }
 
 var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
@@ -66,7 +66,7 @@ var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
     {
         Shortcut = "s",
         MenuLabel = "Start a new game",
-        MethodToRun = runNewGameMenu
+        MethodToRun = RunNewGameMenu
     },
     new MenuItem()
     {

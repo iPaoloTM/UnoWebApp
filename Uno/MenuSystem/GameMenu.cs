@@ -28,7 +28,10 @@ public class GameMenu
 
             //Print card information of current player
             ShowHand();
-
+            
+            //TODO: Remove (Debug)
+            Game.NewJSONExport("");
+            
             // Ask the player for his choice
             PlayerPrompt();
         } while (!Game.State.GameOver);
