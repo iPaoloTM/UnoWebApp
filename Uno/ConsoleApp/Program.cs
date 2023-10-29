@@ -1,5 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.ComponentModel;
+using System.Text.Json;
 using Entities;
 using MenuSystem;
 using UnoEngine;
@@ -13,6 +15,24 @@ string? StartGame(GameEngine gameEngine)
     return null;
 }
 
+string? LoadGame()
+{
+    var newEngine = new GameEngine();
+    string jsonContent = File.ReadAllText("../SaveGames/game.json");
+    
+    var options = new JsonSerializerOptions()
+    {
+        WriteIndented = true
+    };
+    options.Converters.Add(new JsonConverterUno());
+
+    GameState? deserializeState = JsonSerializer.Deserialize<GameState>(jsonContent,options);
+
+    newEngine.State = deserializeState;
+    GameMenu gameMenu = new GameMenu(newEngine);
+    gameMenu.Run();
+    return null;
+}
 
 string? RunNewGameMenu()
 {
@@ -72,7 +92,7 @@ var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
     {
         Shortcut = "l",
         MenuLabel = "Load game",
-        //To be implemented
+        MethodToRun = LoadGame
     },
     new MenuItem()
     {

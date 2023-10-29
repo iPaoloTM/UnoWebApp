@@ -15,7 +15,7 @@ public class GameMenu
     }
 
     public GameEngine Game { get; set; }
-    private Player currPlayer { get; set; } = default!;
+    private Player CurrPlayer { get; set; } = default!;
 
     public void Run()
     {
@@ -23,14 +23,11 @@ public class GameMenu
         {
             Console.Clear();
 
-            currPlayer = Game.State.Players[Game.State.ActivePlayerNo];
+            CurrPlayer = Game.State.Players[Game.State.ActivePlayerNo];
             DrawMenu();
 
             //Print card information of current player
             ShowHand();
-            
-            //TODO: Remove (Debug)
-            Game.NewJSONExport("");
             
             // Ask the player for his choice
             PlayerPrompt();
@@ -39,7 +36,7 @@ public class GameMenu
         Console.Clear();
         Console.WriteLine("> G A M E  O V E R <");
         Console.WriteLine("Congratulations!");
-        Console.WriteLine("Player: " + currPlayer.Nickname + " has won the game!");
+        Console.WriteLine("Player: " + CurrPlayer.Nickname + " has won the game!");
         Console.ReadLine();
 
         /*
@@ -89,14 +86,14 @@ public class GameMenu
                     }
                     else
                     {
-                        var maxCards = currPlayer.HandCards.Count;
+                        var maxCards = CurrPlayer.HandCards.Count;
                         Console.WriteLine("Choose a card from 1 to " + maxCards + ": ");
                         var chosenCard = Console.ReadLine();
                         if (int.TryParse(chosenCard, out var chosenInt) && chosenInt > 0 && chosenInt <= maxCards)
                         {
-                            var playingCard = currPlayer.HandCards[chosenInt - 1];
+                            var playingCard = CurrPlayer.HandCards[chosenInt - 1];
                             var movePlay =
-                                new PlayerMove(currPlayer, EPlayerAction.PlayCard, playingCard);
+                                new PlayerMove(CurrPlayer, EPlayerAction.PlayCard, playingCard);
                             //Check if the move is valid? Will edit when method is clearly defined
                             //if ... { Handle accepted move...}
                             success = Game.HandlePlayerAction(movePlay);
@@ -145,7 +142,7 @@ public class GameMenu
                     {
                         //The player wants to draw a card
                         //Card should be null here??
-                        var moveDraw = new PlayerMove(currPlayer, EPlayerAction.Draw, null);
+                        var moveDraw = new PlayerMove(CurrPlayer, EPlayerAction.Draw, null);
                         success = Game.HandlePlayerAction(moveDraw);
                         if (success == 1)
                         {
@@ -171,7 +168,7 @@ public class GameMenu
                 case "3":
                     Console.WriteLine("What do you want to say?");
                     screamingPlayer = Console.ReadLine();
-                    Game.HandleUnoShouting(currPlayer, screamingPlayer);
+                    Game.HandleUnoShouting(CurrPlayer, screamingPlayer);
                     Game.HandleUnoReporting(screamingPlayer);
                     Console.Clear();
                     DrawMenu();
@@ -180,7 +177,7 @@ public class GameMenu
                 //PLayer wants to end his turn 
                 case "4":
                     //Only end turn if the player has drawn or played
-                    var moveSkip = new PlayerMove(currPlayer, EPlayerAction.NextPlayer, null);
+                    var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(moveSkip);
                     if (turnOver)
                     {
@@ -213,7 +210,7 @@ public class GameMenu
         Console.WriteLine("Your Hand:");
         int i = 0;
         //Add colored text in the future
-        foreach (Card c in currPlayer.HandCards)
+        foreach (Card c in CurrPlayer.HandCards)
         {
             if (c is NumericCard)
             {
@@ -256,7 +253,7 @@ public class GameMenu
     public void DrawMenu()
     {
         //Display whose turn it is
-        Console.WriteLine("Player " + currPlayer.Nickname + "'s turn");
+        Console.WriteLine("Player " + CurrPlayer.Nickname + "'s turn");
         Console.WriteLine("================================================");
 
         //Print the number of cards each player has

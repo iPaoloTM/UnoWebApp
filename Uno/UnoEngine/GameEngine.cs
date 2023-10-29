@@ -20,7 +20,7 @@ public class GameEngine //i removed <TKEY>
 
     public NewValidator Val { get; set; } = new NewValidator();
 
-    private const int InitialHandSize = 7;
+    private const int InitialHandSize = 1;
 
     public void SetupCards()
     {
@@ -158,6 +158,7 @@ public class GameEngine //i removed <TKEY>
                     State.ActivePlayerNo = NextTurn();
                     State.LastMove = playingPlayer.NextPlayer();
                     State.LastMove.PlayedCard = State.UsedDeck.First();
+                    NewJSONExport("../SaveGames/game.json");
                     return 1;
                 }
                 else
@@ -265,20 +266,17 @@ public class GameEngine //i removed <TKEY>
 
     public void NewJSONExport(string filePath)
     {
-        //TODO: Create function to deserialize and load the state, and save the games somewhere in file system
-        //For deserializing into a object:
-        //var deserializedList = JsonSerializer.Deserialize<State>(json, options);
-        
         var options = new JsonSerializerOptions()
         {
             WriteIndented = true
         };
         options.Converters.Add(new JsonConverterUno());
         
-
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+        
         string json = JsonSerializer.Serialize(this.State, options);
-        Console.WriteLine(json);
-        Console.ReadLine();
+        
+        File.WriteAllText(filePath, json);
         
     }
     
