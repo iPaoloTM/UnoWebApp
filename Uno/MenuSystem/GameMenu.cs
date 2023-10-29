@@ -170,6 +170,9 @@ public class GameMenu
                     screamingPlayer = Console.ReadLine();
                     Game.HandleUnoShouting(currPlayer, screamingPlayer);
                     Game.HandleUnoReporting(screamingPlayer);
+                    Console.Clear();
+                    DrawMenu();
+                    ShowHand();
                     break;
                 //PLayer wants to end his turn 
                 case "4":

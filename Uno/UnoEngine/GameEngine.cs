@@ -193,12 +193,16 @@ public class GameEngine //i removed <TKEY>
 
     public void HandleUnoReporting(string reaction)
     {
-        if (Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Success)
+        var match = Regex.Match(reaction, "^report (0|[1-9]\\d*)$");
+        if (match.Success)
         {
-            int playerNumber = int.Parse(Regex.Match(reaction, "^Report (0|[1-9]\\d*)$").Value);
-            if (playerNumber > State.Players.Count && !State.Players[playerNumber].SaidUno)
+            int playerNumber = int.Parse(match.Groups[1].Value);
+            if (playerNumber <= State.Players.Count && playerNumber > 0)
             {
-                DrawCards(2, playerNumber);
+                if (!State.Players[playerNumber-1].SaidUno && State.Players[playerNumber-1].HandCards.Count == 1)
+                {
+                    DrawCards(2, playerNumber-1);
+                }
             }
         }
     }
