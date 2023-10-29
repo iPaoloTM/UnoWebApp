@@ -94,15 +94,11 @@ public class GameEngine //i removed <TKEY>
                                 State.ActivePlayerNo = NextTurn();
                                 break;
                             case EEffect.Wild:
-                                Console.WriteLine("WILD");
-                                Console.ReadLine();
                                 return 2;
                                 break;
                             case EEffect.DrawFour:
                                 DrawCards(4, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
-                                Console.WriteLine("d4");
-                                Console.ReadLine();
                                 return 2;
                                 break;
                             case EEffect.DrawTwo:
@@ -128,13 +124,13 @@ public class GameEngine //i removed <TKEY>
                 response = Val.ValidateMove(decision, State);
                 if (response)
                 {
-                    playingPlayer.HandCards.Add(State.GameDeck.Cards.First());
-                    if (Val.CanPlayCard(State.GameDeck.Cards.First(), State))
+                    var drawnCard = State.GameDeck.Cards.First();
+                    DrawCards(1,State.ActivePlayerNo);
+                    if (Val.CanPlayCard(drawnCard, State))
                     {
                         return 3;
                     }
                     State.LastMove = playingPlayer.Draw();
-                    State.GameDeck.Cards.RemoveAt(0);
                     State.LastMove.PlayedCard = State.UsedDeck.First();
                     
                     
@@ -152,7 +148,6 @@ public class GameEngine //i removed <TKEY>
                 response = Val.ValidateMove(decision, State);
                 if (response)
                 {
-                    //we need to think what to write here guyss :(
                     State.ActivePlayerNo = NextTurn();
                     State.LastMove = playingPlayer.NextPlayer();
                     State.LastMove.PlayedCard = State.UsedDeck.First();
@@ -203,6 +198,15 @@ public class GameEngine //i removed <TKEY>
 
     public void DrawCards(int n, int playerNumber)
     {
+        //Check if there are enough cards in the deck 
+        if (n > State.GameDeck.Cards.Count)
+        {
+            //Remove all cards from used deck except first
+            var removeUsedDeck = State.UsedDeck.Cards.GetRange(1,State.UsedDeck.Cards.Count-1);
+            //Add all cards to game deck
+            State.GameDeck.Cards.AddRange(removeUsedDeck);
+            State.GameDeck.Shuffle();
+        }
         State.Players[playerNumber].HandCards.AddRange(State.GameDeck.Cards.GetRange(0, n));
         State.GameDeck.Cards.RemoveRange(0, n);
     }

@@ -80,8 +80,6 @@ public class GameMenu
                     }
                     else
                     {
-                        ShowLastCard();
-                        ShowHand();
                         var maxCards = currPlayer.HandCards.Count;
                         Console.WriteLine("Choose a card from 1 to " + maxCards + ": ");
                         var chosenCard = Console.ReadLine();
@@ -184,17 +182,6 @@ public class GameMenu
                     break;
             }
         } while (!endTurn);
-
-        //Check if player has said uno when his turn ends and has 1 card left
-        if ((screamingPlayer == null || screamingPlayer.ToLower().Trim() != "uno") &&
-            currPlayer.HandCards.Count == 1)
-        {
-            // Need to add some sort of UNO FLAG to GameEngine.cs, enable it here
-            //Game.ForgotUno(PlayerNumber?) should remember who forgot it
-        }
-
-        //De-activate the uno flag when the player who forgot gets his turn again
-        //Think how to do it?
     }
 
     public void ShowHand()
@@ -233,6 +220,10 @@ public class GameMenu
                 Console.WriteLine("Last played card: " + speCard.Color + " " + speCard.Effect);
                 break;
         }
+        if (Game.State.UsedDeck.Cards.First().Color == EColors.Black)
+        {
+            Console.WriteLine("Chosen color: " + Game.State.ColorInPlay);
+        }
 
         Console.WriteLine();
     }
@@ -258,9 +249,5 @@ public class GameMenu
 
         //Show the last card of the used deck
         ShowLastCard();
-        if (Game.State.UsedDeck.Cards.First().Color == EColors.Black)
-        {
-            Console.WriteLine("Chosen color: " + Game.State.ColorInPlay);
-        }
     }
 }

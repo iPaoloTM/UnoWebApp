@@ -30,7 +30,7 @@ public class NewValidator
         var playerHand = newAction.Player.HandCards;
         foreach (var card in playerHand)
         {
-            return CanPlayCard(card, state);
+            if (CanPlayCard(card, state)) return true;
         }
 
         return false;
