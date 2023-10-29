@@ -31,7 +31,13 @@ public class GameMenu
 
             // Ask the player for his choice
             PlayerPrompt();
-        } while (true); //Change condition later
+        } while (!Game.State.GameOver);
+
+        Console.Clear();
+        Console.WriteLine("> G A M E  O V E R <");
+        Console.WriteLine("Congratulations!");
+        Console.WriteLine("Player: " + currPlayer.Nickname + " has won the game!");
+        Console.ReadLine();
 
         /*
 
@@ -92,7 +98,7 @@ public class GameMenu
                             //if ... { Handle accepted move...}
                             success = Game.HandlePlayerAction(movePlay);
                             if (success == 1) turnOver = true;
-                            else if (success == 2)
+                            else if (success == 2) //Player needs to choose a color
                             {
                                 Console.WriteLine("Choose a new color: ");
                                 Console.WriteLine("1) Red");
@@ -103,21 +109,24 @@ public class GameMenu
                                 Game.SetColorInPlay(int.Parse(color));
                                 turnOver = true;
                             }
-                            
-                            
+                            else if (success == 4) //Player has played his last card, the game is over.
+                            {
+                                turnOver = true;
+                                endTurn = true;
+                            }
                             else
                             {
                                 Console.WriteLine("Can't play the selected card!");
                                 Console.ReadLine();
                             }
                         }
-
-                        Console.Clear();
-                        DrawMenu();
-                        ShowHand();
                     }
 
+                    Console.Clear();
+                    DrawMenu();
+                    ShowHand();
                     break;
+                //Try to draw a card from the game deck
                 case "2":
                     if (turnOver)
                     {
@@ -127,6 +136,7 @@ public class GameMenu
                     else if (!canDraw)
                     {
                         Console.WriteLine("You can play one of your cards!");
+                        Console.ReadLine();
                     }
                     else
                     {
@@ -154,18 +164,18 @@ public class GameMenu
                     DrawMenu();
                     ShowHand();
                     break;
+                //Say something (uno)
                 case "3":
                     Console.WriteLine("What do you want to say?");
                     screamingPlayer = Console.ReadLine();
                     Game.HandleUnoShouting(currPlayer, screamingPlayer);
                     Game.HandleUnoReporting(screamingPlayer);
                     break;
+                //PLayer wants to end his turn 
                 case "4":
-                    //Player wants to skip to the next player?
+                    //Only end turn if the player has drawn or played
                     var moveSkip = new PlayerMove(currPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(moveSkip);
-
-                    //Only end turn if the player has drawn or played
                     if (turnOver)
                     {
                         endTurn = true;
@@ -173,12 +183,20 @@ public class GameMenu
                     else
                     {
                         Console.WriteLine("Can't end turn without doing an action");
+                        Console.ReadLine();
+                        Console.Clear();
+                        DrawMenu();
+                        ShowHand();
                     }
 
                     break;
 
                 default:
                     Console.WriteLine("Invalid option");
+                    Console.ReadLine();
+                    Console.Clear();
+                    DrawMenu();
+                    ShowHand();
                     break;
             }
         } while (!endTurn);
@@ -220,6 +238,7 @@ public class GameMenu
                 Console.WriteLine("Last played card: " + speCard.Color + " " + speCard.Effect);
                 break;
         }
+
         if (Game.State.UsedDeck.Cards.First().Color == EColors.Black)
         {
             Console.WriteLine("Chosen color: " + Game.State.ColorInPlay);

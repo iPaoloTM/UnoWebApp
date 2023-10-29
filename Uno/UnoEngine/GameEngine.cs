@@ -68,6 +68,7 @@ public class GameEngine //i removed <TKEY>
     // 1. True
     // 2. Need to choose color
     // 3. Can play drawn card
+    // 4. Game over, someone has 0 cards
     public int HandlePlayerAction(PlayerMove decision)
     {
         var response = false;
@@ -83,6 +84,12 @@ public class GameEngine //i removed <TKEY>
 
                     playingPlayer.HandCards.Remove(decision.PlayedCard);
                     State.LastMove = playingPlayer.PlayCard(decision.PlayedCard);
+                    if (playingPlayer.HandCards.Count == 0)
+                    {
+                        State.GameOver = true;
+                        return 4;
+                    }
+
                     if (decision.PlayedCard is SpecialCard newSpecialCard)
                     {
                         switch (newSpecialCard.Effect)
@@ -125,15 +132,15 @@ public class GameEngine //i removed <TKEY>
                 if (response)
                 {
                     var drawnCard = State.GameDeck.Cards.First();
-                    DrawCards(1,State.ActivePlayerNo);
+                    DrawCards(1, State.ActivePlayerNo);
                     if (Val.CanPlayCard(drawnCard, State))
                     {
                         return 3;
                     }
+
                     State.LastMove = playingPlayer.Draw();
                     State.LastMove.PlayedCard = State.UsedDeck.First();
-                    
-                    
+
 
                     HandleUnoShouting(playingPlayer);
                     return 1;
@@ -202,11 +209,12 @@ public class GameEngine //i removed <TKEY>
         if (n > State.GameDeck.Cards.Count)
         {
             //Remove all cards from used deck except first
-            var removeUsedDeck = State.UsedDeck.Cards.GetRange(1,State.UsedDeck.Cards.Count-1);
+            var removeUsedDeck = State.UsedDeck.Cards.GetRange(1, State.UsedDeck.Cards.Count - 1);
             //Add all cards to game deck
             State.GameDeck.Cards.AddRange(removeUsedDeck);
             State.GameDeck.Shuffle();
         }
+
         State.Players[playerNumber].HandCards.AddRange(State.GameDeck.Cards.GetRange(0, n));
         State.GameDeck.Cards.RemoveRange(0, n);
     }
