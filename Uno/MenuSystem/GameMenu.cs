@@ -22,8 +22,13 @@ public class GameMenu
         do
         {
             Console.Clear();
-
+            Game.NewTurn();
+            
             CurrPlayer = Game.State.Players[Game.State.ActivePlayerNo];
+            Console.WriteLine("--- " + CurrPlayer.Nickname + "'S TURN ---");
+            Console.ReadLine();
+            Console.Clear();
+            
             DrawMenu();
 
             //Print card information of current player
@@ -38,33 +43,12 @@ public class GameMenu
         Console.WriteLine("Congratulations!");
         Console.WriteLine("Player: " + CurrPlayer.Nickname + " has won the game!");
         Console.ReadLine();
-
-        /*
-
-        //Test json for serializing without converting everything
-        //Easy with newtonsoft but CANT USE IT IN THE COURSE :(
-        //Misses getting the attributes from SpecialCard and NumericCard, everything else works
-
-        var jsonOptions = new JsonSerializerOptions()
-        {
-            WriteIndented = true,
-            AllowTrailingCommas = true
-
-        };
-
-        Game.SaveGameState();
-        Console.WriteLine(JsonSerializer.Serialize(this.Game.GameState,jsonOptions));
-        Console.ReadLine();
-        */
     }
 
 
     //ASK THE PLAYER FOR HIS ACTIONS IN THIS FUNCTION!!
     public void PlayerPrompt()
     {
-        var turnOver = false;
-        var canDraw = true;
-        var endTurn = false;
         string? screamingPlayer = null;
         do //While the player hasn't skipped...
         {
@@ -79,7 +63,7 @@ public class GameMenu
             {
                 // Try to play a card
                 case "1":
-                    if (turnOver)
+                    if (Game.turnOver)
                     {
                         Console.WriteLine("You already acted this turn!");
                         Console.ReadLine();
@@ -94,11 +78,8 @@ public class GameMenu
                             var playingCard = CurrPlayer.HandCards[chosenInt - 1];
                             var movePlay =
                                 new PlayerMove(CurrPlayer, EPlayerAction.PlayCard, playingCard);
-                            //Check if the move is valid? Will edit when method is clearly defined
-                            //if ... { Handle accepted move...}
                             success = Game.HandlePlayerAction(movePlay);
-                            if (success == 1) turnOver = true;
-                            else if (success == 2) //Player needs to choose a color
+                            if (success == 2) //Player needs to choose a color
                             {
                                 Console.WriteLine("Choose a new color: ");
                                 Console.WriteLine("1) Red");
@@ -107,14 +88,8 @@ public class GameMenu
                                 Console.WriteLine("4) Green");
                                 string? color = Console.ReadLine();
                                 Game.SetColorInPlay(int.Parse(color));
-                                turnOver = true;
                             }
-                            else if (success == 4) //Player has played his last card, the game is over.
-                            {
-                                turnOver = true;
-                                endTurn = true;
-                            }
-                            else
+                            else if (success != 1 && success != 4)
                             {
                                 Console.WriteLine("Can't play the selected card!");
                                 Console.ReadLine();
@@ -128,12 +103,12 @@ public class GameMenu
                     break;
                 //Try to draw a card from the game deck
                 case "2":
-                    if (turnOver)
+                    if (Game.turnOver)
                     {
                         Console.WriteLine("You already acted this turn!");
                         Console.ReadLine();
                     }
-                    else if (!canDraw)
+                    else if (!Game.canDraw)
                     {
                         Console.WriteLine("You can play one of your cards!");
                         Console.ReadLine();
@@ -144,16 +119,7 @@ public class GameMenu
                         //Card should be null here??
                         var moveDraw = new PlayerMove(CurrPlayer, EPlayerAction.Draw, null);
                         success = Game.HandlePlayerAction(moveDraw);
-                        if (success == 1)
-                        {
-                            turnOver = true;
-                            canDraw = false;
-                        }
-                        else if (success == 3)
-                        {
-                            canDraw = false;
-                        }
-                        else
+                        if (success != 3 && success != 1)
                         {
                             Console.WriteLine("You can play one of your cards!");
                             Console.ReadLine();
@@ -179,18 +145,14 @@ public class GameMenu
                     //Only end turn if the player has drawn or played
                     var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(moveSkip);
-                    if (turnOver)
-                    {
-                        endTurn = true;
-                    }
-                    else
+                    if(!Game.turnOver)
                     {
                         Console.WriteLine("Can't end turn without doing an action");
                         Console.ReadLine();
                         Console.Clear();
                         DrawMenu();
                         ShowHand();
-                    }
+                    } 
 
                     break;
 
@@ -202,7 +164,7 @@ public class GameMenu
                     ShowHand();
                     break;
             }
-        } while (!endTurn);
+        } while (!Game.endTurn);
     }
 
     public void ShowHand()
@@ -256,10 +218,11 @@ public class GameMenu
         Console.WriteLine("Player " + CurrPlayer.Nickname + "'s turn");
         Console.WriteLine("================================================");
 
+        int a = 0;
         //Print the number of cards each player has
         foreach (Player plyr in Game.State.Players)
         {
-            Console.Write(plyr.Nickname + " - ");
+            Console.Write(a+1 +". " + plyr.Nickname + " - ");
             foreach (Card c in plyr.HandCards)
             {
                 //Print a # for each card
@@ -267,6 +230,7 @@ public class GameMenu
             }
 
             Console.WriteLine();
+            a++;
         }
 
         //Show the last card of the used deck

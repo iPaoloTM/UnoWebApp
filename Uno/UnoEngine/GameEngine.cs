@@ -20,14 +20,14 @@ public class GameEngine //i removed <TKEY>
 
     public NewValidator Val { get; set; } = new NewValidator();
 
-    private const int InitialHandSize = 1;
+    private const int InitialHandSize = 7;
+
+    public bool turnOver { get; set; } = false;
+    public bool canDraw { get; set; } = true;
+    public bool endTurn { get; set; } = false;
 
     public void SetupCards()
     {
-        //Constructor on CardDeck automatically creates another deck
-        //So I do this to avoid having 200+ cards on the table
-        //TODO: Fix 2 decks initialized
-        State.UsedDeck.Cards = new List<Card>();
         State.GameDeck.Shuffle();
 
         int maxNumOfCards = InitialHandSize * State.Players.Count;
@@ -87,6 +87,8 @@ public class GameEngine //i removed <TKEY>
                     if (playingPlayer.HandCards.Count == 0)
                     {
                         State.GameOver = true;
+                        turnOver = true;
+                        endTurn = true;
                         return 4;
                     }
 
@@ -96,21 +98,26 @@ public class GameEngine //i removed <TKEY>
                         {
                             case EEffect.Reverse:
                                 IsAscendingOrder = !IsAscendingOrder;
+                                turnOver = true;
                                 break;
                             case EEffect.Skip:
                                 State.ActivePlayerNo = NextTurn();
+                                turnOver = true;
                                 break;
                             case EEffect.Wild:
+                                turnOver = true;
                                 return 2;
                                 break;
                             case EEffect.DrawFour:
                                 DrawCards(4, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
+                                turnOver = true;
                                 return 2;
                                 break;
                             case EEffect.DrawTwo:
                                 DrawCards(2, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
+                                turnOver = true;
                                 break;
                             default:
                                 throw new Exception("something went wrong");
@@ -119,6 +126,7 @@ public class GameEngine //i removed <TKEY>
 
                     State.ColorInPlay = decision.PlayedCard.Color;
 
+                    turnOver = true;
                     return 1;
                 }
                 else
@@ -135,6 +143,7 @@ public class GameEngine //i removed <TKEY>
                     DrawCards(1, State.ActivePlayerNo);
                     if (Val.CanPlayCard(drawnCard, State))
                     {
+                        canDraw = false;
                         return 3;
                     }
 
@@ -143,6 +152,8 @@ public class GameEngine //i removed <TKEY>
 
 
                     HandleUnoShouting(playingPlayer);
+                    turnOver = true;
+                    canDraw = false;
                     return 1;
                 }
                 else
@@ -152,14 +163,19 @@ public class GameEngine //i removed <TKEY>
 
                 break;
             case EPlayerAction.NextPlayer:
+                
                 response = Val.ValidateMove(decision, State);
                 if (response)
                 {
-                    State.ActivePlayerNo = NextTurn();
-                    State.LastMove = playingPlayer.NextPlayer();
-                    State.LastMove.PlayedCard = State.UsedDeck.First();
-                    NewJSONExport("../SaveGames/game.json");
-                    return 1;
+                    if (turnOver)
+                    {
+                        endTurn = true;
+                        State.ActivePlayerNo = NextTurn();
+                        State.LastMove = playingPlayer.NextPlayer();
+                        State.LastMove.PlayedCard = State.UsedDeck.First();
+                        NewJSONExport("../SaveGames/game.json");
+                        return 1;
+                    }
                 }
                 else
                 {
@@ -178,6 +194,13 @@ public class GameEngine //i removed <TKEY>
         }
 
         return 0;
+    }
+
+    public void NewTurn()
+    {
+        turnOver = false;
+        canDraw = true;
+        endTurn = false;
     }
 
     public void HandleUnoShouting(Player player, string? message = "")
@@ -200,9 +223,9 @@ public class GameEngine //i removed <TKEY>
             int playerNumber = int.Parse(match.Groups[1].Value);
             if (playerNumber <= State.Players.Count && playerNumber > 0)
             {
-                if (!State.Players[playerNumber-1].SaidUno && State.Players[playerNumber-1].HandCards.Count == 1)
+                if (!State.Players[playerNumber - 1].SaidUno && State.Players[playerNumber - 1].HandCards.Count == 1)
                 {
-                    DrawCards(2, playerNumber-1);
+                    DrawCards(2, playerNumber - 1);
                 }
             }
         }
@@ -271,15 +294,14 @@ public class GameEngine //i removed <TKEY>
             WriteIndented = true
         };
         options.Converters.Add(new JsonConverterUno());
-        
+
         Directory.CreateDirectory(Path.GetDirectoryName(filePath));
-        
+
         string json = JsonSerializer.Serialize(this.State, options);
-        
+
         File.WriteAllText(filePath, json);
-        
     }
-    
+
     public void ExportJSON(string filePath)
     {
         Console.Write("Exporting Game State to JSON...");
