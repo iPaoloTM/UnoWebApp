@@ -1,3 +1,5 @@
+using DAL;
+
 namespace MenuSystem;
 using UnoEngine;
 
@@ -66,6 +68,11 @@ public class Menu
 
     public string Run(EMenuLevel menuLevel = EMenuLevel.First)
     {
+     
+        //Database test
+        //TestDB.testingdb();
+        //Console.ReadLine();
+        
         Console.Clear();
 
         var userChoice = "";

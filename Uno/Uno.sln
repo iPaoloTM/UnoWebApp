@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnoEngine", "UnoEngine\UnoE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Entities\Entities.csproj", "{D37559B0-421F-4636-93BE-EADFEA3F269D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{BC223F72-D579-4840-B425-75148885FA89}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,5 +39,9 @@ Global
 		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D37559B0-421F-4636-93BE-EADFEA3F269D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC223F72-D579-4840-B425-75148885FA89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC223F72-D579-4840-B425-75148885FA89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC223F72-D579-4840-B425-75148885FA89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC223F72-D579-4840-B425-75148885FA89}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
