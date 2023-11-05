@@ -1,11 +1,26 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using DAL;
 using Entities;
+using Entities.Database;
 using MenuSystem;
+using Microsoft.EntityFrameworkCore;
 using UnoEngine;
+using Player = Entities.Player;
 
+var contextOptions = new DbContextOptionsBuilder<UnoDbContext>()
+    .UseSqlite("Data Source=app.db")
+    .EnableDetailedErrors()
+    .EnableSensitiveDataLogging()
+    .Options;
+
+using var db = new UnoDbContext(contextOptions);
+db.Database.Migrate();
+
+var GameRepository = new GameRepositoryEF(db);
 
 string? StartGame(GameEngine gameEngine)
 {
@@ -17,7 +32,7 @@ string? StartGame(GameEngine gameEngine)
 
 string? LoadGame()
 {
-    var newEngine = new GameEngine();
+    var newEngine = new GameEngine(GameRepository);
     string jsonContent = File.ReadAllText("../SaveGames/game.json");
     
     var options = new JsonSerializerOptions()
@@ -25,8 +40,9 @@ string? LoadGame()
         WriteIndented = true
     };
     options.Converters.Add(new JsonConverterUno());
-
-    GameState? deserializeState = JsonSerializer.Deserialize<GameState>(jsonContent,options);
+    
+    //TODO: implement to be able to choose which game to load, and retrive the correct id :/
+    GameState? deserializeState = GameRepository.LoadGame(); //JsonSerializer.Deserialize<GameState>(jsonContent,options);
 
     newEngine.State = deserializeState;
     GameMenu gameMenu = new GameMenu(newEngine);
@@ -38,7 +54,7 @@ string? RunNewGameMenu()
 {
     Console.Clear();
     var playerCount = 0;
-    var gameEngine = new GameEngine();
+    var gameEngine = new GameEngine(GameRepository);
 
     while (true)
     {

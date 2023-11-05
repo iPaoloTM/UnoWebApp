@@ -5,9 +5,11 @@ using System.Text.RegularExpressions;
 using Entities;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DAL;
 
 namespace UnoEngine;
 
@@ -25,6 +27,13 @@ public class GameEngine //i removed <TKEY>
     public bool turnOver { get; set; } = false;
     public bool canDraw { get; set; } = true;
     public bool endTurn { get; set; } = false;
+    
+    public GameRepositoryEF? GameRepository { get; set; }
+
+    public GameEngine(GameRepositoryEF? GameRepository)
+    {
+        this.GameRepository = GameRepository;
+    }
 
     public void SetupCards()
     {
@@ -173,7 +182,8 @@ public class GameEngine //i removed <TKEY>
                         State.ActivePlayerNo = NextTurn();
                         State.LastMove = playingPlayer.NextPlayer();
                         State.LastMove.PlayedCard = State.UsedDeck.First();
-                        NewJSONExport("../SaveGames/game.json");
+                        this.GameRepository?.Save(State.Id, State);
+                        //NewJSONExport("../SaveGames/game.json"); we may need it later :)
                         return 1;
                     }
                 }

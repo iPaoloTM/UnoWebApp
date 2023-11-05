@@ -11,8 +11,6 @@ public class Menu
     private const string MenuSeparator = "=======================";
     private static readonly HashSet<string> ReservedShortcuts = new() {"x", "b", "r"};
 
-    public GameEngine Game = new GameEngine();
-
     public Menu(string? title, List<MenuItem> menuItems)
     {
         Title = title;

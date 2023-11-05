@@ -4,6 +4,8 @@ namespace Entities;
 
 public class GameState
 {
+
+    public Guid Id { get; set; } = Guid.NewGuid();
     public CardDeck GameDeck { get; set; } = new CardDeck();
     public CardDeck UsedDeck { get; set; } = new CardDeck(new List<Card>());
     public int ActivePlayerNo { get; set; } = 0;
