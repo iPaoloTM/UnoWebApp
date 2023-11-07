@@ -32,21 +32,48 @@ string? StartGame(GameEngine gameEngine)
 
 string? LoadGame()
 {
+    var saveGames = GameRepository.GetSaveGames();
+    var saveGameListDisplay = saveGames.Select((s, i) => (i + 1) + " - " + s).ToList();
+
+    if (saveGameListDisplay.Count == 0) return null;
+
+    Guid? gameId = null;
+    while (true)
+    {
+        Console.WriteLine(string.Join("\n", saveGameListDisplay));
+        Console.Write($"Select game to load (1..{saveGameListDisplay.Count}):");
+        var userChoiceStr = Console.ReadLine();
+        if (int.TryParse(userChoiceStr, out var parsedChoice))
+        {
+            if (parsedChoice < 0 || parsedChoice > saveGameListDisplay.Count)
+            {
+                Console.WriteLine("Not in range...");
+                continue;
+            }
+
+            gameId = saveGames[parsedChoice - 1].id;
+            Console.WriteLine($"Loading file: {gameId}");
+
+            break;
+        }
+    }
+
     var newEngine = new GameEngine(GameRepository);
-    string jsonContent = File.ReadAllText("../SaveGames/game.json");
-    
+    //string jsonContent = File.ReadAllText("../SaveGames/game.json");
+
     var options = new JsonSerializerOptions()
     {
         WriteIndented = true
     };
     options.Converters.Add(new JsonConverterUno());
-    
-    //TODO: implement to be able to choose which game to load, and retrive the correct id :/
-    GameState? deserializeState = GameRepository.LoadGame(); //JsonSerializer.Deserialize<GameState>(jsonContent,options);
 
+    GameState?
+        deserializeState =
+            GameRepository.LoadGame(gameId); 
     newEngine.State = deserializeState;
     GameMenu gameMenu = new GameMenu(newEngine);
     gameMenu.Run();
+
     return null;
 }
 
@@ -58,41 +85,34 @@ string? RunNewGameMenu()
 
     while (true)
     {
-        Console.Write($"How many players? [2]:");
-        var playerCountStr = Console.ReadLine()?.Trim();
-        if (string.IsNullOrWhiteSpace(playerCountStr)) playerCountStr = "2";
-        if (int.TryParse(playerCountStr, out playerCount))
-        {
-            //&& playerCount <= gameEngine.GetMaxAmountOfPlayers()
-            if (playerCount > 1 ) break;
-        }
+        playerCount = PromptValidator.UserPrompt("How many players? [2]:", 1, 10);
+        if (playerCount == -1) playerCount = 2;
+        break;
     }
-
-
+    
     for (int i = 0; i < playerCount; i++)
     {
-
         string? playerName = "";
         while (true)
         {
-            Console.Write($"Player {i + 1} name (min 1 letter):");
-            playerName = Console.ReadLine()?.Trim();
+
+            playerName = PromptValidator.UserPrompt($"Player {i + 1} name (min 1 letter):");
             if (string.IsNullOrWhiteSpace(playerName))
             {
                 playerName = "Human" + (i + 1);
+            }
+            else
+            {
+                playerName=playerName.Trim();
             }
 
             if (!string.IsNullOrWhiteSpace(playerName) && playerName.Length > 0) break;
             Console.WriteLine("Parse error...");
         }
 
-        gameEngine.State.Players.Add(new Player()
-        {
-            Nickname = playerName,
-            PlayerType = EPlayerType.Human
-        });
+        gameEngine.AddPlayer(playerName);
     }
-    
+
     return StartGame(gameEngine);
 }
 

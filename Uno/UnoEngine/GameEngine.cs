@@ -273,6 +273,8 @@ public class GameEngine //i removed <TKEY>
             case 4:
                 State.ColorInPlay = EColors.Green;
                 break;
+            default:
+                break;
         }
     }
 
@@ -311,61 +313,6 @@ public class GameEngine //i removed <TKEY>
 
         File.WriteAllText(filePath, json);
     }
-
-    public void ExportJSON(string filePath)
-    {
-        Console.Write("Exporting Game State to JSON...");
-
-        try
-        {
-            string GameState = "{\"CardDeck\":[";
-
-            //include GameDeck's cards
-
-            foreach (Card c in this.State.GameDeck.Cards)
-            {
-                GameState += c.ToString() + ",";
-            }
-
-            GameState += "], \"UsedDeck\":[";
-
-            //include UsedDeck's cards
-
-            foreach (Card c in this.State.UsedDeck.Cards)
-            {
-                GameState += c.ToString() + ",";
-            }
-
-            GameState += "], \"Players\":[";
-
-            //include Player hand's cards
-
-            foreach (Player p in this.State.Players)
-            {
-                GameState += p.ToString() + ",";
-            }
-
-            GameState += "],";
-
-            //include utilities info
-
-            GameState += "\"ActivePlayerNo\":" + this.State.ActivePlayerNo + "\"CurrentRoundNo\":" +
-                         this.State.CurrentRoundNo + "";
-
-            GameState += "}";
-
-
-            //TODO: serialize this.GameState? Teacher does it in his example and is simpler
-            string jsonGameState = JsonSerializer.Serialize(GameState);
-
-
-            File.WriteAllText(filePath, jsonGameState);
-
-            Console.WriteLine("Game State exported to JSON successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error exporting game state to JSON: " + ex.Message);
-        }
-    }
+    
+    
 }

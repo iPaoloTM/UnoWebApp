@@ -52,7 +52,7 @@ public class GameRepositoryEF
             .ToList();
     }
 
-    public GameState LoadGame(Guid id)
+    public GameState LoadGame(Guid? id)
     {
         var game = _ctx.Games.First(g => g.Id == id);
         

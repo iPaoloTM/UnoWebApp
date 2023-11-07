@@ -66,10 +66,6 @@ public class Menu
 
     public string Run(EMenuLevel menuLevel = EMenuLevel.First)
     {
-     
-        //Database test
-        //TestDB.testingdb();
-        //Console.ReadLine();
         
         Console.Clear();
 
@@ -77,8 +73,8 @@ public class Menu
         do
         {
             Draw(menuLevel);
-            userChoice = Console.ReadLine()?.Trim();
-
+            userChoice = PromptValidator.UserPrompt("");
+            Console.WriteLine(userChoice);
             if (MenuItems.ContainsKey(userChoice?.ToLower()))
             {
                 if (MenuItems[userChoice!.ToLower()].SubMenuToRun != null)

@@ -23,17 +23,17 @@ public class GameMenu
         {
             Console.Clear();
             Game.NewTurn();
-            
+
             CurrPlayer = Game.State.Players[Game.State.ActivePlayerNo];
             Console.WriteLine("--- " + CurrPlayer.Nickname + "'S TURN ---");
             Console.ReadLine();
             Console.Clear();
-            
+
             DrawMenu();
 
             //Print card information of current player
             ShowHand();
-            
+
             // Ask the player for his choice
             PlayerPrompt();
         } while (!Game.State.GameOver);
@@ -57,12 +57,12 @@ public class GameMenu
             Console.WriteLine("2. Draw from deck ");
             Console.WriteLine("3. Say something");
             Console.WriteLine("4. Skip ");
-            var choice = Console.ReadLine();
+            int? choice = PromptValidator.UserPrompt("", 0, 5);
             int success = 0;
             switch (choice)
             {
                 // Try to play a card
-                case "1":
+                case 1:
                     if (Game.turnOver)
                     {
                         Console.WriteLine("You already acted this turn!");
@@ -71,11 +71,10 @@ public class GameMenu
                     else
                     {
                         var maxCards = CurrPlayer.HandCards.Count;
-                        Console.WriteLine("Choose a card from 1 to " + maxCards + ": ");
-                        var chosenCard = Console.ReadLine();
-                        if (int.TryParse(chosenCard, out var chosenInt) && chosenInt > 0 && chosenInt <= maxCards)
+                        int chosenCard = PromptValidator.UserPrompt("Choose a card from 1 to " + maxCards + ": ", 0, maxCards);
+                        if (chosenCard != -1)
                         {
-                            var playingCard = CurrPlayer.HandCards[chosenInt - 1];
+                            var playingCard = CurrPlayer.HandCards[chosenCard - 1];
                             var movePlay =
                                 new PlayerMove(CurrPlayer, EPlayerAction.PlayCard, playingCard);
                             success = Game.HandlePlayerAction(movePlay);
@@ -86,14 +85,19 @@ public class GameMenu
                                 Console.WriteLine("2) Blue");
                                 Console.WriteLine("3) Yellow");
                                 Console.WriteLine("4) Green");
-                                string? color = Console.ReadLine();
-                                Game.SetColorInPlay(int.Parse(color));
+                                int color = PromptValidator.UserPrompt("", 0, 4);
+                                Game.SetColorInPlay(color);
                             }
                             else if (success != 1 && success != 4)
                             {
                                 Console.WriteLine("Can't play the selected card!");
                                 Console.ReadLine();
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid option");
+                            Console.ReadLine();
                         }
                     }
 
@@ -102,7 +106,7 @@ public class GameMenu
                     ShowHand();
                     break;
                 //Try to draw a card from the game deck
-                case "2":
+                case 2:
                     if (Game.turnOver)
                     {
                         Console.WriteLine("You already acted this turn!");
@@ -131,9 +135,8 @@ public class GameMenu
                     ShowHand();
                     break;
                 //Say something (uno)
-                case "3":
-                    Console.WriteLine("What do you want to say?");
-                    screamingPlayer = Console.ReadLine();
+                case 3:
+                    screamingPlayer = PromptValidator.UserPrompt("What do you want to say?");
                     Game.HandleUnoShouting(CurrPlayer, screamingPlayer);
                     Game.HandleUnoReporting(screamingPlayer);
                     Console.Clear();
@@ -141,21 +144,19 @@ public class GameMenu
                     ShowHand();
                     break;
                 //PLayer wants to end his turn 
-                case "4":
+                case 4:
                     //Only end turn if the player has drawn or played
                     var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(moveSkip);
-                    if(!Game.turnOver)
+                    if (!Game.turnOver)
                     {
                         Console.WriteLine("Can't end turn without doing an action");
                         Console.ReadLine();
                         Console.Clear();
                         DrawMenu();
                         ShowHand();
-                    } 
-
+                    }
                     break;
-
                 default:
                     Console.WriteLine("Invalid option");
                     Console.ReadLine();
@@ -222,7 +223,7 @@ public class GameMenu
         //Print the number of cards each player has
         foreach (Player plyr in Game.State.Players)
         {
-            Console.Write(a+1 +". " + plyr.Nickname + " - ");
+            Console.Write(a + 1 + ". " + plyr.Nickname + " - ");
             foreach (Card c in plyr.HandCards)
             {
                 //Print a # for each card
@@ -236,4 +237,6 @@ public class GameMenu
         //Show the last card of the used deck
         ShowLastCard();
     }
+
+   
 }
