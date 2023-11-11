@@ -81,18 +81,33 @@ public class GameMenu
                             success = Game.HandlePlayerAction(movePlay);
                             if (success == 2) //Player needs to choose a color
                             {
-                                Console.WriteLine("Choose a new color: ");
-                                Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine("1) Red");
-                                Console.ForegroundColor = ConsoleColor.Blue;
-                                Console.WriteLine("2) Blue");
-                                Console.ForegroundColor = ConsoleColor.Yellow;
-                                Console.WriteLine("3) Yellow");
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("4) Green");
-                                Console.ResetColor();
-                                string? color = Console.ReadLine();
-                                Game.SetColorInPlay(int.Parse(color));
+                                string? color;
+                                int result;
+
+                                do
+                                {
+                                    Console.WriteLine("Choose a new color: ");
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("1) Red");
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine("2) Blue");
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine("3) Yellow");
+                                    Console.ForegroundColor = ConsoleColor.Green;
+                                    Console.WriteLine("4) Green");
+                                    Console.ResetColor();
+    
+                                    color = Console.ReadLine();
+                                    
+                                    if (!int.TryParse(color, out result))
+                                    { 
+                                        Console.WriteLine("Invalid choice");
+                                    }
+
+                                } while (!int.TryParse(color, out result) || result < 1 || result > 4);
+
+                                Game.SetColorInPlay(result);
+                                
                             }
                             else if (success != 1 && success != 4)
                             {
