@@ -11,8 +11,8 @@ public class Menu
     private const string MenuSeparator = "=======================";
     private static readonly HashSet<string> ReservedShortcuts = new() {"x", "b", "r"};
 
-    public GameEngine Game = new GameEngine();
-
+    private int selectedOptionIndex = 0;
+    
     public Menu(string? title, List<MenuItem> menuItems)
     {
         Title = title;
@@ -43,78 +43,107 @@ public class Menu
             Console.WriteLine(MenuSeparator);
         }
 
-        foreach (var menuItem in MenuItems)
+        for (int i = 0; i < MenuItems.Count; i++)
         {
-            Console.Write(menuItem.Key);
+            if (i == selectedOptionIndex)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+            }
+
+            Console.Write(MenuItems.ElementAt(i).Key);
             Console.Write(") ");
-            Console.WriteLine(menuItem.Value.MenuLabel);
+            Console.WriteLine(MenuItems.ElementAt(i).Value.MenuLabel);
+
+            if (i == selectedOptionIndex)
+            {
+                Console.ResetColor();
+            }
         }
 
         if (menuLevel != EMenuLevel.First)
         {
-            Console.WriteLine("b) Back");
+            Console.Write("b) ");
+            Console.Write("Back");
+            Console.WriteLine();
         }
 
         if (menuLevel == EMenuLevel.Other)
         {
-            Console.WriteLine("r) Return to main");
+            Console.Write("r) ");
+            Console.Write("Return to main");
+            Console.WriteLine();
         }
 
-        Console.WriteLine("x) eXit");
+        Console.Write("x) ");
+        Console.Write("eXit");
 
-        Console.WriteLine(MenuSeparator);
-        Console.Write("Your choice:");
+        //Console.WriteLine(MenuSeparator);
+        //Console.Write("Your choice:");
     }
 
     public string Run(EMenuLevel menuLevel = EMenuLevel.First)
     {
-     
-        //Database test
-        //TestDB.testingdb();
-        //Console.ReadLine();
-        
         Console.Clear();
-
-        var userChoice = "";
         do
         {
             Draw(menuLevel);
-            userChoice = Console.ReadLine()?.Trim();
 
-            if (MenuItems.ContainsKey(userChoice?.ToLower()))
+            var key = Console.ReadKey().Key;
+            HandleKeyPress(key);
+
+            if (key == ConsoleKey.Enter)
             {
-                if (MenuItems[userChoice!.ToLower()].SubMenuToRun != null)
+                var selectedShortcut = MenuItems.ElementAt(selectedOptionIndex).Key;
+                if (MenuItems[selectedShortcut].SubMenuToRun != null)
                 {
-                    var result = "";
-                    if (menuLevel == EMenuLevel.First)
-                    {
-                         result = MenuItems[userChoice!.ToLower()].SubMenuToRun!(EMenuLevel.Second);
-                    }
-                    else
-                    {
-                        result = MenuItems[userChoice!.ToLower()].SubMenuToRun!(EMenuLevel.Other);
-                    }
-                    // TODO:  handle result - b,x,r
-                    
+                    var result = MenuItems[selectedShortcut].SubMenuToRun!(menuLevel == EMenuLevel.First
+                        ? EMenuLevel.Second
+                        : EMenuLevel.Other);
+                    // TODO: Handle result - b, x, r
                 }
-                
-                else if (MenuItems[userChoice!.ToLower()].MethodToRun != null)
+                else if (MenuItems[selectedShortcut].MethodToRun != null)
                 {
-                    var result = MenuItems[userChoice!.ToLower()].MethodToRun!();
+                    var result = MenuItems[selectedShortcut].MethodToRun!();
                     if (result?.ToLower() == "x")
                     {
-                        userChoice = "x";
+                        return "x";
                     }
                 }
-            }
-            else if (!ReservedShortcuts.Contains(userChoice?.ToLower()))
-            {
-                Console.WriteLine("Undefined shortcut....");
             }
 
             Console.WriteLine();
-        } while (!ReservedShortcuts.Contains(userChoice));
-
-        return userChoice;
+        } while (true);
     }
+
+    private void HandleKeyPress(ConsoleKey key)
+    {
+        switch (key)
+        {
+            case ConsoleKey.DownArrow:
+                MoveSelectionDown();
+                break;
+            case ConsoleKey.UpArrow:
+                MoveSelectionUp();
+                break;
+        }
+    }
+
+    private void MoveSelectionUp()
+    {
+        selectedOptionIndex = (selectedOptionIndex - 1 + MenuItems.Count) % (MenuItems.Count+1);
+        if (selectedOptionIndex < 0)
+        {
+            selectedOptionIndex = MenuItems.Count - 1;
+        }
+    }
+
+    private void MoveSelectionDown()
+    {
+        selectedOptionIndex = (selectedOptionIndex + 1) % (MenuItems.Count+1);
+        if (selectedOptionIndex >= MenuItems.Count)
+        {
+            selectedOptionIndex = 0;
+        }
+    }
+
 }
