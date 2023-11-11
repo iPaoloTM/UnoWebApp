@@ -82,10 +82,15 @@ public class GameMenu
                             if (success == 2) //Player needs to choose a color
                             {
                                 Console.WriteLine("Choose a new color: ");
+                                Console.ForegroundColor = ConsoleColor.Red;
                                 Console.WriteLine("1) Red");
+                                Console.ForegroundColor = ConsoleColor.Blue;
                                 Console.WriteLine("2) Blue");
+                                Console.ForegroundColor = ConsoleColor.Yellow;
                                 Console.WriteLine("3) Yellow");
+                                Console.ForegroundColor = ConsoleColor.Green;
                                 Console.WriteLine("4) Green");
+                                Console.ResetColor();
                                 string? color = Console.ReadLine();
                                 Game.SetColorInPlay(int.Parse(color));
                             }
@@ -174,6 +179,9 @@ public class GameMenu
         //Add colored text in the future
         foreach (Card c in CurrPlayer.HandCards)
         {
+            ConsoleColor color = ColorConverter(c.Color);
+            
+            Console.ForegroundColor = color;
             if (c is NumericCard)
             {
                 NumericCard nc = (NumericCard)c;
@@ -181,9 +189,11 @@ public class GameMenu
             }
             else if (c is SpecialCard)
             {
-                SpecialCard nc = (SpecialCard)c;
+                SpecialCard nc = (SpecialCard)c; 
                 Console.Write(i + 1 + ") " + nc.Color + " " + nc.Effect + ", ");
             }
+            
+            Console.ResetColor();
 
             i++;
         }
@@ -194,6 +204,11 @@ public class GameMenu
     public void ShowLastCard()
     {
         var lastCard = Game.State.UsedDeck.First();
+        
+        ConsoleColor color = ColorConverter(lastCard.Color);
+            
+        Console.ForegroundColor = color;
+        
         switch (lastCard)
         {
             case NumericCard numCard:
@@ -203,10 +218,15 @@ public class GameMenu
                 Console.WriteLine("Last played card: " + speCard.Color + " " + speCard.Effect);
                 break;
         }
+        
+        Console.ResetColor();
+        
 
         if (Game.State.UsedDeck.Cards.First().Color == EColors.Black)
         {
+            Console.ForegroundColor = ColorConverter(Game.State.ColorInPlay);
             Console.WriteLine("Chosen color: " + Game.State.ColorInPlay);
+            Console.ResetColor();
         }
 
         Console.WriteLine();
@@ -235,5 +255,34 @@ public class GameMenu
 
         //Show the last card of the used deck
         ShowLastCard();
+    }
+
+    private ConsoleColor ColorConverter(EColors c)
+    {
+        ConsoleColor color = ConsoleColor.White;
+        switch (c)
+        {
+            case EColors.Red:
+                color = ConsoleColor.Red;
+                break;
+            case EColors.Yellow:
+                color = ConsoleColor.Yellow;
+                break;
+            case EColors.Green:
+                color = ConsoleColor.Green;
+                break;
+            case EColors.Blue:
+                    
+                color = ConsoleColor.Blue;
+                break;
+            case EColors.Black:
+                color = ConsoleColor.Black;
+                break;
+            default:
+                color = ConsoleColor.White;
+                break;
+        }
+
+        return color;
     }
 }
