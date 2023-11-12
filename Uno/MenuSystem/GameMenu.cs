@@ -9,9 +9,13 @@ using UnoEngine;
 
 public class GameMenu
 {
+    
+    private int selectedOptionIndex = 0;
+    public MenuNavigator GameOptionsNavigator { get; set; } 
     public GameMenu(GameEngine game)
     {
         this.Game = game;
+        GameOptionsNavigator = new MenuNavigator(4);
     }
 
     public GameEngine Game { get; set; }
@@ -52,17 +56,40 @@ public class GameMenu
         string? screamingPlayer = null;
         do //While the player hasn't skipped...
         {
+            var promptsList =
+                new List<string> {"1. Play a card ", "2. Draw from deck ", "3. Say something", "4. Skip "};
             Console.WriteLine("Choose an action: ");
-            Console.WriteLine("1. Play a card ");
-            Console.WriteLine("2. Draw from deck ");
-            Console.WriteLine("3. Say something");
-            Console.WriteLine("4. Skip ");
-            var choice = Console.ReadLine();
+            for (int i = 0; i < promptsList.Count; i++)
+            {
+                if (i == selectedOptionIndex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                }
+
+                Console.WriteLine(promptsList[i]);
+
+                if (i == selectedOptionIndex)
+                {
+                    Console.ResetColor();
+                }
+            }
+            var choice = Console.ReadKey();
             int success = 0;
-            switch (choice)
+            if (GameOptionsNavigator.IsNavigationKey(choice.Key))
+            {
+                selectedOptionIndex = GameOptionsNavigator.HandleKeyPress(choice);
+                // Redraw menu with the new selected option
+                Console.Clear();
+                DrawMenu();
+                ShowHand();
+                continue; // Skip the rest of the loop to immediately handle the next keypress
+            }
+            else if (choice.Key == ConsoleKey.Enter)
+            {
+                            switch (selectedOptionIndex + 1)
             {
                 // Try to play a card
-                case "1":
+                case 1:
                     if (Game.turnOver)
                     {
                         Console.WriteLine("You already acted this turn!");
@@ -122,7 +149,7 @@ public class GameMenu
                     ShowHand();
                     break;
                 //Try to draw a card from the game deck
-                case "2":
+                case 2:
                     if (Game.turnOver)
                     {
                         Console.WriteLine("You already acted this turn!");
@@ -151,7 +178,7 @@ public class GameMenu
                     ShowHand();
                     break;
                 //Say something (uno)
-                case "3":
+                case 3:
                     Console.WriteLine("What do you want to say?");
                     screamingPlayer = Console.ReadLine();
                     Game.HandleUnoShouting(CurrPlayer, screamingPlayer);
@@ -161,7 +188,7 @@ public class GameMenu
                     ShowHand();
                     break;
                 //PLayer wants to end his turn 
-                case "4":
+                case 4:
                     //Only end turn if the player has drawn or played
                     var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(moveSkip);
@@ -184,6 +211,8 @@ public class GameMenu
                     ShowHand();
                     break;
             }
+            }
+
         } while (!Game.endTurn);
     }
 

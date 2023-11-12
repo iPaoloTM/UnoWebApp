@@ -12,6 +12,9 @@ public class Menu
     private static readonly HashSet<string> ReservedShortcuts = new() { "b", "r"};
 
     private int selectedOptionIndex = 0;
+
+    public MenuNavigator Navigator { get; set; } 
+
     
     public Menu(string? title, List<MenuItem> menuItems)
     {
@@ -31,7 +34,10 @@ public class Menu
             }
 
             MenuItems[menuItem.Shortcut.ToLower()] = menuItem;
+            
         }
+        Navigator = new MenuNavigator(MenuItems.Count);
+
     }
 
     private void Draw(EMenuLevel menuLevel)
@@ -87,10 +93,13 @@ public class Menu
         do
         {
             Draw(menuLevel);
-
-            var key = Console.ReadKey().Key;
-            HandleKeyPress(key);
-            if (key == ConsoleKey.Enter)
+            
+            var key = Console.ReadKey();
+            if (Navigator.IsNavigationKey(key.Key))
+            {
+                selectedOptionIndex = Navigator.HandleKeyPress(key);
+            }
+            else if (key.Key == ConsoleKey.Enter)
             {
                 var selectedShortcut = MenuItems.ElementAt(selectedOptionIndex).Key;
                 if (selectedShortcut == "x")
@@ -106,36 +115,5 @@ public class Menu
             Console.WriteLine();
         } while (true);
     }
-
-    private void HandleKeyPress(ConsoleKey key)
-    {
-        switch (key)
-        {
-            case ConsoleKey.DownArrow:
-                MoveSelectionDown();
-                break;
-            case ConsoleKey.UpArrow:
-                MoveSelectionUp();
-                break;
-        }
-    }
-
-    private void MoveSelectionUp()
-    {
-        selectedOptionIndex = (selectedOptionIndex - 1) % (MenuItems.Count+1);
-        if (selectedOptionIndex < 0)
-        {
-            selectedOptionIndex = MenuItems.Count - 1;
-        }
-    }
-
-    private void MoveSelectionDown()
-    {
-        selectedOptionIndex = (selectedOptionIndex + 1) % (MenuItems.Count+1);
-        if (selectedOptionIndex >= MenuItems.Count)
-        {
-            selectedOptionIndex = 0;
-        }
-    }
-
+    
 }
