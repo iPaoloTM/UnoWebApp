@@ -100,6 +100,11 @@ var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
         MenuLabel = "Options",
         //To be implemented
     },
+    new MenuItem()
+    {
+        Shortcut = "x",
+        MenuLabel = "Exit",
+    },
 });
 
 

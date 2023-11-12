@@ -9,7 +9,7 @@ public class Menu
     public Dictionary<string, MenuItem> MenuItems { get; set; } = new();
 
     private const string MenuSeparator = "=======================";
-    private static readonly HashSet<string> ReservedShortcuts = new() {"x", "b", "r"};
+    private static readonly HashSet<string> ReservedShortcuts = new() { "b", "r"};
 
     private int selectedOptionIndex = 0;
     
@@ -74,8 +74,8 @@ public class Menu
             Console.WriteLine();
         }
 
-        Console.Write("x) ");
-        Console.Write("eXit");
+        //Console.Write("x) ");
+        //Console.Write("eXit");
 
         //Console.WriteLine(MenuSeparator);
         //Console.Write("Your choice:");
@@ -90,24 +90,16 @@ public class Menu
 
             var key = Console.ReadKey().Key;
             HandleKeyPress(key);
-
             if (key == ConsoleKey.Enter)
             {
                 var selectedShortcut = MenuItems.ElementAt(selectedOptionIndex).Key;
-                if (MenuItems[selectedShortcut].SubMenuToRun != null)
+                if (selectedShortcut == "x")
                 {
-                    var result = MenuItems[selectedShortcut].SubMenuToRun!(menuLevel == EMenuLevel.First
-                        ? EMenuLevel.Second
-                        : EMenuLevel.Other);
-                    // TODO: Handle result - b, x, r
+                    return "x";
                 }
-                else if (MenuItems[selectedShortcut].MethodToRun != null)
+                if (MenuItems[selectedShortcut].MethodToRun != null)
                 {
                     var result = MenuItems[selectedShortcut].MethodToRun!();
-                    if (result?.ToLower() == "x")
-                    {
-                        return "x";
-                    }
                 }
             }
 
