@@ -130,7 +130,7 @@ public class Menu
 
     private void MoveSelectionUp()
     {
-        selectedOptionIndex = (selectedOptionIndex - 1 + MenuItems.Count) % (MenuItems.Count+1);
+        selectedOptionIndex = (selectedOptionIndex - 1) % (MenuItems.Count+1);
         if (selectedOptionIndex < 0)
         {
             selectedOptionIndex = MenuItems.Count - 1;
