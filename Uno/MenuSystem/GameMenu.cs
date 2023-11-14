@@ -27,17 +27,17 @@ public class GameMenu
         {
             Console.Clear();
             Game.NewTurn();
-            
+
             CurrPlayer = Game.State.Players[Game.State.ActivePlayerNo];
             Console.WriteLine("--- " + CurrPlayer.Nickname + "'S TURN ---");
             Console.ReadLine();
             Console.Clear();
-            
+
             DrawMenu();
 
             //Print card information of current player
             ShowHand();
-            
+
             // Ask the player for his choice
             PlayerPrompt();
         } while (!Game.State.GameOver);
@@ -98,16 +98,22 @@ public class GameMenu
                     else
                     {
                         var maxCards = CurrPlayer.HandCards.Count;
-                        Console.WriteLine("Choose a card from 1 to " + maxCards + ": ");
-                        var chosenCard = Console.ReadLine();
-                        if (int.TryParse(chosenCard, out var chosenInt) && chosenInt > 0 && chosenInt <= maxCards)
+                        int chosenCard = PromptValidator.UserPrompt("Choose a card from 1 to " + maxCards + ": ", 0, maxCards);
+                        if (chosenCard != -1)
                         {
-                            var playingCard = CurrPlayer.HandCards[chosenInt - 1];
+                            var playingCard = CurrPlayer.HandCards[chosenCard - 1];
                             var movePlay =
                                 new PlayerMove(CurrPlayer, EPlayerAction.PlayCard, playingCard);
                             success = Game.HandlePlayerAction(movePlay);
                             if (success == 2) //Player needs to choose a color
                             {
+                                Console.WriteLine("Choose a new color: ");
+                                Console.WriteLine("1) Red");
+                                Console.WriteLine("2) Blue");
+                                Console.WriteLine("3) Yellow");
+                                Console.WriteLine("4) Green");
+                                int color = PromptValidator.UserPrompt("", 0, 4);
+                                Game.SetColorInPlay(color);
                                 string? color;
                                 int result;
 
@@ -141,6 +147,11 @@ public class GameMenu
                                 Console.WriteLine("Can't play the selected card!");
                                 Console.ReadLine();
                             }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid option");
+                            Console.ReadLine();
                         }
                     }
 
@@ -179,8 +190,7 @@ public class GameMenu
                     break;
                 //Say something (uno)
                 case 3:
-                    Console.WriteLine("What do you want to say?");
-                    screamingPlayer = Console.ReadLine();
+                    screamingPlayer = PromptValidator.UserPrompt("What do you want to say?");
                     Game.HandleUnoShouting(CurrPlayer, screamingPlayer);
                     Game.HandleUnoReporting(screamingPlayer);
                     Console.Clear();
@@ -192,15 +202,14 @@ public class GameMenu
                     //Only end turn if the player has drawn or played
                     var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                     Game.HandlePlayerAction(moveSkip);
-                    if(!Game.turnOver)
+                    if (!Game.turnOver)
                     {
                         Console.WriteLine("Can't end turn without doing an action");
                         Console.ReadLine();
                         Console.Clear();
                         DrawMenu();
                         ShowHand();
-                    } 
-
+                    }
                     break;
 
                 default:
@@ -286,7 +295,7 @@ public class GameMenu
         //Print the number of cards each player has
         foreach (Player plyr in Game.State.Players)
         {
-            Console.Write(a+1 +". " + plyr.Nickname + " - ");
+            Console.Write(a + 1 + ". " + plyr.Nickname + " - ");
             foreach (Card c in plyr.HandCards)
             {
                 //Print a # for each card

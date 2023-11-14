@@ -5,9 +5,11 @@ using System.Text.RegularExpressions;
 using Entities;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DAL;
 
 namespace UnoEngine;
 
@@ -25,6 +27,13 @@ public class GameEngine //i removed <TKEY>
     public bool turnOver { get; set; } = false;
     public bool canDraw { get; set; } = true;
     public bool endTurn { get; set; } = false;
+    
+    public GameRepositoryEF? GameRepository { get; set; }
+
+    public GameEngine(GameRepositoryEF? GameRepository)
+    {
+        this.GameRepository = GameRepository;
+    }
 
     public void SetupCards()
     {
@@ -173,7 +182,8 @@ public class GameEngine //i removed <TKEY>
                         State.ActivePlayerNo = NextTurn();
                         State.LastMove = playingPlayer.NextPlayer();
                         State.LastMove.PlayedCard = State.UsedDeck.First();
-                        NewJSONExport("../SaveGames/game.json");
+                        this.GameRepository?.Save(State.Id, State);
+                        //NewJSONExport("../SaveGames/game.json"); we may need it later :)
                         return 1;
                     }
                 }
@@ -263,6 +273,8 @@ public class GameEngine //i removed <TKEY>
             case 4:
                 State.ColorInPlay = EColors.Green;
                 break;
+            default:
+                break;
         }
     }
 
@@ -301,61 +313,6 @@ public class GameEngine //i removed <TKEY>
 
         File.WriteAllText(filePath, json);
     }
-
-    public void ExportJSON(string filePath)
-    {
-        Console.Write("Exporting Game State to JSON...");
-
-        try
-        {
-            string GameState = "{\"CardDeck\":[";
-
-            //include GameDeck's cards
-
-            foreach (Card c in this.State.GameDeck.Cards)
-            {
-                GameState += c.ToString() + ",";
-            }
-
-            GameState += "], \"UsedDeck\":[";
-
-            //include UsedDeck's cards
-
-            foreach (Card c in this.State.UsedDeck.Cards)
-            {
-                GameState += c.ToString() + ",";
-            }
-
-            GameState += "], \"Players\":[";
-
-            //include Player hand's cards
-
-            foreach (Player p in this.State.Players)
-            {
-                GameState += p.ToString() + ",";
-            }
-
-            GameState += "],";
-
-            //include utilities info
-
-            GameState += "\"ActivePlayerNo\":" + this.State.ActivePlayerNo + "\"CurrentRoundNo\":" +
-                         this.State.CurrentRoundNo + "";
-
-            GameState += "}";
-
-
-            //TODO: serialize this.GameState? Teacher does it in his example and is simpler
-            string jsonGameState = JsonSerializer.Serialize(GameState);
-
-
-            File.WriteAllText(filePath, jsonGameState);
-
-            Console.WriteLine("Game State exported to JSON successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error exporting game state to JSON: " + ex.Message);
-        }
-    }
+    
+    
 }

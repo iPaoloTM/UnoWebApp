@@ -89,6 +89,7 @@ public class Menu
 
     public string Run(EMenuLevel menuLevel = EMenuLevel.First)
     {
+        
         Console.Clear();
         do
         {
