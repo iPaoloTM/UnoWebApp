@@ -3,25 +3,44 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 <head>
     <title></title>
 </head>
 <body>
 <div>
-        <div class="col-md-4">
-            <form method="post">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label asp-for="plyrNumber" class="control-label"></label>
-                    <input asp-for="plyrNumber" class="form-control" />
-                    <span asp-validation-for="plyrNumber" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                </div>
-            </form>
-        </div>
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="PlyrNumber" class="control-label"></label>
+                <input asp-for="PlyrNumber" class="form-control" />
+                <span asp-validation-for="PlyrNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+            @if (@Model?.PlyrNumber != null)
+            {
+                <form method="post" asp-action="SetPlayerNames">
+                    @{
+                        int plyrNumber = Model.PlyrNumber;
+                        for (int i = 1; i <= plyrNumber; i++)
+                        {
+                            <div class="form-group">
+                                <label for="@($"playerName{i}")">Player @i Name:</label>
+                                <input type="text" id="@($"playerName{i}")" name="@($"playerName{i}")" class="form-control" />
+                                <!-- Validation span here if needed -->
+                            </div>
+                        }
+                    }
+                    <div class="form-group">
+                        <input type="submit" value="Set Names" class="btn btn-primary" />
+                    </div>
+                </form>
+            }
+        </form>
+    </div>
     
 </div>
 </body>
