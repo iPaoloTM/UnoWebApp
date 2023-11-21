@@ -1,0 +1,28 @@
+﻿@page
+@model RazorWebApp.Pages.NewGame.NewGame
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div>
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="plyrNumber" class="control-label"></label>
+                    <input asp-for="plyrNumber" class="form-control" />
+                    <span asp-validation-for="plyrNumber" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    
+</div>
+</body>
+</html>
