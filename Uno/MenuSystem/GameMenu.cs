@@ -6,6 +6,7 @@ using UnoEngine;
 namespace MenuSystem;
 
 using UnoEngine;
+using System.Threading;
 
 public class GameMenu
 {
@@ -38,8 +39,17 @@ public class GameMenu
             //Print card information of current player
             ShowHand();
 
-            // Ask the player for his choice
-            PlayerPrompt();
+            if (CurrPlayer.PlayerType == EPlayerType.AI)
+            {
+                AIturn();
+            }
+            else
+            {
+                // Ask the player for his choice
+                PlayerPrompt();
+            }
+
+            
         } while (!Game.State.GameOver);
 
         Console.Clear();
@@ -47,6 +57,20 @@ public class GameMenu
         Console.WriteLine("Congratulations!");
         Console.WriteLine("Player: " + CurrPlayer.Nickname + " has won the game!");
         Console.ReadLine();
+    }
+
+    public void AIturn()
+    {
+        Console.WriteLine("AI is deciding..");
+        
+        Thread.Sleep(1000);
+
+        int code = Game.AIplay();
+        
+        
+        //should we handle it here?
+        
+        Console.WriteLine("AI has played!");
     }
 
 

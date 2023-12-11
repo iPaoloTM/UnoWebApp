@@ -62,6 +62,60 @@ public class GameEngine //i removed <TKEY>
         }
     }
 
+    public int AIplay()
+    {
+        var maxCards = State.Players[State.ActivePlayerNo].HandCards.Count;
+
+        PlayerMove[] possibleMoves = new PlayerMove[maxCards + 2]; ;
+
+        int i = 0;
+        for (; i < maxCards; i++)
+        {
+            possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer,
+                State.Players[State.ActivePlayerNo].HandCards[i]);
+        }
+        
+        possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.Draw, null);
+        possibleMoves[i + 1] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null);
+        Random rnd = new Random();
+        bool flag = true;
+
+        while (flag)
+        {
+            int rand = rnd.Next(0, maxCards + 2);
+            
+            int code = HandlePlayerAction(possibleMoves[rand]);
+
+            switch (code) {
+            
+                case 0:
+                    flag = true;
+                    PlayerMove[] possibleMovesTemp = new PlayerMove[possibleMoves.Length-1]; ;
+                    
+                    //copy values before the move to remove
+                    if (rand > 0)
+                    {
+                        Array.Copy(possibleMoves, 0, possibleMovesTemp, 0, rand);
+                    }
+                    
+                    //copy values after the move to remove
+                    if (rand < possibleMoves.Length - 1)
+                    {
+                        Array.Copy(possibleMoves, rand + 1, possibleMovesTemp, rand, possibleMoves.Length - rand - 1);
+                    }
+                    break; 
+                
+                //I guess that we return either if move is ok, or is not. Can we handle the rest elsewhere?
+                default:
+                    flag = false;
+                    return code;
+                    break;
+            }
+        }
+
+        return -1;
+    }
+
 
     public void AddPlayer(string playerName, EPlayerType type = EPlayerType.Human)
     {   
