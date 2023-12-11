@@ -1,4 +1,5 @@
 ﻿@page
+@using Entities.Database
 @model RazorWebApp.Pages.NewGame.NewGame
 
 <!DOCTYPE html>
@@ -20,25 +21,26 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-            @if (@Model?.PlyrNumber != null)
+            @if (Model?.PlyrNumber != null)
             {
-                <form method="post" asp-action="SetPlayerNames">
-                    @{
-                        int plyrNumber = Model.PlyrNumber;
-                        for (int i = 1; i <= plyrNumber; i++)
-                        {
-                            <div class="form-group">
-                                <label for="@($"playerName{i}")">Player @i Name:</label>
-                                <input type="text" id="@($"playerName{i}")" name="@($"playerName{i}")" class="form-control" />
-                                <!-- Validation span here if needed -->
-                            </div>
-                        }
+                Model.Players = new Player[Model.PlyrNumber];
+                string? temp = null;
+                <div class="form-group">
+                    @for (int i = 0; i < Model.PlyrNumber; i++)
+                    {
+                        
+                        <label for="@($"playerName{i}")">Player @i Name:</label>
+                        <input type="text" id="@($"playerName{i}")" asp-for="@temp" name="@($"playerName{i}")" class="form-control" />
+                        Model.Players[i] = new Player();
                     }
-                    <div class="form-group">
-                        <input type="submit" value="Set Names" class="btn btn-primary" />
-                    </div>
-                </form>
+                </div>
+
+                <div class="form-group">
+                    <input type="submit" value="Set Names" class="btn btn-primary" />
+                </div>
+                Console.WriteLine(Model.Players);
             }
+            
         </form>
     </div>
     

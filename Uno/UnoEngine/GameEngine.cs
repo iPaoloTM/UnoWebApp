@@ -63,11 +63,12 @@ public class GameEngine //i removed <TKEY>
     }
 
 
-    public void AddPlayer(string playerName)
-    {
+    public void AddPlayer(string playerName, EPlayerType type = EPlayerType.Human)
+    {   
+        
         State.Players.Add(new Player(nickname: playerName)
         {
-            PlayerType = EPlayerType.Human
+            PlayerType = type
         });
     }
 

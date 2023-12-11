@@ -82,15 +82,27 @@ string? RunNewGameMenu()
     Console.Clear();
     var playerCount = 0;
     var gameEngine = new GameEngine(GameRepository);
+    var humanCount = 0;
 
     while (true)
     {
-        playerCount = PromptValidator.UserPrompt("How many players? [2]:", 1, 10);
+        playerCount = PromptValidator.UserPrompt("How many human players? [2]:", 1, 10);
         if (playerCount == -1) playerCount = 2;
         break;
     }
+
+    while (true)
+    {
+        humanCount = PromptValidator.UserPrompt("How many of these players are human? [2]:", 1, playerCount);
+        if ((humanCount is int) && (humanCount >= 1) && (humanCount <= playerCount))
+        {
+            break;
+        }
+
+        humanCount = 2;
+    }
     
-    for (int i = 0; i < playerCount; i++)
+    for (int i = 0; i < humanCount; i++)
     {
         string? playerName = "";
         while (true)
@@ -111,6 +123,18 @@ string? RunNewGameMenu()
         }
 
         gameEngine.AddPlayer(playerName);
+        
+    }
+
+    var AIcount = playerCount - humanCount;
+
+    if (AIcount > 0)
+    {
+        for (int i = 0; i < AIcount; i++)
+        {
+            var AIName = "PlayerGPT " + (i + 1);
+            gameEngine.AddPlayer(AIName, EPlayerType.AI);
+        }
     }
 
     return StartGame(gameEngine);

@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\DAL\DAL.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Pages\Play\" />
     </ItemGroup>
 
 </Project>
