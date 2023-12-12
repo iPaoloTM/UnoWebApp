@@ -22,7 +22,7 @@ public class GameEngine //i removed <TKEY>
 
     public NewValidator Val { get; set; } = new NewValidator();
 
-    private const int InitialHandSize = 7;
+    private int InitialHandSize = 7;
 
     public bool turnOver { get; set; } = false;
     public bool canDraw { get; set; } = true;
@@ -313,6 +313,11 @@ public class GameEngine //i removed <TKEY>
 
         File.WriteAllText(filePath, json);
     }
-    
-    
+
+    public void setOptions(GameOptions options)
+    {
+        this.State.Settings = options;
+        this.InitialHandSize = options.HandSize;
+        this.IsAscendingOrder = options.InitialOrder;
+    }
 }

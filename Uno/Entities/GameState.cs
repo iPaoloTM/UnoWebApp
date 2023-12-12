@@ -19,4 +19,6 @@ public class GameState
     public bool GameOver = false;
 
     public static int NumberOfCards = 112;
+
+    public GameOptions Settings = new GameOptions();
 }
