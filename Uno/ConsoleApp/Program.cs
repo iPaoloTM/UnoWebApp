@@ -1,11 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using DAL;
 using Entities;
 using Entities.Database;
+
 using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 using UnoEngine;
@@ -93,8 +93,8 @@ string? RunNewGameMenu()
 
     while (true)
     {
-        humanCount = PromptValidator.UserPrompt("How many of these players are human? [2]:", 1, playerCount);
-        if ((humanCount is int) && (humanCount >= 1) && (humanCount <= playerCount))
+        humanCount = PromptValidator.UserPrompt("How many of these players are human? [2]:", 0, playerCount);
+        if ((humanCount is int) && (humanCount >= 0) && (humanCount <= playerCount))
         {
             break;
         }

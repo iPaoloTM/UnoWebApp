@@ -63,7 +63,7 @@ public class GameMenu
     {
         Console.WriteLine("AI is deciding..");
         
-        Thread.Sleep(1000);
+        Console.ReadLine();
 
         int code = Game.AIplay();
         
@@ -77,6 +77,7 @@ public class GameMenu
     //ASK THE PLAYER FOR HIS ACTIONS IN THIS FUNCTION!!
     public void PlayerPrompt()
     {
+        
         string? screamingPlayer = null;
         do //While the player hasn't skipped...
         {

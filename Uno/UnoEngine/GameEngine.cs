@@ -66,7 +66,7 @@ public class GameEngine //i removed <TKEY>
     {
         var maxCards = State.Players[State.ActivePlayerNo].HandCards.Count;
 
-        PlayerMove[] possibleMoves = new PlayerMove[maxCards + 2]; ;
+        PlayerMove[] possibleMoves = new PlayerMove[maxCards + 2];
 
         int i = 0;
         for (; i < maxCards; i++)
@@ -79,16 +79,21 @@ public class GameEngine //i removed <TKEY>
         possibleMoves[i + 1] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null);
         Random rnd = new Random();
         bool flag = true;
-
+        Console.WriteLine("console log 1");
+        Console.ReadLine();
         while (flag)
         {
             int rand = rnd.Next(0, maxCards + 2);
-            
+            Console.WriteLine(rand);
+            Console.ReadLine();
             int code = HandlePlayerAction(possibleMoves[rand]);
-
+            Console.WriteLine(code);
+            Console.ReadLine();
             switch (code) {
-            
                 case 0:
+                case 3:
+                    Console.WriteLine("console log 4");
+                    Console.ReadLine();
                     flag = true;
                     PlayerMove[] possibleMovesTemp = new PlayerMove[possibleMoves.Length-1]; ;
                     
@@ -105,7 +110,12 @@ public class GameEngine //i removed <TKEY>
                     }
                     break; 
                 
-                //I guess that we return either if move is ok, or is not. Can we handle the rest elsewhere?
+                //I guess that we return either if move is ok, or is not. Can we handle the rest elsewhere? 
+                case 2:
+                    Random rnd2 = new Random();
+                    var chosenColor = rnd2.Next(1, 4);
+                    SetColorInPlay(chosenColor);
+                    break;
                 default:
                     flag = false;
                     return code;
