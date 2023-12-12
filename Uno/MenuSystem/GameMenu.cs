@@ -33,21 +33,14 @@ public class GameMenu
             Console.WriteLine("--- " + CurrPlayer.Nickname + "'S TURN ---");
             Console.ReadLine();
             Console.Clear();
+            
+                DrawMenu();
 
-            DrawMenu();
-
-            //Print card information of current player
-            ShowHand();
-
-            if (CurrPlayer.PlayerType == EPlayerType.AI)
-            {
-                AIturn();
-            }
-            else
-            {
+                //Print card information of current player
+                ShowHand();
                 // Ask the player for his choice
                 PlayerPrompt();
-            }
+            
 
             
         } while (!Game.State.GameOver);
@@ -64,13 +57,14 @@ public class GameMenu
         Console.WriteLine("AI is deciding..");
         
         Console.ReadLine();
-
+        
         int code = Game.AIplay();
         
         
         //should we handle it here?
         
         Console.WriteLine("AI has played!");
+        
     }
 
 
@@ -81,7 +75,13 @@ public class GameMenu
         string? screamingPlayer = null;
         do //While the player hasn't skipped...
         {
-            var promptsList =
+            if (CurrPlayer.PlayerType == EPlayerType.AI)
+            {
+                AIturn();
+            }
+            else
+            {
+                var promptsList =
                 new List<string> {"1. Play a card ", "2. Draw from deck ", "3. Say something", "4. Skip "};
             Console.WriteLine("Choose an action: ");
             for (int i = 0; i < promptsList.Count; i++)
@@ -224,6 +224,7 @@ public class GameMenu
                     DrawMenu();
                     ShowHand();
                     break;
+            }
             }
             }
 

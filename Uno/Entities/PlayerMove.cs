@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Entities;
 
 public class PlayerMove
@@ -14,4 +16,8 @@ public class PlayerMove
         this.Player = player;
     }
 
+    public override string ToString()
+    {
+        return $"{this.PlayerAction} +  {this.Player.Nickname} +  {(this.PlayedCard != null ? this.PlayedCard.ToString() : this.Player.Nickname)}";
+    }
 }

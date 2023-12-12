@@ -67,33 +67,27 @@ public class GameEngine //i removed <TKEY>
         var maxCards = State.Players[State.ActivePlayerNo].HandCards.Count;
 
         PlayerMove[] possibleMoves = new PlayerMove[maxCards + 2];
-
-        int i = 0;
-        for (; i < maxCards; i++)
+        
+        for (int i = 0; i < maxCards; i++)
         {
-            possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer,
+            possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.PlayCard,
                 State.Players[State.ActivePlayerNo].HandCards[i]);
         }
         
-        possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.Draw, null);
-        possibleMoves[i + 1] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null);
-        Random rnd = new Random();
+        possibleMoves[maxCards] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.Draw, null);
+        possibleMoves[maxCards + 1] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null);
         bool flag = true;
-        Console.WriteLine("console log 1");
-        Console.ReadLine();
         while (flag)
         {
+            Random rnd = new Random();
             int rand = rnd.Next(0, maxCards + 2);
-            Console.WriteLine(rand);
+            Console.WriteLine(possibleMoves[rand]);
             Console.ReadLine();
             int code = HandlePlayerAction(possibleMoves[rand]);
-            Console.WriteLine(code);
-            Console.ReadLine();
             switch (code) {
+                
                 case 0:
                 case 3:
-                    Console.WriteLine("console log 4");
-                    Console.ReadLine();
                     flag = true;
                     PlayerMove[] possibleMovesTemp = new PlayerMove[possibleMoves.Length-1]; ;
                     
@@ -108,6 +102,7 @@ public class GameEngine //i removed <TKEY>
                     {
                         Array.Copy(possibleMoves, rand + 1, possibleMovesTemp, rand, possibleMoves.Length - rand - 1);
                     }
+                    Console.WriteLine("invalid move we are trying again");
                     break; 
                 
                 //I guess that we return either if move is ok, or is not. Can we handle the rest elsewhere? 
