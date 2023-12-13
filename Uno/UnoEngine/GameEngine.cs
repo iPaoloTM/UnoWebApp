@@ -66,32 +66,57 @@ public class GameEngine //i removed <TKEY>
     {
         var maxCards = State.Players[State.ActivePlayerNo].HandCards.Count;
 
-        PlayerMove[] possibleMoves = new PlayerMove[maxCards + 2];
+        //PlayerMove[] possibleMoves = new PlayerMove[maxCards];
+        List<PlayerMove> list = new List<PlayerMove>();
         
         for (int i = 0; i < maxCards; i++)
         {
-            possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.PlayCard,
-                State.Players[State.ActivePlayerNo].HandCards[i]);
+            //possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.PlayCard, State.Players[State.ActivePlayerNo].HandCards[i]);
+            list.Add(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.PlayCard, State.Players[State.ActivePlayerNo].HandCards[i]));
         }
-        
-        possibleMoves[maxCards] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.Draw, null);
-        possibleMoves[maxCards + 1] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null);
         bool flag = true;
+        Random rnd = new Random();
         while (flag)
         {
-            Random rnd = new Random();
-            int rand = rnd.Next(0, possibleMoves.Length);
-            Console.WriteLine(possibleMoves[rand]);
-            Console.ReadLine();
-            int code = HandlePlayerAction(possibleMoves[rand]);
+            int code = 0;
+            int rand = rnd.Next(0, list.Count);
+            if (list.Count == 0)
+            {
+                code = HandlePlayerAction(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.Draw, null));
+            }
+            else
+            {
+                
+                //Console.WriteLine(possibleMoves[rand]);
+                //Console.ReadLine();
+                code = HandlePlayerAction(list[rand]);    
+            }
+            
             switch (code) {
                 
                 case 0:
-                case 3:
                     flag = true;
-                    PlayerMove[] possibleMovesTemp = new PlayerMove[possibleMoves.Length-1]; ;
+                    //PlayerMove[] possibleMovesTemp = new PlayerMove[list.Count-1]; ;
+                    
+                    list.RemoveAt(rand);
+                    break;
+                case 3:
+                    
+                    flag = true;
+                    
+                    //PlayerMove[] possibleMovesTemp = new PlayerMove[list.Count-1]; ;
+                    List<PlayerMove> list2 = new List<PlayerMove>();
+                    
+                    for (int i = 0; i < State.Players[State.ActivePlayerNo].HandCards.Count; i++)
+                    {
+                        //possibleMoves[i] = new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.PlayCard, State.Players[State.ActivePlayerNo].HandCards[i]);
+                        list2.Add(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.PlayCard, State.Players[State.ActivePlayerNo].HandCards[i]));
+                    }
+
+                    list = list2;
                     
                     //copy values before the move to remove
+                    /**
                     if (rand > 0)
                     {
                         Array.Copy(possibleMoves, 0, possibleMovesTemp, 0, rand);
@@ -101,7 +126,10 @@ public class GameEngine //i removed <TKEY>
                     if (rand < possibleMoves.Length - 1)
                     {
                         Array.Copy(possibleMoves, rand + 1, possibleMovesTemp, rand, possibleMoves.Length - rand - 1);
+
+                        possibleMoves = possibleMovesTemp;
                     }
+                    **/
                     Console.WriteLine("invalid move we are trying again");
                     break; 
                 
@@ -110,9 +138,11 @@ public class GameEngine //i removed <TKEY>
                     Random rnd2 = new Random();
                     var chosenColor = rnd2.Next(1, 4);
                     SetColorInPlay(chosenColor);
+                    HandlePlayerAction(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null));
                     flag = false;
                     break;
                 default:
+                    HandlePlayerAction(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null));
                     flag = false;
                     return code;
                     break;
