@@ -7,7 +7,7 @@
     <title></title>
     <style>
         .new-game-container {
-            background-color: #f8f8f8; /* Light background color */
+            background-color: #f8f8f8;
             padding: 20px;
             border-radius: 10px;
             margin: 20px auto;
@@ -53,22 +53,16 @@
     </script>
     <script>
         $(document).ready(function () {
-            // Function to toggle AI name field
             function toggleAINameField() {
                 $(this).closest('.form-group').find('.ai-name').toggle(this.checked);
             }
-
-            // Attach the event to existing and future AI checkboxes
             $(document).on('change', '.ai-checkbox', toggleAINameField);
-
-            // Initial state set up for AI name fields
             $('.ai-checkbox').each(toggleAINameField);
             
             function toggleCustomRuleOptions() {
                 var ruleType = $('#ruleType').val();
                 $('#customRuleOptions').toggle(ruleType === 'Custom');
             }
-            // Attach event and initialize state
             $('#ruleType').change(toggleCustomRuleOptions).change();
             
             $('#customRuleOptions').on('change', '.color-picker', function() {

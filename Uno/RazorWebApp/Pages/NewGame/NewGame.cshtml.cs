@@ -1,5 +1,4 @@
-﻿using Entities.Database;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using UnoEngine;
 
@@ -7,12 +6,11 @@ namespace RazorWebApp.Pages.NewGame;
 
 public class NewGame : PageModel
 {
-    private readonly GameEngine _gameEngine; // Assuming GameEngine is injected
-
-    public NewGame(GameEngine gameEngine)
-    {
-        _gameEngine = gameEngine;
-    }
+   private readonly GameEngine _gameEngine; 
+   public NewGame(GameEngine gameEngine)
+   { 
+       _gameEngine = gameEngine;
+   }
 
     [BindProperty]
     public int PlyrNumber { get; set; } = 5;
@@ -105,29 +103,25 @@ public class NewGame : PageModel
             var colors = new List<string> { Color1, Color2, Color3, Color4 };
             if (colors.Distinct().Count() != colors.Count)
             {
-                // Handle the case where colors are not unique
                 ModelState.AddModelError("", "Duplicate colors are not allowed.");
                 return Page();
             }
-            // Custom rule logic
             if (BlockedCard)
             {
-                // Logic for Blocked Card
+                
             }
 
             if (WildCards)
             {
-                // Logic for Wild Cards
+                
             }
         }
-
+        
         _gameEngine.SetupCards();
-        // ... additional game setup logic
 
-        // Redirect to game page
-        var gameId = _gameEngine.State.Id; // Assuming you have a method to get the game's GUID
-        ViewData["GameId"] = gameId;
-        return RedirectToPage("/Game", new { id = gameId });
+      var gameId = _gameEngine.State.Id; 
+      ViewData["GameId"] = gameId;
+      return RedirectToPage("/Game");
     }
     public class PlayerInfo
     {

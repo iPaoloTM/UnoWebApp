@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using DAL; // Ensure this namespace is correct
+using DAL;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RazorWebApp.Pages.LoadGame
@@ -23,8 +23,6 @@ namespace RazorWebApp.Pages.LoadGame
         public IActionResult OnPostLoadGame(Guid gameId)
         {
             var gameState = _gameRepository.LoadGame(gameId);
-            // Logic to handle the loaded game
-            // Redirect to the game page or display the game state
 
             return Page();
         }
