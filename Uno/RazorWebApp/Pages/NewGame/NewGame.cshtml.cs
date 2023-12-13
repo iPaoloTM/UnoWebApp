@@ -6,6 +6,8 @@ namespace RazorWebApp.Pages.NewGame;
 
 public class NewGame : PageModel
 {
+
+    
     [BindProperty]
     public int PlyrNumber { get; set; } = default!;
     
