@@ -13,13 +13,63 @@ public class NewGame : PageModel
     {
         _gameEngine = gameEngine;
     }
+
+    [BindProperty]
+    public int PlyrNumber { get; set; } = 5;
+
+    [BindProperty]
+    public List<PlayerInfo> Players { get; set; } = new List<PlayerInfo>();
+
+    [BindProperty]
+    public bool IsPlayerNumberConfirmed { get; set; } = false;
+
+    [BindProperty] public string RuleType { get; set; } = "Classical";
+
+    [BindProperty]
+    public bool BlockedCard { get; set; }
+
+    [BindProperty]
+    public bool WildCards { get; set; }
     
     [BindProperty]
-    public int PlyrNumber { get; set; } = default!;
+    public string Color1 { get; set; } = "#ff0000";
+
+    [BindProperty]
+    public string Color2 { get; set; } = "#00ff00";
+
+    [BindProperty]
+    public string Color3 { get; set; } = "#ff0ff0";
+
+    [BindProperty]
+    public string Color4 { get; set; } = "#ff00ff";
     
     public void OnGet()
     {
+        // Initialize with default values
+        for (int i = 0; i < PlyrNumber; i++)
+        {
+            Players.Add(new PlayerInfo { IsAI = false });
+        }
         
+        Color1 = "#ff0000"; // Example default color
+        Color2 = "#00ff00";
+        Color3 = "#0000ff";
+        Color4 = "#ffff00";
+    }
+    private void InitializePlayers()
+    {
+        Players = new List<PlayerInfo>();
+        for (int i = 0; i < PlyrNumber; i++)
+        {
+            // Default name for AI players can be set here if needed
+            Players.Add(new PlayerInfo { IsAI = i != 0 }); // First player is not AI by default
+        }   
+    }
+    
+    public void OnPostConfirmPlayerNumber()
+    {
+        InitializePlayers();
+        IsPlayerNumberConfirmed = true;
     }
 
     public IActionResult OnPostStart()
@@ -43,6 +93,45 @@ public class NewGame : PageModel
                 _gameEngine.AddPlayer(player.Name);
             }
         }
-    }
+        
+        // Initialize game based on rule type and checkbox states
+        if (RuleType == "Classical")
+        {
+            // Classical rule logic
+            
+        }
+        else
+        {
+            var colors = new List<string> { Color1, Color2, Color3, Color4 };
+            if (colors.Distinct().Count() != colors.Count)
+            {
+                // Handle the case where colors are not unique
+                ModelState.AddModelError("", "Duplicate colors are not allowed.");
+                return Page();
+            }
+            // Custom rule logic
+            if (BlockedCard)
+            {
+                // Logic for Blocked Card
+            }
 
+            if (WildCards)
+            {
+                // Logic for Wild Cards
+            }
+        }
+
+        _gameEngine.SetupCards();
+        // ... additional game setup logic
+
+        // Redirect to game page
+        var gameId = _gameEngine.State.Id; // Assuming you have a method to get the game's GUID
+        ViewData["GameId"] = gameId;
+        return RedirectToPage("/Game", new { id = gameId });
+    }
+    public class PlayerInfo
+    {
+        public string? Name { get; set; }
+        public bool IsAI { get; set; }
+    }
 }
