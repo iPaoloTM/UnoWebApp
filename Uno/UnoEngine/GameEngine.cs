@@ -80,7 +80,7 @@ public class GameEngine //i removed <TKEY>
         while (flag)
         {
             Random rnd = new Random();
-            int rand = rnd.Next(0, maxCards + 2);
+            int rand = rnd.Next(0, possibleMoves.Length);
             Console.WriteLine(possibleMoves[rand]);
             Console.ReadLine();
             int code = HandlePlayerAction(possibleMoves[rand]);
@@ -110,6 +110,7 @@ public class GameEngine //i removed <TKEY>
                     Random rnd2 = new Random();
                     var chosenColor = rnd2.Next(1, 4);
                     SetColorInPlay(chosenColor);
+                    flag = false;
                     break;
                 default:
                     flag = false;

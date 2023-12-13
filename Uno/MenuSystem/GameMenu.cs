@@ -37,7 +37,11 @@ public class GameMenu
                 DrawMenu();
 
                 //Print card information of current player
-                ShowHand();
+                if (CurrPlayer.PlayerType == EPlayerType.Human)
+                {
+                    ShowHand();
+                }
+
                 // Ask the player for his choice
                 PlayerPrompt();
             
@@ -64,6 +68,11 @@ public class GameMenu
         //should we handle it here?
         
         Console.WriteLine("AI has played!");
+        DrawMenu();
+        if (CurrPlayer.PlayerType == EPlayerType.Human)
+        {
+            ShowHand();
+        }
         
     }
 
