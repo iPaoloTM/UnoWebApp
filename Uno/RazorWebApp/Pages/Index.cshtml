@@ -4,7 +4,57 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section CustomStyles {
+    <style>
+        body {
+            background: linear-gradient(to right, #ffffff, #f2f2e6);
+            color: #333;
+        }
+        .centered-content {
+            min-height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .menu-background {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .menu-link {
+            display: block; 
+            color: #007bff; 
+            font-size: 18px;
+            margin: 10px 0;
+        }
+
+        .uno-title {
+            color: red;
+            font-size: 60px; 
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 200px;
+            height: 200px; 
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+    </style>
+}
+
+<div class="centered-content">
+    <img src="uno.png" alt="Logo" class="logo">
+    <div class="uno-title">UnoGame</div>
+    <div class="menu-background">
+        <a class="menu-link" asp-area="" asp-page="/NewGame/NewGame">New Game</a>
+        <a class="nav-link" asp-area="" asp-page="/JoinGame">Join Game</a>
+        <a class="menu-link" asp-area="" asp-page="/LoadGame/LoadGame">Load Game</a>
+        <a class="menu-link" asp-area="" asp-page="/Privacy">Privacy</a>
+    </div>
 </div>
