@@ -1,0 +1,24 @@
+@page
+@model RazorWebApp.Pages.LoadGame.LoadGameModel
+
+<h2>Load Game</h2>
+
+@if (Model.Games.Count > 0)
+{
+    foreach (var game in Model.Games)
+    {
+        <div>
+            <p>Game ID: @game.id - Started at: @game.startedAt</p>
+            <form method="post" asp-page-handler="LoadGame">
+                <input type="hidden" name="gameId" value="@game.id" />
+                <input type="submit" value="Load this game" class="btn btn-primary" />
+            </form>
+        </div>
+    }
+}
+else
+{
+    <p>No games to load.</p>
+}
+
+<a class="btn btn-secondary" asp-page="/Index">Back to Main Menu</a>
