@@ -20,6 +20,11 @@ public class NewGame : PageModel
 
     [BindProperty]
     public bool IsPlayerNumberConfirmed { get; set; } = false;
+    
+    [BindProperty]
+    public bool IsHumanPlayerNumberConfirmed { get; set; } = false;
+
+    
 
     [BindProperty] public string RuleType { get; set; } = "Classical";
 
@@ -68,6 +73,12 @@ public class NewGame : PageModel
     {
         InitializePlayers();
         IsPlayerNumberConfirmed = true;
+    }
+
+    public void OnPostConfirmHumanPlayerNumber()
+    {
+        InitializePlayers();
+        IsHumanPlayerNumberConfirmed = true;
     }
 
     public IActionResult OnPostStart()
