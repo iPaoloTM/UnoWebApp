@@ -139,7 +139,7 @@ public class NewGame : PageModel
 
       var gameId = _gameEngine.State.Id; 
       ViewData["GameId"] = gameId;
-      return RedirectToPage("/Game");
+      return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = _gameEngine.State.ActivePlayerNo });
     }
     public class PlayerInfo
     {
