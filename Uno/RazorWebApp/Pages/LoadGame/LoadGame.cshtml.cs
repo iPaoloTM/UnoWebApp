@@ -20,7 +20,7 @@ namespace RazorWebApp.Pages.LoadGame
             Games = _gameRepository.GetSaveGames() ?? new List<(Guid id, DateTime startedAt)>(); // Ensure this is never null
         }
         
-        public IActionResult OnPostLoadGame(Guid gameId)
+        public IActionResult OnPost(Guid gameId)
         {
             var gameState = _gameRepository.LoadGame(gameId);
 
