@@ -1,10 +1,27 @@
+using DAL;
+using Microsoft.EntityFrameworkCore;
+using UnoEngine;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+builder.Services.AddDbContext<UnoDbContext>(options =>
+    options.UseSqlite("Data Source=app.db")); // Use SQLite
+
+builder.Services.AddScoped<GameRepositoryEF>();
+
+builder.Services.AddScoped<GameEngine>();
+
 var app = builder.Build();
 
+// Apply migrations
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<UnoDbContext>();
+    dbContext.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

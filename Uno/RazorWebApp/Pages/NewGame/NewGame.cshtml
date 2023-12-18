@@ -1,5 +1,4 @@
 ﻿@page
-@using Entities.Database
 @model RazorWebApp.Pages.NewGame.NewGame
 
 <!DOCTYPE html>
@@ -7,43 +6,171 @@
 <html lang="en">
 <head>
     <title></title>
+    <style>
+        .new-game-container {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .back-button {
+            display: block;
+            margin: 10px auto 20px;
+            width: 200px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        #customRuleOptions {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #ffffff;
+            border: #6c757d;
+        }
+    
+        #customRuleOptions .checkbox {
+            margin-bottom: 10px; /* Space between checkboxes */
+        }
+        
+        .game-id-display {
+            background-color: #b02a37;
+            border: #6c757d;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#PlyrNumber').change(function () {
+                if (@Model.IsPlayerNumberConfirmed.ToString().ToLower() === 'true') {
+                    location.reload(); // Reload the page
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            function toggleAINameField() {
+                $(this).closest('.form-group').find('.ai-name').toggle(this.checked);
+            }
+            $(document).on('change', '.ai-checkbox', toggleAINameField);
+            $('.ai-checkbox').each(toggleAINameField);
+            
+            function toggleCustomRuleOptions() {
+                var ruleType = $('#ruleType').val();
+                $('#customRuleOptions').toggle(ruleType === 'Custom');
+            }
+            $('#ruleType').change(toggleCustomRuleOptions).change();
+            
+            $('#customRuleOptions').on('change', '.color-picker', function() {
+                var colors = $('.color-picker').map(function() { return $(this).val(); }).get();
+                var hasDuplicates = colors.some(function(item, idx) { 
+                    return colors.indexOf(item) != idx 
+                });
+                if (hasDuplicates) {
+                    alert('Duplicate colors are not allowed.');
+                }
+            });
+        });
+    </script>
 </head>
 <body>
-<div>
-    <div class="col-md-4">
-        <form method="post">
+<div class="new-game-container">
+    <h2>Create a New Game</h2>
+    <form method="post" asp-page-handler="ConfirmPlayerNumber">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="PlyrNumber" class="control-label">Choose Number of Players</label>
+            <input asp-for="PlyrNumber" class="form-control" type="number" min="2" max="10" />
+            <span asp-validation-for="PlyrNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Confirm Number of Players</button>
+        </div>
+    </form>
+   
+    @if (Model.IsPlayerNumberConfirmed)
+    {
+        <form method="post" asp-page-handler="ConfirmHumanPlayerNumber">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="PlyrNumber" class="control-label"></label>
-                <input asp-for="PlyrNumber" class="form-control" />
+                <label asp-for="HPlyrNumber" class="control-label">Choose Number of Human Players</label>
+                <input asp-for="HPlyrNumber" class="form-control" type="number" min="0" max=@Model.PlyrNumber />
                 <span asp-validation-for="PlyrNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <button type="submit" class="btn btn-primary">Confirm Number of Human players</button>
             </div>
-            @if (Model?.PlyrNumber != null)
-            {
-                Model.Players = new Player[Model.PlyrNumber];
-                string? temp = null;
-                <div class="form-group">
-                    @for (int i = 0; i < Model.PlyrNumber; i++)
-                    {
-                        
-                        <label for="@($"playerName{i}")">Player @i Name:</label>
-                        <input type="text" id="@($"playerName{i}")" asp-for="@temp" name="@($"playerName{i}")" class="form-control" />
-                        Model.Players[i] = new Player();
-                    }
-                </div>
-
-                <div class="form-group">
-                    <input type="submit" value="Set Names" class="btn btn-primary" />
-                </div>
-                Console.WriteLine(Model.Players);
-            }
-            
-        </form>
-    </div>
+        </form> 
+    }
     
+
+    @if (Model.IsHumanPlayerNumberConfirmed)
+    {
+        <form method="post" asp-page-handler="Start">
+                @for (int i = 0; i < Model.Players.Count; i++)
+                {
+                    if (!Model.Players[i].IsAI)
+                    {
+                        <div class="form-group">
+                            <label>@($"Player {i + 1}")</label>
+                            <input asp-for="Players[i].Name" class="form-control"/>
+                        </div>
+                    }
+                    
+                }
+            <div class="form-group">
+                <label for="ruleType">Select Game Rules</label>
+                <select id="ruleType" name="ruleType" class="form-control">
+                    <option value="Classical">Classical Rules</option>
+                    <option value="Custom">Custom Rules</option>
+                </select>
+            </div>
+
+            <!-- Custom Rule Options -->
+            <div id="customRuleOptions" style="display:none;">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="blockedCard" /> Blocked Card
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="wildCards" /> Wild Cards
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Color 1:</label>
+                    <input type="color" name="color1" class="color-picker" value="@Model.Color1"  />
+                </div>
+                <div class="form-group">
+                    <label>Color 2:</label>
+                    <input type="color" name="color2" class="color-picker" value="@Model.Color2"  />
+                </div>
+                <div class="form-group">
+                    <label>Color 3:</label>
+                    <input type="color" name="color3" class="color-picker" value="@Model.Color3"  />
+                </div>
+                <div class="form-group">
+                    <label>Color 4:</label>
+                    <input type="color" name="color4" class="color-picker" value="@Model.Color4"  />
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Start Game" class="btn btn-success" />
+            </div>
+
+            <div class="game-id-display">
+                Game ID: @ViewData["GameId"]
+            </div>
+                
+            <a class="btn btn-secondary back-button" asp-page="/Index">Back to Main Menu</a>
+        </form>
+    }
 </div>
 </body>
 </html>
