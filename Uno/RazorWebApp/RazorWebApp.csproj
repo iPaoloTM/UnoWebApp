@@ -13,17 +13,5 @@
       <ProjectReference Include="..\UnoEngine\UnoEngine.csproj" />
     </ItemGroup>
 
-<<<<<<< HEAD
-    <ItemGroup>
-      <Folder Include="Pages\Play\" />
-    </ItemGroup>
-=======
->>>>>>> mikais-2023/12/13-RazorWebPageEdit
-      <ProjectReference Include="..\UnoEngine\UnoEngine.csproj" />
-
-    <ItemGroup>
-      <Folder Include="Pages\Play\" />
-    </ItemGroup>
-
 
 </Project>
