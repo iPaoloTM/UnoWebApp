@@ -14,6 +14,9 @@ public class NewGame : PageModel
 
     [BindProperty]
     public int PlyrNumber { get; set; } = 5;
+    
+    [BindProperty]
+    public int HPlyrNumber { get; set; } = 5;
 
     [BindProperty]
     public List<PlayerInfo> Players { get; set; } = new List<PlayerInfo>();
@@ -62,16 +65,20 @@ public class NewGame : PageModel
     private void InitializePlayers()
     {
         Players = new List<PlayerInfo>();
-        for (int i = 0; i < PlyrNumber; i++)
+        for (int i = 0; i < HPlyrNumber; i++)
         {
             // Default name for AI players can be set here if needed
-            Players.Add(new PlayerInfo { IsAI = i != 0 }); // First player is not AI by default
-        }   
+            Players.Add(new PlayerInfo{IsAI = false}); // First player is not AI by default
+        }
+
+        for (int j = HPlyrNumber; j < PlyrNumber; j++)
+        {
+            Players.Add(new PlayerInfo{IsAI = true});
+        }
     }
     
     public void OnPostConfirmPlayerNumber()
     {
-        InitializePlayers();
         IsPlayerNumberConfirmed = true;
     }
 
