@@ -24,7 +24,7 @@ namespace RazorWebApp.Pages.LoadGame
         {
             var gameState = _gameRepository.LoadGame(gameId);
 
-            return Page();
+            return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = gameState.ActivePlayerNo });;
         }
     }
     

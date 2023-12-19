@@ -1,4 +1,5 @@
-﻿using Entities.Database;
+﻿using DAL;
+using Entities.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using UnoEngine;
@@ -8,10 +9,12 @@ namespace RazorWebApp.Pages.NewGame;
 
 public class NewGame : PageModel
 {
-   private readonly GameEngine _gameEngine; 
-   public NewGame(GameEngine gameEngine)
+   private readonly GameEngine _gameEngine;
+   private readonly GameRepositoryEF _gameRepository;
+   public NewGame(GameEngine gameEngine, GameRepositoryEF gameRepository)
    { 
        _gameEngine = gameEngine;
+       _gameRepository = gameRepository;
    }
 
     [BindProperty]
@@ -109,7 +112,7 @@ public class NewGame : PageModel
             {
                 // Add human player
                 var name = string.IsNullOrWhiteSpace(Players[i].Name) ? $"Player {i+1}" : Players[i].Name;
-                _gameEngine.AddPlayer(name, EPlayerType.Human);
+                _gameEngine.AddPlayer(name);
             }
         }
         
@@ -142,6 +145,7 @@ public class NewGame : PageModel
 
       var gameId = _gameEngine.State.Id; 
       ViewData["GameId"] = gameId;
+      _gameRepository.Save(_gameEngine.State.Id,_gameEngine.State);
       return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = _gameEngine.State.ActivePlayerNo });
     }
     public class PlayerInfo

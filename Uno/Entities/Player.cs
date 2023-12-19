@@ -17,11 +17,11 @@ public class Player
     public bool SaidUno { get; set; } = false;
 
 
-    public Player(string nickname = "player", EPlayerType Type = EPlayerType.Human)
+    public Player(string nickname = "player", EPlayerType playerType = EPlayerType.Human)
     {
         Nickname = nickname ?? throw new ArgumentNullException(nameof(nickname), "Nickname cannot be null.");
         HandCards = new List<Card>();
-        PlayerType = Type;
+        this.PlayerType = playerType;
     }
 
     public void AddCard(Card card)
