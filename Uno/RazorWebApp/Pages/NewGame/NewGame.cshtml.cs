@@ -146,7 +146,7 @@ public class NewGame : PageModel
       var gameId = _gameEngine.State.Id; 
       ViewData["GameId"] = gameId;
       _gameRepository.Save(_gameEngine.State.Id,_gameEngine.State);
-      return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = _gameEngine.State.ActivePlayerNo });
+      return RedirectToPage("../Game/ChoosePlayer", new { GameId = gameId });
     }
     public class PlayerInfo
     {
