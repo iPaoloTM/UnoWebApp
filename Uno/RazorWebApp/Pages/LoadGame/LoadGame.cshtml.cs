@@ -8,7 +8,7 @@ namespace RazorWebApp.Pages.LoadGame
     {
         private readonly GameRepositoryEF _gameRepository;
         public List<(Guid id, DateTime startedAt)> Games { get; set; }
-
+        
         public LoadGameModel(GameRepositoryEF gameRepository)
         {
             _gameRepository = gameRepository;
@@ -22,9 +22,7 @@ namespace RazorWebApp.Pages.LoadGame
         
         public IActionResult OnPost(Guid gameId)
         {
-            var gameState = _gameRepository.LoadGame(gameId);
-
-            return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = gameState.ActivePlayerNo });;
+            return RedirectToPage("../Game/ChoosePlayer", new { GameId = gameId});
         }
     }
     

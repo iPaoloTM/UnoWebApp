@@ -19,7 +19,7 @@ public class Game : PageModel
 
     [BindProperty(SupportsGet = true)] public Guid GameId { get; set; }
 
-    [BindProperty(SupportsGet = true)] public Guid PlayerId { get; set; }
+    [BindProperty(SupportsGet = true)] public int PlayerId { get; set; }
 
     public void OnGet()
     {
