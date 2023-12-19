@@ -97,17 +97,18 @@ public class NewGame : PageModel
         }
 
         // Process the player information
-        foreach (var player in Players)
+        for (int i = 0; i< Players.Count; i++)
         {
-            if (player.IsAI)
+            if (Players[i].IsAI)
             {
                 // Add AI player
-                _gameEngine.AddPlayer(player.Name);
+                _gameEngine.AddPlayer("PlayerGPT " + (i + 1));
             }
             else
             {
                 // Add human player
-                _gameEngine.AddPlayer(player.Name);
+                var name = string.IsNullOrWhiteSpace(Players[i].Name) ? $"Player {i+1}" : Players[i].Name;
+                _gameEngine.AddPlayer(name);
             }
         }
         
