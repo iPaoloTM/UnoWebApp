@@ -1,0 +1,157 @@
+* {
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+.card-drawer {
+  display: flex;
+  justify-content: space-around;
+}
+
+.uno-card {
+  display: inline-block;
+  width: 10em;
+  height: 15em;
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, .2);
+  background: #fafafa;
+  padding: 1em;
+  border-radius: .5em;
+  display: inline-flex;
+  color: #fafafa;
+  text-shadow: 0 0 3px black;
+}
+
+.uno-card .uno-card-body {
+  height: 100%;
+  width: 100%;
+  border-radius: 1em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.uno-card .uno-card-body .uno-card-number {
+  font-size: 3em;
+  display: flex;
+  justify-content: center;
+}
+
+.uno-card .uno-card-body::after,
+.uno-card .uno-card-body::before {
+  padding: 1em;
+  display: flex;
+}
+
+.uno-card .uno-card-body::after {
+  justify-content: flex-end;
+}
+
+.uno-card .uno-card-body::before {
+  justify-content: flex-start;
+}
+
+.uno-card.yellow .uno-card-body {
+  background: goldenrod;
+}
+
+.uno-card.blue .uno-card-body {
+  background: royalblue;
+}
+
+.uno-card.green .uno-card-body {
+  background: forestgreen;
+}
+
+.uno-card.red .uno-card-body {
+  background: red;
+}
+
+.uno-card.black .uno-card-body {
+  background: #2f2f2f;
+}
+
+/* You need to manually expand the loop for each number */
+.uno-card.number-0 .uno-card-body::before,
+.uno-card.number-0 .uno-card-body::after,
+.uno-card.number-0 .uno-card-body .uno-card-number::before {
+  content: '0';
+}
+
+.uno-card.number-1 .uno-card-body::before,
+.uno-card.number-1 .uno-card-body::after,
+.uno-card.number-1 .uno-card-body .uno-card-number::before {
+  content: '1';
+}
+
+.uno-card.number-2 .uno-card-body::before,
+.uno-card.number-2 .uno-card-body::after,
+.uno-card.number-2 .uno-card-body .uno-card-number::before {
+  content: '2';
+}
+
+.uno-card.number-3 .uno-card-body::before,
+.uno-card.number-3 .uno-card-body::after,
+.uno-card.number-3 .uno-card-body .uno-card-number::before {
+  content: '3';
+}
+
+.uno-card.number-4 .uno-card-body::before,
+.uno-card.number-4 .uno-card-body::after,
+.uno-card.number-4 .uno-card-body .uno-card-number::before {
+  content: '4';
+}
+
+.uno-card.number-5 .uno-card-body::before,
+.uno-card.number-5 .uno-card-body::after,
+.uno-card.number-5 .uno-card-body .uno-card-number::before {
+  content: '5';
+}
+
+.uno-card.number-6 .uno-card-body::before,
+.uno-card.number-6 .uno-card-body::after,
+.uno-card.number-6 .uno-card-body .uno-card-number::before {
+  content: '6';
+}
+
+.uno-card.number-7 .uno-card-body::before,
+.uno-card.number-7 .uno-card-body::after,
+.uno-card.number-7 .uno-card-body .uno-card-number::before {
+  content: '7';
+}
+
+.uno-card.number-8 .uno-card-body::before,
+.uno-card.number-8 .uno-card-body::after,
+.uno-card.number-8 .uno-card-body .uno-card-number::before {
+  content: '8';
+}
+
+.uno-card.number-9 .uno-card-body::before,
+.uno-card.number-9 .uno-card-body::after,
+.uno-card.number-9 .uno-card-body .uno-card-number::before {
+  content: '9';
+}
+/* Repeat the above block for numbers 1 through 9 */
+
+.uno-card.draw-2 .uno-card-body::before,
+.uno-card.draw-2 .uno-card-body::after,
+.uno-card.draw-2 .uno-card-body .uno-card-number::before {
+  content: '+2';
+}
+
+.uno-card.draw-4 .uno-card-body::before,
+.uno-card.draw-4 .uno-card-body::after,
+.uno-card.draw-4 .uno-card-body .uno-card-number::before {
+  content: '+4';
+}
+
+.uno-card.skip .uno-card-body::before,
+.uno-card.skip .uno-card-body::after,
+.uno-card.skip .uno-card-body .uno-card-number::before {
+  content: '🔄';
+}
+
+.uno-card.wild .uno-card-body::before,
+.uno-card.wild .uno-card-body::after,
+.uno-card.wild .uno-card-body .uno-card-number::before {
+  content: '❌';
+}
