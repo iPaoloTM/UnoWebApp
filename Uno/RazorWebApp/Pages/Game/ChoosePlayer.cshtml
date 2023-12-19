@@ -1,0 +1,30 @@
+﻿@page
+@using Entities
+@model RazorWebApp.Pages.Game.ChoosePlayer
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+<div>
+    @if (Model.PlayerList.Count > 0)
+    {
+        foreach (var player in Model.PlayerList)
+        {
+            <div>
+                <p>Name: @player.Nickname </p>
+                <form method="post" asp-page-handler="PlayerChosen">
+                    <input type="hidden" name="gameId" value="@Model.GameId" />
+                    <input type="hidden" name="playerId" value="@Model.PlayerList.IndexOf(player)" />
+                    <input type="submit" value="I am this player" class="btn btn-primary" />
+                </form>
+            </div>
+        }
+    }
+</div>
+</body>
+</html>
