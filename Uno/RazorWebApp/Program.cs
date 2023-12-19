@@ -1,6 +1,7 @@
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using UnoEngine;
+using Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 

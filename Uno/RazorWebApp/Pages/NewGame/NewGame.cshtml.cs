@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using UnoEngine;
+using Entities;
 
 namespace RazorWebApp.Pages.NewGame;
 
@@ -102,13 +103,13 @@ public class NewGame : PageModel
             if (Players[i].IsAI)
             {
                 // Add AI player
-                _gameEngine.AddPlayer("PlayerGPT " + (i + 1));
+                _gameEngine.AddPlayer("PlayerGPT " + (i + 1), EPlayerType.AI);
             }
             else
             {
                 // Add human player
                 var name = string.IsNullOrWhiteSpace(Players[i].Name) ? $"Player {i+1}" : Players[i].Name;
-                _gameEngine.AddPlayer(name);
+                _gameEngine.AddPlayer(name, EPlayerType.Human);
             }
         }
         
