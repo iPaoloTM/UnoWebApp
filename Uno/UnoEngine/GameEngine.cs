@@ -22,24 +22,24 @@ public class GameEngine //i removed <TKEY>
 
     public NewValidator Val { get; set; } = new NewValidator();
 
-    private int InitialHandSize = 7;
+    private int _initialHandSize = 7; //Default value
 
-    public bool turnOver { get; set; } = false;
-    public bool canDraw { get; set; } = true;
-    public bool endTurn { get; set; } = false;
+    public bool TurnOver { get; set; } = false;
+    public bool CanDraw { get; set; } = true;
+    public bool EndTurn { get; set; } = false;
     
     public GameRepositoryEF? GameRepository { get; set; }
 
-    public GameEngine(GameRepositoryEF? GameRepository)
+    public GameEngine(GameRepositoryEF? gameRepository)
     {
-        this.GameRepository = GameRepository;
+        this.GameRepository = gameRepository;
     }
 
     public void SetupCards()
     {
         State.GameDeck.Shuffle();
 
-        int maxNumOfCards = InitialHandSize * State.Players.Count;
+        int maxNumOfCards = _initialHandSize * State.Players.Count;
         int dealtCards = 0;
         while (dealtCards < maxNumOfCards)
         {
@@ -78,7 +78,7 @@ public class GameEngine //i removed <TKEY>
         Random rnd = new Random();
         while (flag)
         {
-            int code = 0;
+            int code;
             int rand = rnd.Next(0, list.Count);
             if (list.Count == 0)
             {
@@ -95,12 +95,15 @@ public class GameEngine //i removed <TKEY>
             switch (code) {
                 
                 case 0:
+                    //Coudln't play card
+                    
                     flag = true;
                     //PlayerMove[] possibleMovesTemp = new PlayerMove[list.Count-1]; ;
                     
                     list.RemoveAt(rand);
                     break;
                 case 3:
+                    //Drew card we can play
                     
                     flag = true;
                     
@@ -114,38 +117,27 @@ public class GameEngine //i removed <TKEY>
                     }
 
                     list = list2;
-                    
-                    //copy values before the move to remove
-                    /**
-                    if (rand > 0)
-                    {
-                        Array.Copy(possibleMoves, 0, possibleMovesTemp, 0, rand);
-                    }
-                    
-                    //copy values after the move to remove
-                    if (rand < possibleMoves.Length - 1)
-                    {
-                        Array.Copy(possibleMoves, rand + 1, possibleMovesTemp, rand, possibleMoves.Length - rand - 1);
-
-                        possibleMoves = possibleMovesTemp;
-                    }
-                    **/
-                    Console.WriteLine("invalid move we are trying again");
                     break; 
                 
                 //I guess that we return either if move is ok, or is not. Can we handle the rest elsewhere? 
                 case 2:
+                    //Played color choosing card
                     Random rnd2 = new Random();
                     var chosenColor = rnd2.Next(1, 4);
                     SetColorInPlay(chosenColor);
                     HandlePlayerAction(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null));
                     flag = false;
+                    return code;
                     break;
+                case 1:
+                    //Drew card
+                    HandlePlayerAction(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null));
+                    return code;
                 default:
+                    //Played any other card.
                     HandlePlayerAction(new PlayerMove(State.Players[State.ActivePlayerNo], EPlayerAction.NextPlayer, null));
                     flag = false;
                     return code;
-                    break;
             }
         }
 
@@ -187,8 +179,8 @@ public class GameEngine //i removed <TKEY>
                     if (playingPlayer.HandCards.Count == 0)
                     {
                         State.GameOver = true;
-                        turnOver = true;
-                        endTurn = true;
+                        TurnOver = true;
+                        EndTurn = true;
                         return 4;
                     }
 
@@ -198,26 +190,26 @@ public class GameEngine //i removed <TKEY>
                         {
                             case EEffect.Reverse:
                                 IsAscendingOrder = !IsAscendingOrder;
-                                turnOver = true;
+                                TurnOver = true;
                                 break;
                             case EEffect.Skip:
                                 State.ActivePlayerNo = NextTurn();
-                                turnOver = true;
+                                TurnOver = true;
                                 break;
                             case EEffect.Wild:
-                                turnOver = true;
+                                TurnOver = true;
                                 return 2;
                                 break;
                             case EEffect.DrawFour:
                                 DrawCards(4, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
-                                turnOver = true;
+                                TurnOver = true;
                                 return 2;
                                 break;
                             case EEffect.DrawTwo:
                                 DrawCards(2, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
-                                turnOver = true;
+                                TurnOver = true;
                                 break;
                             default:
                                 throw new Exception("something went wrong");
@@ -226,7 +218,7 @@ public class GameEngine //i removed <TKEY>
 
                     State.ColorInPlay = decision.PlayedCard.Color;
 
-                    turnOver = true;
+                    TurnOver = true;
                     return 1;
                 }
                 else
@@ -243,7 +235,7 @@ public class GameEngine //i removed <TKEY>
                     DrawCards(1, State.ActivePlayerNo);
                     if (Val.CanPlayCard(drawnCard, State))
                     {
-                        canDraw = false;
+                        CanDraw = false;
                         return 3;
                     }
 
@@ -252,8 +244,8 @@ public class GameEngine //i removed <TKEY>
 
 
                     HandleUnoShouting(playingPlayer);
-                    turnOver = true;
-                    canDraw = false;
+                    TurnOver = true;
+                    CanDraw = false;
                     return 1;
                 }
                 else
@@ -267,9 +259,9 @@ public class GameEngine //i removed <TKEY>
                 response = Val.ValidateMove(decision, State);
                 if (response)
                 {
-                    if (turnOver)
+                    if (TurnOver)
                     {
-                        endTurn = true;
+                        EndTurn = true;
                         State.ActivePlayerNo = NextTurn();
                         State.LastMove = playingPlayer.NextPlayer();
                         State.LastMove.PlayedCard = State.UsedDeck.First();
@@ -299,9 +291,9 @@ public class GameEngine //i removed <TKEY>
 
     public void NewTurn()
     {
-        turnOver = false;
-        canDraw = true;
-        endTurn = false;
+        TurnOver = false;
+        CanDraw = true;
+        EndTurn = false;
     }
 
     public void HandleUnoShouting(Player player, string? message = "")
@@ -405,10 +397,10 @@ public class GameEngine //i removed <TKEY>
         File.WriteAllText(filePath, json);
     }
 
-    public void setOptions(GameOptions options)
+    public void SetOptions(GameOptions options)
     {
         this.State.Settings = options;
-        this.InitialHandSize = options.HandSize;
+        this._initialHandSize = options.HandSize;
         this.IsAscendingOrder = options.InitialOrder;
     }
 }

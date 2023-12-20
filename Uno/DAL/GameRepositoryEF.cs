@@ -40,7 +40,7 @@ public class GameRepositoryEF
         }
 
         var changeCount = _ctx.SaveChanges();
-        Console.WriteLine("SaveChanges: " + changeCount);
+        //Console.WriteLine("SaveChanges: " + changeCount);
     }
 
     public List<(Guid id, DateTime dt)> GetSaveGames()

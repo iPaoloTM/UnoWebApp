@@ -120,7 +120,8 @@ public class NewGame : PageModel
         if (RuleType == "Classical")
         {
             // Classical rule logic
-            
+            var defaultRules = new GameOptions();
+            _gameEngine.State.Settings = defaultRules;
         }
         else
         {
@@ -145,7 +146,7 @@ public class NewGame : PageModel
 
       var gameId = _gameEngine.State.Id; 
       ViewData["GameId"] = gameId;
-      _gameRepository.Save(_gameEngine.State.Id,_gameEngine.State);
+      _gameRepository.Save(gameId,_gameEngine.State);
       return RedirectToPage("../Game/ChoosePlayer", new { GameId = gameId });
     }
     public class PlayerInfo

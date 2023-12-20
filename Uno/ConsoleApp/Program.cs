@@ -139,7 +139,7 @@ string? RunNewGameMenu()
     }
     
     //
-    gameEngine.setOptions(options);
+    gameEngine.SetOptions(options);
 
     return StartGame(gameEngine);
 }
