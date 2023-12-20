@@ -12,6 +12,7 @@ public class Game : PageModel
     public GameEngine Engine;
 
     public string shoutingText = default!;
+    
 
     [BindProperty] public bool IsPlayerTurn { get; set; } = false;
     [BindProperty(SupportsGet = true)] public Guid GameId { get; set; }
@@ -32,11 +33,11 @@ public class Game : PageModel
         if (PlayerId == Engine.State.ActivePlayerNo) IsPlayerTurn = true;
     }
 
-    public IActionResult OnPostCardClicked(Guid gameId, int cardIndex,int currPlayer)
+    public IActionResult OnPostCardClicked(Guid gameId, int cardIndex, int currPlayer)
     {
         var currState = _gameRepository.LoadGame(gameId);
         Engine.State = currState;
-        Console.WriteLine("Chosen card is "+cardIndex);
+        Console.WriteLine("Chosen card is " + cardIndex);
 
         if (!currState.TurnOver)
         {
@@ -49,11 +50,40 @@ public class Game : PageModel
             if (success == 1)
             {
                 Console.WriteLine("SAVING...");
-                _gameRepository.Save(gameId,Engine.State);
+                _gameRepository.Save(gameId, Engine.State);
+            } else if (success == 2)
+            {
+                //User has to choose color
+                Console.WriteLine("COLOR REached");
+                TempData["showColorSelection"] = true;
+                _gameRepository.Save(gameId, Engine.State);
             }
         }
-        return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
 
+        return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
+    }
+
+    public IActionResult  OnPostSelectColor(string selectedColor, Guid gameId, int currPlayer)
+    {
+        switch (selectedColor)
+        {
+            case "yellow":
+                Engine.SetColorInPlay(3);
+                break;
+            case "blue":
+                Engine.SetColorInPlay(2);
+                break;
+            case "red":
+                Engine.SetColorInPlay(1);
+                break;
+            case "green":
+                Engine.SetColorInPlay(4);
+                break;
+        }
+        Console.WriteLine("SAVING...");
+        _gameRepository.Save(gameId, Engine.State);
+        return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
+        
     }
 
     public IActionResult OnPostDrawCard(Guid gameId, int currPlayer)
@@ -69,11 +99,10 @@ public class Game : PageModel
         {
             var moveDraw = new PlayerMove(Engine.State.Players[Engine.State.ActivePlayerNo], EPlayerAction.Draw, null);
             Engine.HandlePlayerAction(moveDraw);
-            _gameRepository.Save(gameId,Engine.State);
-
+            _gameRepository.Save(gameId, Engine.State);
         }
         //Console.WriteLine(Engine.State.Id);
-        
+
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
     }
 
@@ -88,14 +117,14 @@ public class Game : PageModel
             var moveSkip = new PlayerMove(Engine.State.Players[currPlayer], EPlayerAction.NextPlayer,
                 null);
             var response = Engine.HandlePlayerAction(moveSkip);
-        
+
             //Conditions to end turn are met
             if (response == 1)
             {
                 _gameRepository.Save(gameId, Engine.State);
             }
-
         }
+
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
     }
 

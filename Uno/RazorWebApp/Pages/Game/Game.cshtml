@@ -1,12 +1,12 @@
 ﻿@page
 @using Entities
 @model RazorWebApp.Pages.Game.Game
-
 @{
     Layout = null;
 }
 
 <!DOCTYPE html>
+
 
 <html xmlns="http://www.w3.org/1999/html">
 <head>
@@ -180,9 +180,8 @@
 </style>
 <body>
 <div>
-    <h1>Game ID: @Model.GameId</h1>
-    <h1>Game ID: @Model.Engine.State.Id</h1>
-    <h1>Active player ID: @Model.PlayerId</h1>
+    <h1>@Html.Raw((bool)(TempData["showColorSelection"] ?? false))</h1>
+    <h1>Active player ID: @Model.Engine.State.ActivePlayerNo</h1>
     <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
 
     <div class="card-drawer">
@@ -207,6 +206,21 @@
             </form>
         }
     </div>
+    <div>
+        @if ((TempData["showColorSelection"] != null && (bool)TempData["showColorSelection"]))
+        {
+          <form method="post" asp-page-handler="SelectColor">
+            <input type="hidden" name="gameId" value="@Model.GameId"/>
+            <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+            <button type="submit" class="btn btn-warning" name="selectedColor" value="yellow">Yellow</button>
+            <button type="submit" class="btn btn-primary" name="selectedColor" value="blue">Blue</button>
+            <button type="submit" class="btn btn-success" name="selectedColor" value="green">Green</button>
+            <button type="submit" class="btn btn-danger" name="selectedColor" value="red">Red</button>
+          </form>
+        }
+    </div>
+
+
 </div>
 @if (!Model.IsPlayerTurn)
 {
