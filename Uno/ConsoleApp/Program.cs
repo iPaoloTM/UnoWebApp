@@ -1,11 +1,11 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using DAL;
 using Entities;
 using Entities.Database;
-
 using MenuSystem;
 using Microsoft.EntityFrameworkCore;
 using UnoEngine;
@@ -20,7 +20,8 @@ var contextOptions = new DbContextOptionsBuilder<UnoDbContext>()
 using var db = new UnoDbContext(contextOptions);
 db.Database.Migrate();
 
-var GameRepository = new GameRepositoryEF(db);
+var gameRepository = new GameRepositoryEF(db);
+var options = new GameOptions();
 
 string? StartGame(GameEngine gameEngine)
 {
@@ -32,7 +33,7 @@ string? StartGame(GameEngine gameEngine)
 
 string? LoadGame()
 {
-    var saveGames = GameRepository.GetSaveGames();
+    var saveGames = gameRepository.GetSaveGames();
     var saveGameListDisplay = saveGames.Select((s, i) => (i + 1) + " - " + s).ToList();
 
     if (saveGameListDisplay.Count == 0) return null;
@@ -58,7 +59,7 @@ string? LoadGame()
         }
     }
 
-    var newEngine = new GameEngine(GameRepository);
+    var newEngine = new GameEngine(gameRepository);
     //string jsonContent = File.ReadAllText("../SaveGames/game.json");
 
     var options = new JsonSerializerOptions()
@@ -69,7 +70,7 @@ string? LoadGame()
 
     GameState?
         deserializeState =
-            GameRepository.LoadGame(gameId); 
+            gameRepository.LoadGame(gameId); 
     newEngine.State = deserializeState;
     GameMenu gameMenu = new GameMenu(newEngine);
     gameMenu.Run();
@@ -81,7 +82,7 @@ string? RunNewGameMenu()
 {
     Console.Clear();
     var playerCount = 0;
-    var gameEngine = new GameEngine(GameRepository);
+    var gameEngine = new GameEngine(gameRepository);
     var humanCount = 0;
 
     while (true)
@@ -136,8 +137,18 @@ string? RunNewGameMenu()
             gameEngine.AddPlayer(AIName, EPlayerType.AI);
         }
     }
+    
+    //
+    gameEngine.setOptions(options);
 
     return StartGame(gameEngine);
+}
+
+string? ChangeOptions()
+{
+    var optMenu = new OptionsMenu();
+    options = optMenu.Run();
+    return null;
 }
 
 var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
@@ -158,7 +169,7 @@ var mainMenu = new Menu(">> U N O <<", new List<MenuItem>()
     {
         Shortcut = "o",
         MenuLabel = "Options",
-        //To be implemented
+        MethodToRun = ChangeOptions
     },
     new MenuItem()
     {
