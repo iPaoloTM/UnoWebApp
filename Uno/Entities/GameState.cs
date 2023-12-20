@@ -9,6 +9,11 @@ public class GameState
     public CardDeck GameDeck { get; set; } = new CardDeck();
     public CardDeck UsedDeck { get; set; } = new CardDeck(new List<Card>());
     public int ActivePlayerNo { get; set; } = 0;
+    
+    public bool TurnOver { get; set; } = false;
+    public bool CanDraw { get; set; } = true;
+    public bool EndTurn { get; set; } = false;
+    
     public List<Player> Players { get; set; } = new List<Player>();
 
     public PlayerMove? LastMove { get; set; }

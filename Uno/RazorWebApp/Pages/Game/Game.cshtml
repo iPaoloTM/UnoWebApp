@@ -185,18 +185,26 @@
     <h1>Active player ID: @Model.PlayerId</h1>
     <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
 
-  <div class="card-drawer">
-    @Html.Raw(HtmlCardFormatter.Convert(Model.Engine.State.GameDeck.First()))
-  </div>
-  <div>
-    <h3 style="text-align: center">Last card played</h3>
-    <h2>Your deck:</h2>
-  </div>
+    <div class="card-drawer">
+        @Html.Raw(HtmlCardFormatter.Convert(Model.Engine.State.UsedDeck.First()))
+    </div>
+    <div>
+        <h3 style="text-align: center">Last card played</h3>
+        <h2>Your deck:</h2>
+    </div>
     <div class="card-drawer">
         @foreach (var card in Model.Engine.State.Players[Model.PlayerId].HandCards)
         {
-            var res = HtmlCardFormatter.Convert(card);
-            @Html.Raw(res)
+            int cardIndex = Model.Engine.State.Players[Model.PlayerId].HandCards.IndexOf(card);
+
+            <form method="post" asp-page-handler="CardClicked" class="card-form">
+                <input type="hidden" name="gameId" value="@Model.GameId"/>
+                <input type="hidden" name="cardIndex" value="@cardIndex"/>
+                <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+                <button type="submit" class="card-button">
+                    @Html.Raw(HtmlCardFormatter.Convert(card))
+                </button>
+            </form>
         }
     </div>
 </div>
@@ -219,7 +227,7 @@ else
         <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
         <input type="submit" value="Skip a turn" class="btn btn-primary"/>
     </form>
-    
+
     <form method="post">
         <button type="submit" class="btn btn-primary" asp-page-handler="Shout">Shout something!</button>
     </form>

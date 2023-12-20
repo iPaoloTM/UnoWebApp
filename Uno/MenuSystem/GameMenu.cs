@@ -27,7 +27,6 @@ public class GameMenu
         do
         {
             Console.Clear();
-            Game.NewTurn();
 
             CurrPlayer = Game.State.Players[Game.State.ActivePlayerNo];
             Console.WriteLine("--- " + CurrPlayer.Nickname + "'S TURN ---");
@@ -150,7 +149,7 @@ public class GameMenu
                     {
                         // Try to play a card
                         case 1:
-                            if (Game.TurnOver)
+                            if (Game.State.TurnOver)
                             {
                                 Console.WriteLine("You already acted this turn!");
                                 Console.ReadLine();
@@ -203,12 +202,12 @@ public class GameMenu
                             break;
                         //Try to draw a card from the game deck
                         case 2:
-                            if (Game.TurnOver)
+                            if (Game.State.TurnOver)
                             {
                                 Console.WriteLine("You already acted this turn!");
                                 Console.ReadLine();
                             }
-                            else if (!Game.CanDraw)
+                            else if (!Game.State.CanDraw)
                             {
                                 Console.WriteLine("You can play one of your cards!");
                                 Console.ReadLine();
@@ -244,7 +243,7 @@ public class GameMenu
                             //Only end turn if the player has drawn or played
                             var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                             Game.HandlePlayerAction(moveSkip);
-                            if (!Game.TurnOver)
+                            if (!Game.State.TurnOver)
                             {
                                 Console.WriteLine("Can't end turn without doing an action");
                                 Console.ReadLine();
@@ -265,7 +264,7 @@ public class GameMenu
                     }
                 }
             }
-        } while (!Game.EndTurn);
+        } while (!Game.State.EndTurn);
     }
 
     public void ShowHand()

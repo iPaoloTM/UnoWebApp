@@ -24,9 +24,7 @@ public class GameEngine //i removed <TKEY>
 
     private int _initialHandSize = 7; //Default value
 
-    public bool TurnOver { get; set; } = false;
-    public bool CanDraw { get; set; } = true;
-    public bool EndTurn { get; set; } = false;
+
     
     public GameRepositoryEF? GameRepository { get; set; }
 
@@ -179,8 +177,8 @@ public class GameEngine //i removed <TKEY>
                     if (playingPlayer.HandCards.Count == 0)
                     {
                         State.GameOver = true;
-                        TurnOver = true;
-                        EndTurn = true;
+                        State.TurnOver = true;
+                        State.EndTurn = true;
                         return 4;
                     }
 
@@ -190,26 +188,26 @@ public class GameEngine //i removed <TKEY>
                         {
                             case EEffect.Reverse:
                                 IsAscendingOrder = !IsAscendingOrder;
-                                TurnOver = true;
+                                State.TurnOver = true;
                                 break;
                             case EEffect.Skip:
                                 State.ActivePlayerNo = NextTurn();
-                                TurnOver = true;
+                                State.TurnOver = true;
                                 break;
                             case EEffect.Wild:
-                                TurnOver = true;
+                                State.TurnOver = true;
                                 return 2;
                                 break;
                             case EEffect.DrawFour:
                                 DrawCards(4, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
-                                TurnOver = true;
+                                State.TurnOver = true;
                                 return 2;
                                 break;
                             case EEffect.DrawTwo:
                                 DrawCards(2, NextTurn());
                                 State.ActivePlayerNo = NextTurn();
-                                TurnOver = true;
+                                State.TurnOver = true;
                                 break;
                             default:
                                 throw new Exception("something went wrong");
@@ -218,7 +216,7 @@ public class GameEngine //i removed <TKEY>
 
                     State.ColorInPlay = decision.PlayedCard.Color;
 
-                    TurnOver = true;
+                    State.TurnOver = true;
                     return 1;
                 }
                 else
@@ -235,7 +233,7 @@ public class GameEngine //i removed <TKEY>
                     DrawCards(1, State.ActivePlayerNo);
                     if (Val.CanPlayCard(drawnCard, State))
                     {
-                        CanDraw = false;
+                        State.CanDraw = false;
                         return 3;
                     }
 
@@ -244,8 +242,8 @@ public class GameEngine //i removed <TKEY>
 
 
                     HandleUnoShouting(playingPlayer);
-                    TurnOver = true;
-                    CanDraw = false;
+                    State.TurnOver = true;
+                    State.CanDraw = false;
                     return 1;
                 }
                 else
@@ -259,12 +257,13 @@ public class GameEngine //i removed <TKEY>
                 response = Val.ValidateMove(decision, State);
                 if (response)
                 {
-                    if (TurnOver)
+                    if (State.TurnOver)
                     {
-                        EndTurn = true;
+                        State.EndTurn = true;
                         State.ActivePlayerNo = NextTurn();
                         State.LastMove = playingPlayer.NextPlayer();
                         State.LastMove.PlayedCard = State.UsedDeck.First();
+                        NewTurn();
                         this.GameRepository?.Save(State.Id, State);
                         //NewJSONExport("../SaveGames/game.json"); we may need it later :)
                         return 1;
@@ -291,9 +290,9 @@ public class GameEngine //i removed <TKEY>
 
     public void NewTurn()
     {
-        TurnOver = false;
-        CanDraw = true;
-        EndTurn = false;
+        State.TurnOver = false;
+        State.CanDraw = true;
+        State.EndTurn = false;
     }
 
     public void HandleUnoShouting(Player player, string? message = "")
