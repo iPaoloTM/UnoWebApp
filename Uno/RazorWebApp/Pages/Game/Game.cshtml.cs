@@ -10,6 +10,9 @@ public class Game : PageModel
 {
     private readonly GameRepositoryEF _gameRepository = default!;
     public GameEngine Engine;
+    
+    [BindProperty]
+    public bool IsPlayerTurn { get; set; } = false;
 
     public Game(GameRepositoryEF gameRepository)
     {
@@ -25,5 +28,6 @@ public class Game : PageModel
     {
         var gameState = _gameRepository.LoadGame(GameId);
         Engine.State = gameState;
+        if (PlayerId == Engine.State.ActivePlayerNo) IsPlayerTurn = true;
     }
 }

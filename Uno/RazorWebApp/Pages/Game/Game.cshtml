@@ -184,8 +184,12 @@
     <h1>Active player ID: @Model.PlayerId</h1>
     <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
 
-<div class="card-drawer">
-    @foreach (var card in Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].HandCards)
+  @if (!Model.IsPlayerTurn)
+  {
+    <h1>It's not your turn yet!!</h1>
+  }
+  <div class="card-drawer">
+    @foreach (var card in Model.Engine.State.Players[Model.PlayerId].HandCards)
     {
         var res = HtmlCardFormatter.Convert(card);
         @Html.Raw(res)
