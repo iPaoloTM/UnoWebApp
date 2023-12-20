@@ -8,7 +8,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <title></title>
 </head>
@@ -180,33 +180,51 @@
 </style>
 <body>
 <div>
-  <h1>Game ID: @Model.GameId</h1>
-  <h1>Game ID: @Model.Engine.State.Id</h1>
-  <h1>Active player ID: @Model.PlayerId</h1>
-  <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
+    <h1>Game ID: @Model.GameId</h1>
+    <h1>Game ID: @Model.Engine.State.Id</h1>
+    <h1>Active player ID: @Model.PlayerId</h1>
+    <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
 
-  @if (!Model.IsPlayerTurn)
-  {
-    <h1>It's not your turn yet!!</h1>
-  }
   <div class="card-drawer">
-    @foreach (var card in Model.Engine.State.Players[Model.PlayerId].HandCards)
-    {
-      var res = HtmlCardFormatter.Convert(card);
-      @Html.Raw(res)
-    }
+    @Html.Raw(HtmlCardFormatter.Convert(Model.Engine.State.GameDeck.First()))
   </div>
+  <div>
+    <h3 style="text-align: center">Last card played</h3>
+    <h2>Your deck:</h2>
+  </div>
+    <div class="card-drawer">
+        @foreach (var card in Model.Engine.State.Players[Model.PlayerId].HandCards)
+        {
+            var res = HtmlCardFormatter.Convert(card);
+            @Html.Raw(res)
+        }
+    </div>
 </div>
-<h4 text-align="center">To play a card, just click on it</h4>
-<form method="post">
-  <button type="submit" class="btn btn-primary"  asp-page-handler="DrawCard" >Draw a card</button>
-</form>
-<form method="post">
-<button type="submit" class="btn btn-primary" asp-page-handler="SkipTurn">Skip a turn</button>
-</form>
-<form method="post">
-  <button type="submit" class="btn btn-primary" asp-page-handler="Shout">Shout something!</button>
-</form>
-<input asp-for="shoutingText" type="text" placeholder="Shout...">
+@if (!Model.IsPlayerTurn)
+{
+    <h1>It's not your turn yet!!</h1>
+}
+else
+{
+    <h4 text-align="center">To play a card, just click on it</h4>
+
+    <form method="post" asp-page-handler="DrawCard">
+        <input type="hidden" name="gameId" value="@Model.GameId"/>
+        <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+        <input type="submit" value="Draw a card" class="btn btn-primary"/>
+    </form>
+
+    <form method="post" asp-page-handler="SkipTurn">
+        <input type="hidden" name="gameId" value="@Model.GameId"/>
+        <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+        <input type="submit" value="Skip a turn" class="btn btn-primary"/>
+    </form>
+    
+    <form method="post">
+        <button type="submit" class="btn btn-primary" asp-page-handler="Shout">Shout something!</button>
+    </form>
+    <input asp-for="shoutingText" type="text" placeholder="Shout...">
+}
+
 </body>
 </html>

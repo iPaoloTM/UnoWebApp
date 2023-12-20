@@ -10,10 +10,16 @@ public class Game : PageModel
 {
     private readonly GameRepositoryEF _gameRepository = default!;
     public GameEngine Engine;
+    
     public string shoutingText = default!;
     
     [BindProperty]
     public bool IsPlayerTurn { get; set; } = false;
+    [BindProperty(SupportsGet = true)] 
+    public Guid GameId { get; set; }
+
+    [BindProperty(SupportsGet = true)] 
+    public int PlayerId { get; set; }
 
     public Game(GameRepositoryEF gameRepository)
     {
@@ -21,19 +27,26 @@ public class Game : PageModel
         Engine = new GameEngine(_gameRepository);
     }
 
-    [BindProperty(SupportsGet = true)] public Guid GameId { get; set; }
 
-    [BindProperty(SupportsGet = true)] public int PlayerId { get; set; }
 
     public void OnGet()
     {
         var gameState = _gameRepository.LoadGame(GameId);
         Engine.State = gameState;
         if (PlayerId == Engine.State.ActivePlayerNo) IsPlayerTurn = true;
+        
     }
     
-    public void OnPostDrawCard()
+    public void OnPostDrawCard(Guid gameId,int currPlayer)
     {
+        /* TODO
+         For some reason i cannot comprehend, if I dont load the state every time from the 
+         database the engine accessed is a new instance without the relevant game information
+         I have no clue how to fix this
+         */
+        var currState = _gameRepository.LoadGame(gameId);
+        Engine.State = currState;
+        
         if (Engine.TurnOver)
         {
             //you already acted this turn
@@ -45,7 +58,6 @@ public class Game : PageModel
         else
         {
             //Console.WriteLine(Engine.State.Id);
-            Console.WriteLine("EngineID: "+Engine.State.Id);
         
             var moveDraw = new PlayerMove(Engine.State.Players[Engine.State.ActivePlayerNo], EPlayerAction.Draw, null);
             int success = Engine.HandlePlayerAction(moveDraw);
@@ -56,23 +68,20 @@ public class Game : PageModel
         }
     }
 
-    public void OnPostSkipTurn()
+    public IActionResult OnPostSkipTurn(Guid gameId,int currPlayer)
     {
-        var gameState = _gameRepository.LoadGame(GameId);
-   
-        Engine = new GameEngine(_gameRepository)
+        var currState = _gameRepository.LoadGame(GameId);
+        Engine.State = currState;
+        var moveSkip = new PlayerMove(Engine.State.Players[currPlayer], EPlayerAction.NextPlayer,
+            null);
+        int response = Engine.HandlePlayerAction(moveSkip);
+        //Conditions to end turn are met
+        if (response == 1)
         {
-            State = gameState
-        };
-
-        Console.WriteLine(Engine.State.Id);
-        var moveSkip = new PlayerMove(Engine.State.Players[Engine.State.ActivePlayerNo], EPlayerAction.NextPlayer, null);
-        Engine.HandlePlayerAction(moveSkip);
-        if (!Engine.TurnOver)
-        {
-            //can't end turn without doing smth
+            _gameRepository.Save(gameId,Engine.State);
         }
-        _gameRepository.Save(GameId, Engine.State);
+
+        return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
     }
 
     public void OnPostShout()
