@@ -31,11 +31,16 @@
             font-size: 18px;
             margin: 10px 0;
         }
-
         .uno-title {
-            color: red;
-            font-size: 60px; 
-            margin-bottom: 30px;
+            color: #ff0000; /* Red color */
+            font-size: 5rem; /* Responsive font size */
+            font-weight: bold; /* Bold text */
+            text-align: center; /* Center the text */
+            margin-bottom: 20px; /* Slightly reduced margin */
+            text-transform: uppercase; /* Uppercase text */
+            letter-spacing: 6px; /* Increased letter spacing */
+            line-height: 1.2; /* Adjusted line height */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Subtle text shadow */
         }
 
         .logo {
@@ -50,7 +55,7 @@
 
 <div class="centered-content">
     <img src="uno.png" alt="Logo" class="logo">
-    <div class="uno-title">UnoGame</div>
+    <div class="uno-title">Uno Game</div>
     <div class="menu-background">
         <a class="menu-link" asp-area="" asp-page="/NewGame/NewGame">New Game</a>
         <a class="menu-link" asp-area="" asp-page="/LoadGame/LoadGame">Load Game</a>
