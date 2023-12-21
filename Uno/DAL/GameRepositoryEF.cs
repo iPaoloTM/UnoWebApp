@@ -39,6 +39,7 @@ public class GameRepositoryEF
             game.GameStateJson = JsonSerializer.Serialize(state, options);
         }
 
+        
         var changeCount = _ctx.SaveChanges();
         //Console.WriteLine("SaveChanges: " + changeCount);
     }

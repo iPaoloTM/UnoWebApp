@@ -19,6 +19,8 @@ public class GameEngine //i removed <TKEY>
     public GameState State { get; set; } = new GameState();
 
     public bool IsAscendingOrder = true;
+    
+
 
     public NewValidator Val { get; set; } = new NewValidator();
 
@@ -254,21 +256,17 @@ public class GameEngine //i removed <TKEY>
                 break;
             case EPlayerAction.NextPlayer:
                 
-                response = Val.ValidateMove(decision, State);
-                if (response)
-                {
+                
                     if (State.TurnOver)
                     {
                         State.EndTurn = true;
                         State.ActivePlayerNo = NextTurn();
                         State.LastMove = playingPlayer.NextPlayer();
                         State.LastMove.PlayedCard = State.UsedDeck.First();
-                        NewTurn();
                         this.GameRepository?.Save(State.Id, State);
                         //NewJSONExport("../SaveGames/game.json"); we may need it later :)
                         return 1;
                     }
-                }
                 else
                 {
                     return 0;

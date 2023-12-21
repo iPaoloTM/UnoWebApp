@@ -24,7 +24,6 @@
     }
     
     .uno-card {
-      display: inline-block;
       width: 10em;
       height: 15em;
       box-shadow: inset 0 0 3px rgba(0, 0, 0, .2);
@@ -184,9 +183,15 @@
     <h1>Active player ID: @Model.Engine.State.ActivePlayerNo</h1>
     <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
 
-    <div class="card-drawer">
-        @Html.Raw(HtmlCardFormatter.Convert(Model.Engine.State.UsedDeck.First()))
-    </div>
+  <div class="card-drawer">
+    @Html.Raw(HtmlCardFormatter.Convert(Model.Engine.State.UsedDeck.First()))
+  </div>
+  <div>
+    @if (Model.Engine.State.UsedDeck.First().Color == EColors.Black)
+            {
+              <h3 style="text-align: center">Color in play: @Model.Engine.State.ColorInPlay</h3>
+            }
+  </div>
     <div>
         <h3 style="text-align: center">Last card played</h3>
         <h2>Your deck:</h2>
@@ -207,15 +212,15 @@
         }
     </div>
     <div>
-        @if ((TempData["showColorSelection"] != null && (bool)TempData["showColorSelection"]))
+        @if (TempData["showColorSelection"] != null && (bool)(TempData["showColorSelection"] ?? false))
         {
           <form method="post" asp-page-handler="SelectColor">
             <input type="hidden" name="gameId" value="@Model.GameId"/>
             <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
-            <button type="submit" class="btn btn-warning" name="selectedColor" value="yellow">Yellow</button>
+            <button type="submit" class="btn btn-primary" name="selectedColor" value="yellow">Yellow</button>
             <button type="submit" class="btn btn-primary" name="selectedColor" value="blue">Blue</button>
-            <button type="submit" class="btn btn-success" name="selectedColor" value="green">Green</button>
-            <button type="submit" class="btn btn-danger" name="selectedColor" value="red">Red</button>
+            <button type="submit" class="btn btn-primary" name="selectedColor" value="green">Green</button>
+            <button type="submit" class="btn btn-primary" name="selectedColor" value="red">Red</button>
           </form>
         }
     </div>

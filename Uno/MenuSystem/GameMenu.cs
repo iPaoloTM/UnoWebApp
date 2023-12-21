@@ -27,6 +27,7 @@ public class GameMenu
         do
         {
             Console.Clear();
+            Game.NewTurn();
 
             CurrPlayer = Game.State.Players[Game.State.ActivePlayerNo];
             Console.WriteLine("--- " + CurrPlayer.Nickname + "'S TURN ---");
@@ -151,7 +152,8 @@ public class GameMenu
                         case 1:
                             if (Game.State.TurnOver)
                             {
-                                Console.WriteLine("You already acted this turn!");
+                                Console.WriteLine("Y" +
+                                                  "ou already acted this turn!");
                                 Console.ReadLine();
                             }
                             else
@@ -242,8 +244,8 @@ public class GameMenu
                         case 4:
                             //Only end turn if the player has drawn or played
                             var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
-                            Game.HandlePlayerAction(moveSkip);
-                            if (!Game.State.TurnOver)
+                            int overSuccess = Game.HandlePlayerAction(moveSkip);
+                            if (overSuccess !=1)
                             {
                                 Console.WriteLine("Can't end turn without doing an action");
                                 Console.ReadLine();
@@ -251,7 +253,6 @@ public class GameMenu
                                 DrawMenu();
                                 ShowHand();
                             }
-
                             break;
 
                         default:
@@ -367,7 +368,6 @@ public class GameMenu
                 color = ConsoleColor.Green;
                 break;
             case EColors.Blue:
-
                 color = ConsoleColor.Blue;
                 break;
             case EColors.Black:

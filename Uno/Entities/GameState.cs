@@ -10,20 +10,19 @@ public class GameState
     public CardDeck UsedDeck { get; set; } = new CardDeck(new List<Card>());
     public int ActivePlayerNo { get; set; } = 0;
     
+    public List<Player> Players { get; set; } = new List<Player>();
+
     public bool TurnOver { get; set; } = false;
     public bool CanDraw { get; set; } = true;
     public bool EndTurn { get; set; } = false;
-    
-    public List<Player> Players { get; set; } = new List<Player>();
-
     public PlayerMove? LastMove { get; set; }
     public int CurrentRoundNo { get; set; } = 0;
 
-    public EColors ColorInPlay;
+    public EColors ColorInPlay { get; set; }
 
-    public bool GameOver = false;
+    public bool GameOver { get; set; } = false;
 
-    public static int NumberOfCards = 112;
+    public static int NumberOfCards { get; set; }  = 112;
 
-    public GameOptions Settings = new GameOptions();
+    public GameOptions Settings { get; set; } = new GameOptions();
 }

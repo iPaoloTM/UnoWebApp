@@ -39,7 +39,7 @@ public class Game : PageModel
         Engine.State = currState;
         Console.WriteLine("Chosen card is " + cardIndex);
 
-        if (!currState.TurnOver)
+        if (!Engine.State.TurnOver)
         {
             var playingCard = Engine.State.Players[Engine.State.ActivePlayerNo].HandCards[cardIndex];
             Console.WriteLine(playingCard);
@@ -57,30 +57,35 @@ public class Game : PageModel
                 Console.WriteLine("COLOR REached");
                 TempData["showColorSelection"] = true;
                 _gameRepository.Save(gameId, Engine.State);
-            }
+            }   
         }
-
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
     }
 
     public IActionResult  OnPostSelectColor(string selectedColor, Guid gameId, int currPlayer)
     {
+        var currState = _gameRepository.LoadGame(gameId);
+        Engine.State = currState;
         switch (selectedColor)
         {
             case "yellow":
+                Console.WriteLine("YELLOW" +selectedColor);
                 Engine.SetColorInPlay(3);
                 break;
             case "blue":
+                Console.WriteLine("BLUE " +selectedColor);
                 Engine.SetColorInPlay(2);
                 break;
             case "red":
+                Console.WriteLine("RED " +selectedColor);
                 Engine.SetColorInPlay(1);
                 break;
             case "green":
+                Console.WriteLine("GREEN " +selectedColor);
                 Engine.SetColorInPlay(4);
                 break;
         }
-        Console.WriteLine("SAVING...");
+        
         _gameRepository.Save(gameId, Engine.State);
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
         
@@ -95,7 +100,7 @@ public class Game : PageModel
          */
         var currState = _gameRepository.LoadGame(gameId);
         Engine.State = currState;
-        if (!currState.TurnOver && currState.CanDraw)
+        if (!Engine.State.TurnOver && Engine.State.CanDraw)
         {
             var moveDraw = new PlayerMove(Engine.State.Players[Engine.State.ActivePlayerNo], EPlayerAction.Draw, null);
             Engine.HandlePlayerAction(moveDraw);
@@ -112,7 +117,7 @@ public class Game : PageModel
         var currState = _gameRepository.LoadGame(GameId);
         Engine.State = currState;
 
-        if (currState.TurnOver)
+        if (Engine.State.TurnOver)
         {
             var moveSkip = new PlayerMove(Engine.State.Players[currPlayer], EPlayerAction.NextPlayer,
                 null);
@@ -121,6 +126,7 @@ public class Game : PageModel
             //Conditions to end turn are met
             if (response == 1)
             {
+                Engine.NewTurn();
                 _gameRepository.Save(gameId, Engine.State);
             }
         }

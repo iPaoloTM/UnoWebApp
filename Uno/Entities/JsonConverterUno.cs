@@ -24,7 +24,7 @@ public class JsonConverterUno : JsonConverter<Card>
             throw new JsonException();
         }
     }
-
+    
     public override void Write(Utf8JsonWriter writer, Card value, JsonSerializerOptions options)
     {
         JsonSerializer.Serialize(writer, (dynamic)value, options);
