@@ -1,0 +1,26 @@
+@page
+@model RazorWebApp.Pages.EndGame.EndGame
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Game Over</title>
+</head>
+<body>
+<div>
+    @if (Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname == Model.WinPlayer)
+        {
+            <h1>@Model.WinPlayer won the game!</h1>
+        }
+        else
+        {
+           <h1>You lost! @Model.WinPlayer won the game! </h1>
+        }
+</div>
+</body>
+</html>
