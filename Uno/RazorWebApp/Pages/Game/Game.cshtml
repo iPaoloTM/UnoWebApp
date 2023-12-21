@@ -257,38 +257,50 @@
     <div>
         <h3 style="text-align: center">Last card played</h3>
     </div>
-    <h2>Your deck:</h2>
-    <div class="card-drawer">
-        @foreach (var card in Model.Engine.State.Players[Model.PlayerId].HandCards)
-        {
-            int cardIndex = Model.Engine.State.Players[Model.PlayerId].HandCards.IndexOf(card);
+    @if (Model.Engine.State.Players[Model.PlayerId].PlayerType == EPlayerType.Human)
+    {
+        <h2>Your deck:</h2>
+        <div class="card-drawer">
+            @foreach (var card in Model.Engine.State.Players[Model.PlayerId].HandCards)
+            {
+                int cardIndex = Model.Engine.State.Players[Model.PlayerId].HandCards.IndexOf(card);
 
-            <form method="post" asp-page-handler="CardClicked" class="card-form">
-                <input type="hidden" name="gameId" value="@Model.GameId"/>
-                <input type="hidden" name="cardIndex" value="@cardIndex"/>
-                <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
-                <div class="container">
-                    <button type="submit" class="card-button">
-                        @Html.Raw(HtmlCardFormatter.Convert(card))
-                    </button>
-                </div>
+                <form method="post" asp-page-handler="CardClicked" class="card-form">
+                    <input type="hidden" name="gameId" value="@Model.GameId"/>
+                    <input type="hidden" name="cardIndex" value="@cardIndex"/>
+                    <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+                    <div class="container">
+                        <button type="submit" class="card-button">
+                            @Html.Raw(HtmlCardFormatter.Convert(card))
+                        </button>
+                    </div>
 
-            </form>
-        }
-    </div>
-    <div>
-        @if (TempData["showColorSelection"] != null && (bool)(TempData["showColorSelection"] ?? false))
-        {
-            <form method="post" asp-page-handler="SelectColor">
-                <input type="hidden" name="gameId" value="@Model.GameId"/>
-                <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
-                <button type="submit" class="btn btn-primary" name="selectedColor" value="yellow">Yellow</button>
-                <button type="submit" class="btn btn-primary" name="selectedColor" value="blue">Blue</button>
-                <button type="submit" class="btn btn-primary" name="selectedColor" value="green">Green</button>
-                <button type="submit" class="btn btn-primary" name="selectedColor" value="red">Red</button>
-            </form>
-        }
-    </div>
+                </form>
+            }
+        </div>
+        <div>
+            @if (TempData["showColorSelection"] != null && (bool)(TempData["showColorSelection"] ?? false))
+            {
+                <form method="post" asp-page-handler="SelectColor">
+                    <input type="hidden" name="gameId" value="@Model.GameId"/>
+                    <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+                    <button type="submit" class="btn btn-primary" name="selectedColor" value="yellow">Yellow</button>
+                    <button type="submit" class="btn btn-primary" name="selectedColor" value="blue">Blue</button>
+                    <button type="submit" class="btn btn-primary" name="selectedColor" value="green">Green</button>
+                    <button type="submit" class="btn btn-primary" name="selectedColor" value="red">Red</button>
+                </form>
+            }
+        </div>
+    }
+    else
+    {
+        <form method="post" asp-page-handler="AIPlay">
+            <input type="hidden" name="gameId" value="@Model.GameId"/>
+            <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+            <button type="submit" class="btn btn-primary">Let AI play</button>
+        </form>
+    }
+
 
 
 </div>

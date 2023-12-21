@@ -53,7 +53,7 @@ public class Game : PageModel
             } else if (success == 2)
             {
                 //User has to choose color
-                Console.WriteLine("COLOR REached");
+                Console.WriteLine("COLOR Reached");
                 TempData["showColorSelection"] = true;
                 _gameRepository.Save(gameId, Engine.State);
             }   
@@ -143,5 +143,17 @@ public class Game : PageModel
         _gameRepository.Save(gameId, Engine.State);
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
 
+    }
+
+    public IActionResult OnPostAIPlay(Guid gameId, int currPlayer)
+    {
+        var currState = _gameRepository.LoadGame(gameId);
+        Engine.State = currState;
+
+        Engine.AIplay();
+        
+        _gameRepository.Save(gameId,Engine.State);
+        return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
+ 
     }
 }

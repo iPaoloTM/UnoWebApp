@@ -16,6 +16,7 @@ public class GameState
     public bool CanDraw { get; set; } = true;
     public bool EndTurn { get; set; } = false;
     public PlayerMove? LastMove { get; set; }
+    
     public int CurrentRoundNo { get; set; } = 0;
 
     public EColors ColorInPlay { get; set; }
