@@ -64,7 +64,7 @@ public class GameMenu
 
         int code = Game.AIplay();
 
-        
+
         if (Game.State.Players[aiPlayNumber].HandCards.Count > cardsCount)
         {
             Console.WriteLine("AI drew a card.");
@@ -80,6 +80,7 @@ public class GameMenu
             {
                 Console.WriteLine("AI drew a card.");
             }
+
             switch (lastCard)
             {
                 case NumericCard numCard:
@@ -245,7 +246,7 @@ public class GameMenu
                             //Only end turn if the player has drawn or played
                             var moveSkip = new PlayerMove(CurrPlayer, EPlayerAction.NextPlayer, null);
                             int overSuccess = Game.HandlePlayerAction(moveSkip);
-                            if (overSuccess !=1)
+                            if (overSuccess != 1)
                             {
                                 Console.WriteLine("Can't end turn without doing an action");
                                 Console.ReadLine();
@@ -253,6 +254,7 @@ public class GameMenu
                                 DrawMenu();
                                 ShowHand();
                             }
+
                             break;
 
                         default:

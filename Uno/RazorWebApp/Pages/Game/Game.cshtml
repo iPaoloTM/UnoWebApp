@@ -19,9 +19,25 @@
       font-family: sans-serif;
     }
     
+    .mainCard {
+      fill: black; /* Replaced the SCSS variable $fill-card-color with its value */
+    }
+    
+    .centerText {
+      font-family: Arial;
+      font-size: 11.5px;
+      font-weight: bold;
+      letter-spacing: -0.7px;
+      -ms-transform: rotate(-15deg);
+      -webkit-transform: rotate(-15deg);
+      transform: rotate(-15deg);
+      text-shadow: -0.1px 0.1px #806308, -0.2px 0.2px #806308, -0.3px 0.3px #806308, -0.4px 0.4px #806308, -0.5px 0.5px #806308, -0.6px 0.6px #806308, -0.7px 0.7px #806308;
+    }
+    
     .card-drawer {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     
     .uno-card {
@@ -31,9 +47,16 @@
       background: #fafafa;
       padding: 1em;
       border-radius: .5em;
-      display: inline-flex;
       color: #fafafa;
       text-shadow: 0 0 3px black;
+    }
+    
+    .container{
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-content: space-around;
+          margin: 1em;
     }
     
     .uno-card .uno-card-body {
@@ -186,11 +209,38 @@
   <div>
     @foreach (Player plyr in Model.Engine.State.Players)
              {
-               <h3>@(a + 1 + ". " + plyr.Nickname + " - ")</h3>  
+               <h3 style="display: inline-block; vertical-align: top;">@(a + 1 + ". " + plyr.Nickname + " - ")</h3>  
                  foreach (Card c in plyr.HandCards)
                  {
-                   <h4>#</h4>  
+                   <svg width="30" height="52" style="display: inline-block; vertical-align: top;">
+                       <!-- define symbol for backCard -->
+                       <defs>
+                         <symbol id="backCard" viewBox="0 0 300 520" stroke="white" stroke-width="11">
+                           <rect class="mainCard" x="15" y="25" rx="10" ry="15" width="250" height="420" />
+                           <ellipse cx="230" cy="160" rx="97" ry="172" fill="red" stroke="red" style="-ms-transform: rotate(25deg);-webkit-transform: rotate(25deg);transform: rotate(25deg);" />
+                           <svg width="240" height="410" x="19" y="30">
+                             <ellipse cx="-130" cy="230" rx="20" ry="20" fill="black" stroke="black" stroke-dasharray="6,7" stroke-width="418" opacity="0.15" style="-ms-transform: rotate(25deg);-webkit-transform: rotate(25deg); transform: rotate( -65deg);" />
+                           </svg>
+                         </symbol>
+                       </defs>
+                   
+                       <!-- use symbol for backCard -->
+                       <use xlink:href="#backCard"></use>
+                   
+                       <!-- Gradient for text -->
+                       <defs>
+                          <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+                             <stop offset="0%" stop-color="white"/>
+                             <stop offset="55%" stop-color="gold"/>
+                             <stop offset="100%" stop-color="#806308"/>
+                          </linearGradient>
+                       </defs>
+                   
+                      <!-- Text on card -->
+                      <text class="centerText" x="-4" y="30" fill="url(#Gradient2)">UNO</text> 
+                   </svg>  
                  }
+               <br/>
                  a++;
              }
   </div>
@@ -216,9 +266,12 @@
                 <input type="hidden" name="gameId" value="@Model.GameId"/>
                 <input type="hidden" name="cardIndex" value="@cardIndex"/>
                 <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
-                <button type="submit" class="card-button">
+                <div class="container">
+                  <button type="submit" class="card-button">
                     @Html.Raw(HtmlCardFormatter.Convert(card))
-                </button>
+                    </button>
+                </div>
+              
             </form>
         }
     </div>
