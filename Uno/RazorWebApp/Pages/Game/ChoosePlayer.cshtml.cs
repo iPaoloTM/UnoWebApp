@@ -10,7 +10,7 @@ public class ChoosePlayer : PageModel
     private readonly GameRepositoryEF _gameRepository;
     public List<Player> PlayerList = default!;
     [BindProperty(SupportsGet = true)] public Guid GameId { get; set; }
-
+    
 
     public ChoosePlayer(GameRepositoryEF gameRepository)
     {

@@ -18,10 +18,10 @@ public class NewGame : PageModel
    }
 
     [BindProperty]
-    public int PlyrNumber { get; set; } = 5;
+    public int PlyrNumber { get; set; } 
     
     [BindProperty]
-    public int HPlyrNumber { get; set; } = 5;
+    public int HPlyrNumber { get; set; } 
 
     [BindProperty]
     public List<PlayerInfo> Players { get; set; } = new List<PlayerInfo>();
@@ -80,16 +80,40 @@ public class NewGame : PageModel
         {
             Players.Add(new PlayerInfo{IsAI = true});
         }
+        
+        foreach (var player in Players)
+        {
+            Console.WriteLine(player.Name);
+        }
+        
     }
     
     public void OnPostConfirmPlayerNumber()
     {
+        TempData["PlyrNumber"] = PlyrNumber;
         IsPlayerNumberConfirmed = true;
+        Console.WriteLine("Players Number : "+ PlyrNumber);
     }
 
     public void OnPostConfirmHumanPlayerNumber()
     {
-        InitializePlayers();
+        PlyrNumber = (int)TempData["PlyrNumber"];
+        Console.WriteLine("Players Number : "+ PlyrNumber);
+        Console.WriteLine("Human Players " + HPlyrNumber);
+        Players = new List<PlayerInfo>();
+        for (int i = 0; i < HPlyrNumber; i++)
+        {
+            // Default name for AI players can be set here if needed
+            Players.Add(new PlayerInfo{IsAI = false}); // First player is not AI by default
+            Console.WriteLine("AAAAAAAAAAAAAAAA");
+        }
+
+        for (int j = 0; j < PlyrNumber-HPlyrNumber; j++)
+        {
+            Players.Add(new PlayerInfo{IsAI = true});
+            Console.WriteLine("OOOOOOOOOOOOOOOOOO");
+        }
+        
         IsHumanPlayerNumberConfirmed = true;
     }
 
@@ -107,6 +131,7 @@ public class NewGame : PageModel
             {
                 // Add AI player
                 _gameEngine.AddPlayer("PlayerGPT " + (i + 1), EPlayerType.AI);
+                
             }
             else
             {
@@ -114,6 +139,11 @@ public class NewGame : PageModel
                 var name = string.IsNullOrWhiteSpace(Players[i].Name) ? $"Player {i+1}" : Players[i].Name;
                 _gameEngine.AddPlayer(name);
             }
+        }
+        Console.WriteLine("AOAOAOAOOAOAOAOAOAOAO");
+        foreach (var player in _gameEngine.State.Players)
+        {
+            Console.WriteLine(player.Nickname);
         }
         
         // Initialize game based on rule type and checkbox states

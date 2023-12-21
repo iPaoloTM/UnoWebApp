@@ -149,9 +149,10 @@ public class Game : PageModel
     {
         var currState = _gameRepository.LoadGame(gameId);
         Engine.State = currState;
-
-        Engine.AIplay();
-        
+        if (Engine.State.Players[currPlayer].PlayerType == EPlayerType.AI)
+        {
+            Engine.AIplay();
+        }
         _gameRepository.Save(gameId,Engine.State);
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
  

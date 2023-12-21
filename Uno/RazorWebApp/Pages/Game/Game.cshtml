@@ -292,22 +292,19 @@
             }
         </div>
     }
-    else
-    {
         <form method="post" asp-page-handler="AIPlay">
             <input type="hidden" name="gameId" value="@Model.GameId"/>
             <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
             <button type="submit" class="btn btn-primary">Let AI play</button>
         </form>
-    }
 
-
-
+    
 </div>
 @if (!Model.IsPlayerTurn)
 {
     <h1>It's not your turn yet!!</h1>
 }
+
 else
 {
     <h4 text-align="center">To play a card, just click on it</h4>
