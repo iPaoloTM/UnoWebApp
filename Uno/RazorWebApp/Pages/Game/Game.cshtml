@@ -3,6 +3,7 @@
 @model RazorWebApp.Pages.Game.Game
 @{
     Layout = null;
+    int a = 0;
 }
 
 <!DOCTYPE html>
@@ -179,10 +180,20 @@
 </style>
 <body>
 <div>
-    <h1>@Html.Raw((bool)(TempData["showColorSelection"] ?? false))</h1>
     <h1>Active player ID: @Model.Engine.State.ActivePlayerNo</h1>
-    <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
-
+  <h2>@Model.Engine.State.Players[Model.Engine.State.ActivePlayerNo].Nickname's turn</h2>
+  
+  <div>
+    @foreach (Player plyr in Model.Engine.State.Players)
+             {
+               <h3>@(a + 1 + ". " + plyr.Nickname + " - ")</h3>  
+                 foreach (Card c in plyr.HandCards)
+                 {
+                   <h4>#</h4>  
+                 }
+                 a++;
+             }
+  </div>
   <div class="card-drawer">
     @Html.Raw(HtmlCardFormatter.Convert(Model.Engine.State.UsedDeck.First()))
   </div>
@@ -247,10 +258,13 @@ else
         <input type="submit" value="Skip a turn" class="btn btn-primary"/>
     </form>
 
-    <form method="post">
-        <button type="submit" class="btn btn-primary" asp-page-handler="Shout">Shout something!</button>
-    </form>
-    <input asp-for="shoutingText" type="text" placeholder="Shout...">
+  <form method="post" asp-page-handler="Shout">
+    <input type="hidden" name="gameId" value="@Model.GameId"/>
+    <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
+    <input name="shoutingText" type="text" placeholder="Shout...">
+    <button type="submit" class="btn btn-primary">Shout something!</button>
+  </form>
+    
 }
 
 </body>

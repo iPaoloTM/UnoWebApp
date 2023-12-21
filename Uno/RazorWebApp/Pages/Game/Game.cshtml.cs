@@ -10,8 +10,7 @@ public class Game : PageModel
 {
     private readonly GameRepositoryEF _gameRepository = default!;
     public GameEngine Engine;
-
-    public string shoutingText = default!;
+    
     
 
     [BindProperty] public bool IsPlayerTurn { get; set; } = false;
@@ -134,8 +133,15 @@ public class Game : PageModel
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
     }
 
-    public void OnPostShout()
+    public IActionResult OnPostShout(string? shoutingText, Guid gameId, int currPlayer)
     {
-        Console.WriteLine(this.shoutingText);
+        var currState = _gameRepository.LoadGame(GameId);
+        Engine.State = currState;
+        Player player = Engine.State.Players[currPlayer];
+        Engine.HandleUnoShouting(player, shoutingText);
+        Engine.HandleUnoReporting(shoutingText);
+        _gameRepository.Save(gameId, Engine.State);
+        return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
+
     }
 }
