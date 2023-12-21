@@ -12,7 +12,7 @@ using UnoEngine;
 using Player = Entities.Player;
 
 var contextOptions = new DbContextOptionsBuilder<UnoDbContext>()
-    .UseSqlite("Data Source=app.db")
+    .UseSqlite("Data Source=../../../../../Uno/RazorWebApp/app.db")
     .EnableDetailedErrors()
     .EnableSensitiveDataLogging()
     .Options;
