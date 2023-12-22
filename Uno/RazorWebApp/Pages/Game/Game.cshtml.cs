@@ -153,6 +153,7 @@ public class Game : PageModel
         {
             Engine.AIplay();
         }
+        Engine.NewTurn();
         _gameRepository.Save(gameId,Engine.State);
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
  

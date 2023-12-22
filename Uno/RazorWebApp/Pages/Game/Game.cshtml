@@ -292,11 +292,15 @@
             }
         </div>
     }
+    @if (Model.Engine.State.Players[Model.PlayerId].PlayerType == EPlayerType.AI && Model.PlayerId == Model.Engine.State.ActivePlayerNo)
+    {
         <form method="post" asp-page-handler="AIPlay">
             <input type="hidden" name="gameId" value="@Model.GameId"/>
             <input type="hidden" name="currPlayer" value="@Model.PlayerId"/>
             <button type="submit" class="btn btn-primary">Let AI play</button>
         </form>
+    }
+
 
     
 </div>

@@ -1,4 +1,6 @@
 ﻿@page
+@using Entities
+@using Microsoft.EntityFrameworkCore
 @model RazorWebApp.Pages.NewGame.NewGame
 
 <!DOCTYPE html>
@@ -84,42 +86,38 @@
     <form method="post" asp-page-handler="ConfirmPlayerNumber">
         <div class="form-group">
             <label asp-for="PlyrNumber" class="control-label">Choose Number of Players</label>
-            <input asp-for="PlyrNumber" class="form-control" type="number" min="2" max="10" />
+            <input asp-for="PlyrNumber" class="form-control" type="number" min="2" max="10" name="generalPlayerNumber"/>
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-primary">Confirm Number of Players</button>
         </div>
     </form>
-   
+
     @if (Model.IsPlayerNumberConfirmed)
     {
         <form method="post" asp-page-handler="ConfirmHumanPlayerNumber">
             <div class="form-group">
                 <label asp-for="HPlyrNumber" class="control-label">Choose Number of Human Players</label>
-                <input asp-for="HPlyrNumber" class="form-control" type="number" min="0" max=@Model.PlyrNumber />
+                <input asp-for="HPlyrNumber" class="form-control" type="number" name="humanPlayerNumber" in="0" max=@Model.PlyrNumber/>
 
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Confirm Number of Human players</button>
             </div>
-        </form> 
+        </form>
     }
-    
+
 
     @if (Model.IsHumanPlayerNumberConfirmed)
     {
         <form method="post" asp-page-handler="Start">
-                @for (int i = 0; i < Model.Players.Count; i++)
-                {
-                    if (!Model.Players[i].IsAI)
-                    {
-                        <div class="form-group">
-                            <label>@($"Player {i + 1}")</label>
-                            <input asp-for="Players[i].Name" class="form-control"/>
-                        </div>
-                    }
-                    
-                }
+            @for (int i = 0; i < Model.HPlyrNumber; i++)
+            {
+                <div class="form-group">
+                    <label>@($"Player {i + 1}")</label>
+                    <input asp-for="nicknameList[i]" class="form-control"/>
+                </div>
+            }
             <div class="form-group">
                 <label for="ruleType">Select Game Rules</label>
                 <select id="ruleType" name="ruleType" class="form-control">
@@ -132,39 +130,39 @@
             <div id="customRuleOptions" style="display:none;">
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="blockedCard" /> Blocked Card
+                        <input type="checkbox" name="blockedCard"/> Blocked Card
                     </label>
                 </div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="wildCards" /> Wild Cards
+                        <input type="checkbox" name="wildCards"/> Wild Cards
                     </label>
                 </div>
                 <div class="form-group">
                     <label>Color 1:</label>
-                    <input type="color" name="color1" class="color-picker" value="@Model.Color1"  />
+                    <input type="color" name="color1" class="color-picker" value="@Model.Color1"/>
                 </div>
                 <div class="form-group">
                     <label>Color 2:</label>
-                    <input type="color" name="color2" class="color-picker" value="@Model.Color2"  />
+                    <input type="color" name="color2" class="color-picker" value="@Model.Color2"/>
                 </div>
                 <div class="form-group">
                     <label>Color 3:</label>
-                    <input type="color" name="color3" class="color-picker" value="@Model.Color3"  />
+                    <input type="color" name="color3" class="color-picker" value="@Model.Color3"/>
                 </div>
                 <div class="form-group">
                     <label>Color 4:</label>
-                    <input type="color" name="color4" class="color-picker" value="@Model.Color4"  />
+                    <input type="color" name="color4" class="color-picker" value="@Model.Color4"/>
                 </div>
             </div>
             <div class="form-group">
-                <input type="submit" value="Start Game" class="btn btn-success" />
+                <input type="submit" value="Start Game" class="btn btn-success"/>
             </div>
 
             <div class="game-id-display">
                 Game ID: @ViewData["GameId"]
             </div>
-                
+
             <a class="btn btn-secondary back-button" asp-page="/Index">Back to Main Menu</a>
         </form>
     }

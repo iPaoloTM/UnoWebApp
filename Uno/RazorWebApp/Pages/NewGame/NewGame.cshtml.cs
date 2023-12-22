@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using UnoEngine;
 using Entities;
+using Player = Entities.Player;
 
 namespace RazorWebApp.Pages.NewGame;
 
@@ -24,7 +25,7 @@ public class NewGame : PageModel
     public int HPlyrNumber { get; set; } 
 
     [BindProperty]
-    public List<PlayerInfo> Players { get; set; } = new List<PlayerInfo>();
+    public List<Player> Players { get; set; } = new List<Player>();
 
     [BindProperty]
     public bool IsPlayerNumberConfirmed { get; set; } = false;
@@ -32,7 +33,8 @@ public class NewGame : PageModel
     [BindProperty]
     public bool IsHumanPlayerNumberConfirmed { get; set; } = false;
 
-    
+    [BindProperty]
+    public List<string> nicknameList { get; set; } = new List<string>();
 
     [BindProperty] public string RuleType { get; set; } = "Classical";
 
@@ -56,90 +58,57 @@ public class NewGame : PageModel
     
     public void OnGet()
     {
-        // Initialize with default values
-        for (int i = 0; i < PlyrNumber; i++)
-        {
-            Players.Add(new PlayerInfo { IsAI = false });
-        }
-        
         Color1 = "#ff0000"; // Example default color
         Color2 = "#00ff00";
         Color3 = "#0000ff";
         Color4 = "#ffff00";
-    }
-    private void InitializePlayers()
-    {
-        Players = new List<PlayerInfo>();
-        for (int i = 0; i < HPlyrNumber; i++)
+        for (int i = 0; i < 10; i++)
         {
-            // Default name for AI players can be set here if needed
-            Players.Add(new PlayerInfo{IsAI = false}); // First player is not AI by default
+            nicknameList.Add("");
         }
-
-        for (int j = HPlyrNumber; j < PlyrNumber; j++)
-        {
-            Players.Add(new PlayerInfo{IsAI = true});
-        }
-        
-        foreach (var player in Players)
-        {
-            Console.WriteLine(player.Name);
-        }
-        
     }
     
-    public void OnPostConfirmPlayerNumber()
+    public void OnPostConfirmPlayerNumber(int generalPlayerNumber)
     {
-        TempData["PlyrNumber"] = PlyrNumber;
+        Console.WriteLine(generalPlayerNumber);
+        PlyrNumber = generalPlayerNumber;
+        TempData["PlyrNumber"] = generalPlayerNumber;
         IsPlayerNumberConfirmed = true;
-        Console.WriteLine("Players Number : "+ PlyrNumber);
+        Console.WriteLine("Players Number : "+ generalPlayerNumber);
     }
 
-    public void OnPostConfirmHumanPlayerNumber()
+    public void OnPostConfirmHumanPlayerNumber(int humanPlayerNumber)
     {
-        PlyrNumber = (int)TempData["PlyrNumber"];
-        Console.WriteLine("Players Number : "+ PlyrNumber);
-        Console.WriteLine("Human Players " + HPlyrNumber);
-        Players = new List<PlayerInfo>();
-        for (int i = 0; i < HPlyrNumber; i++)
+        HPlyrNumber = humanPlayerNumber;
+        TempData["HPlyrNumber"] = humanPlayerNumber;
+        Console.WriteLine("Human Players " + humanPlayerNumber);
+        for (int i = 0; i < humanPlayerNumber; i++)
         {
-            // Default name for AI players can be set here if needed
-            Players.Add(new PlayerInfo{IsAI = false}); // First player is not AI by default
-            Console.WriteLine("AAAAAAAAAAAAAAAA");
+            nicknameList.Add("");
         }
-
-        for (int j = 0; j < PlyrNumber-HPlyrNumber; j++)
-        {
-            Players.Add(new PlayerInfo{IsAI = true});
-            Console.WriteLine("OOOOOOOOOOOOOOOOOO");
-        }
-        
         IsHumanPlayerNumberConfirmed = true;
+        
     }
 
     public IActionResult OnPostStart()
     {
-        if (!ModelState.IsValid || PlyrNumber < 2 || PlyrNumber > 10)
+        int hPlyrNumber = (int)TempData["HPlyrNumber"];
+        int totalPlyrNumber = (int)TempData["PlyrNumber"];
+        if (!ModelState.IsValid || totalPlyrNumber < 2 || totalPlyrNumber > 10)
         {
             return Page();
         }
 
-        // Process the player information
-        for (int i = 0; i< Players.Count; i++)
+        for (int i = 0; i< totalPlyrNumber-hPlyrNumber; i++)
         {
-            if (Players[i].IsAI)
-            {
-                // Add AI player
-                _gameEngine.AddPlayer("PlayerGPT " + (i + 1), EPlayerType.AI);
-                
-            }
-            else
-            {
-                // Add human player
-                var name = string.IsNullOrWhiteSpace(Players[i].Name) ? $"Player {i+1}" : Players[i].Name;
-                _gameEngine.AddPlayer(name);
-            }
+            _gameEngine.AddPlayer("PlayerGPT " + (i+1),EPlayerType.AI);
         }
+        Console.WriteLine(nicknameList.Count);
+        for (int i = 0; i < hPlyrNumber;i++)
+        {
+            _gameEngine.AddPlayer(nicknameList[i]);
+        }
+        
         Console.WriteLine("AOAOAOAOOAOAOAOAOAOAO");
         foreach (var player in _gameEngine.State.Players)
         {
@@ -179,10 +148,6 @@ public class NewGame : PageModel
       _gameRepository.Save(gameId,_gameEngine.State);
       return RedirectToPage("../Game/ChoosePlayer", new { GameId = gameId });
     }
-    public class PlayerInfo
-    {
-        public string? Name { get; set; }
-        public bool IsAI { get; set; }
-    }
+
     
 }
