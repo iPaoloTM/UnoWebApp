@@ -1,4 +1,5 @@
-﻿using DAL;
+﻿using System.Security.Claims;
+using DAL;
 using Entities.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -38,30 +39,14 @@ public class NewGame : PageModel
 
     [BindProperty] public string RuleType { get; set; } = "Classical";
 
-    [BindProperty]
-    public bool BlockedCard { get; set; }
-
-    [BindProperty]
-    public bool WildCards { get; set; }
+    [BindProperty] public int NumberOfCards { get; set; } = 7;
     
-    [BindProperty]
-    public string Color1 { get; set; } = "#ff0000";
+    [BindProperty] public bool InvertedOrder { get; set; }
 
-    [BindProperty]
-    public string Color2 { get; set; } = "#00ff00";
-
-    [BindProperty]
-    public string Color3 { get; set; } = "#ff0ff0";
-
-    [BindProperty]
-    public string Color4 { get; set; } = "#ff00ff";
     
     public void OnGet()
     {
-        Color1 = "#ff0000"; // Example default color
-        Color2 = "#00ff00";
-        Color3 = "#0000ff";
-        Color4 = "#ffff00";
+
         for (int i = 0; i < 10; i++)
         {
             nicknameList.Add("");
@@ -109,7 +94,6 @@ public class NewGame : PageModel
             _gameEngine.AddPlayer(nicknameList[i]);
         }
         
-        Console.WriteLine("AOAOAOAOOAOAOAOAOAOAO");
         foreach (var player in _gameEngine.State.Players)
         {
             Console.WriteLine(player.Nickname);
@@ -120,26 +104,18 @@ public class NewGame : PageModel
         {
             // Classical rule logic
             var defaultRules = new GameOptions();
-            _gameEngine.State.Settings = defaultRules;
+            _gameEngine.SetOptions(defaultRules);
         }
         else
         {
-            var colors = new List<string> { Color1, Color2, Color3, Color4 };
-            if (colors.Distinct().Count() != colors.Count)
-            {
-                ModelState.AddModelError("", "Duplicate colors are not allowed.");
-                return Page();
-            }
-            if (BlockedCard)
-            {
-                
-            }
-
-            if (WildCards)
-            {
-                
-            }
+            var customRules = new GameOptions();
+            Console.WriteLine(InvertedOrder);
+            Console.WriteLine(NumberOfCards);
+            customRules.InitialOrder = InvertedOrder;
+            customRules.HandSize = NumberOfCards;
+            _gameEngine.SetOptions(customRules);
         }
+  
         
         _gameEngine.SetupCards();
 

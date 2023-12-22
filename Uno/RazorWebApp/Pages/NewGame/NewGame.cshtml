@@ -129,32 +129,27 @@
             <!-- Custom Rule Options -->
             <div id="customRuleOptions" style="display:none;">
                 <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="blockedCard"/> Blocked Card
-                    </label>
+                    <label>Inverted order:</label>
+                    <select asp-for="InvertedOrder" class="form-control">
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+
+
                 </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="wildCards"/> Wild Cards
-                    </label>
+                <div>
+                    <label>Hand size: </label>
+                    <select asp-for="NumberOfCards" class="form-control" required>
+                        @for (int i = 2; i <= 9; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label>Color 1:</label>
-                    <input type="color" name="color1" class="color-picker" value="@Model.Color1"/>
-                </div>
-                <div class="form-group">
-                    <label>Color 2:</label>
-                    <input type="color" name="color2" class="color-picker" value="@Model.Color2"/>
-                </div>
-                <div class="form-group">
-                    <label>Color 3:</label>
-                    <input type="color" name="color3" class="color-picker" value="@Model.Color3"/>
-                </div>
-                <div class="form-group">
-                    <label>Color 4:</label>
-                    <input type="color" name="color4" class="color-picker" value="@Model.Color4"/>
-                </div>
+
             </div>
+
+
             <div class="form-group">
                 <input type="submit" value="Start Game" class="btn btn-success"/>
             </div>
