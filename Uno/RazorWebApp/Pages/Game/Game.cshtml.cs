@@ -25,11 +25,18 @@ public class Game : PageModel
     }
 
 
-    public void OnGet()
+    public IActionResult? OnGet(Guid gameId)
     {
         var gameState = _gameRepository.LoadGame(GameId);
         Engine.State = gameState;
         if (PlayerId == Engine.State.ActivePlayerNo) IsPlayerTurn = true;
+
+        if (Engine.State.GameOver)
+        {
+            return RedirectToPage("../EndGame/EndGame", new { GameId = gameId, WinPlayer =  Engine.State.Players[Engine.State.ActivePlayerNo].Nickname});
+        }
+
+        return null;
     }
 
     public IActionResult OnPostCardClicked(Guid gameId, int cardIndex, int currPlayer)
@@ -56,6 +63,14 @@ public class Game : PageModel
                 Console.WriteLine("COLOR Reached");
                 TempData["showColorSelection"] = true;
                 _gameRepository.Save(gameId, Engine.State);
+            }  else if (success == 4)
+            {
+                //User has won
+                Console.WriteLine("Game over!");
+                TempData["WinNickname"] = Engine.State.Players[currPlayer].Nickname;
+                _gameRepository.Save(gameId, Engine.State);
+                Console.WriteLine("!!!!!!!!!"+Engine.State.GameOver);
+                return RedirectToPage("../EndGame/EndGame", new { GameId = gameId, WinPlayer =  Engine.State.Players[currPlayer].Nickname});
             }   
         }
         return RedirectToPage("../Game/Game", new { GameId = gameId, PlayerId = currPlayer });
