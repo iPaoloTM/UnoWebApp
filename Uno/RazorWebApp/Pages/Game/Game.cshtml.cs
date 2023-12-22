@@ -68,7 +68,6 @@ public class Game : PageModel
                 //User has won
                 Console.WriteLine("Game over!");
                 TempData["WinNickname"] = Engine.State.Players[currPlayer].Nickname;
-                Engine.NewTurn();
                 _gameRepository.Save(gameId, Engine.State);
                 Console.WriteLine("!!!!!!!!!"+Engine.State.GameOver);
                 return RedirectToPage("../EndGame/EndGame", new { GameId = gameId, WinPlayer =  Engine.State.Players[currPlayer].Nickname});
